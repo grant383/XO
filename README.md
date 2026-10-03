@@ -27,3 +27,28 @@ Do not skip phase exit criteria.
 - Deterministic/statistical forecasting before ML.
 - Auditable decisions and data provenance.
 - No secrets committed to the repository.
+
+## Local development
+
+Prerequisites: Node.js 24 LTS (≥ 22.12 works), Corepack (`corepack enable`), Docker.
+
+```bash
+cp .env.example .env.local          # then set AUTH_SECRET / ENCRYPTION_KEY (openssl rand -base64 32)
+pnpm install
+docker compose up -d                # postgres, redis, s3 emulator, mailpit (localhost-only ports)
+pnpm db:bootstrap                   # create least-privilege roles (idempotent)
+pnpm db:migrate
+pnpm dev
+```
+
+| Command | Purpose |
+|---|---|
+| `pnpm test` | Unit tests |
+| `pnpm test:db` | RLS + integration tests (rebuilds `directorxo_test` from scratch) |
+| `pnpm typecheck` / `pnpm lint` / `pnpm format:check` | Static checks |
+| `pnpm db:generate` | Generate table DDL migration from `src/platform/db/schema` |
+| `pnpm drizzle-kit generate --custom --name=<name>` | Hand-written SQL migration (roles, grants, RLS) |
+
+Mail UI: http://localhost:58025 · Health: `/api/health/live`, `/api/health/ready`.
+
+See `docs/adr/0007-database-roles-and-rls.md` before adding any table.

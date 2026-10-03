@@ -38,3 +38,15 @@ Release 1 uses explicit formulas and statistical methods. Learned models belong 
 Status: Accepted
 
 `DIRECTORXO_PRODUCT_SPEC.md` governs product/technical behavior. Approved Figma governs visual and interaction implementation. Conflicts are resolved explicitly and documented.
+
+## Recorded ADRs (`docs/adr/`)
+
+| ADR | Title | Status |
+|---|---|---|
+| [0005](adr/0005-runtime-and-toolchain-versions.md) | Runtime and toolchain versions | Accepted |
+| [0006](adr/0006-modular-monolith-layout.md) | Modular monolith code layout | Accepted |
+| [0007](adr/0007-database-roles-and-rls.md) | Database roles, tenant context and RLS | Accepted |
+| [0008](adr/0008-account-level-audit-events.md) | Account-level audit events | Accepted |
+| [0009](adr/0009-authentication-better-auth.md) | Authentication with Better Auth | Accepted |
+| [0010](adr/0010-hosting-railway.md) | Hosting on Railway; RPO/RTO | Accepted |
+| [0011](adr/0011-billing-accounts.md) | Billing accounts separate from venture ownership | Accepted |

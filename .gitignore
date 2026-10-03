@@ -47,3 +47,4 @@ venv/
 # misc
 *.swp
 *~
+next-env.d.ts

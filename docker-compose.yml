@@ -1,0 +1,67 @@
+# Local development infrastructure only. Never used for staging/production.
+# Ports bind to localhost on uncommon defaults to avoid clashing with other projects;
+# override with DXO_*_PORT in the shell (update .env.local URLs to match).
+name: directorxo
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      # Local-only superuser used by `pnpm db:bootstrap` to create least-privilege roles.
+      POSTGRES_USER: dxo_admin
+      POSTGRES_PASSWORD: local-admin-password
+      POSTGRES_DB: directorxo
+    ports:
+      - "127.0.0.1:${DXO_PG_PORT:-54329}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+      - ./docker/postgres/init-test-db.sql:/docker-entrypoint-initdb.d/10-init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dxo_admin -d directorxo"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8-alpine
+    # BullMQ requires noeviction; AOF keeps queued jobs across restarts.
+    command: ["redis-server", "--maxmemory-policy", "noeviction", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:${DXO_REDIS_PORT:-63799}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  s3:
+    # S3-compatible object storage emulator (SeaweedFS). Production uses a managed bucket.
+    image: chrislusf/seaweedfs:latest
+    command: ["server", "-dir=/data", "-s3", "-s3.port=8333", "-s3.config=/etc/seaweedfs/s3.json"]
+    ports:
+      - "127.0.0.1:${DXO_S3_PORT:-58333}:8333"
+    volumes:
+      - s3-data:/data
+      - ./docker/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:${DXO_SMTP_PORT:-51025}:1025" # SMTP
+      - "127.0.0.1:${DXO_MAIL_UI_PORT:-58025}:8025" # Web UI
+
+  stripe-cli:
+    image: stripe/stripe-cli:latest
+    profiles: ["stripe"]
+    command: ["listen", "--forward-to", "http://host.docker.internal:3000/api/webhooks/stripe"]
+    environment:
+      STRIPE_API_KEY: ${STRIPE_SECRET_KEY:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  postgres-data:
+  redis-data:
+  s3-data:

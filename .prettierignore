@@ -1,0 +1,6 @@
+pnpm-lock.yaml
+db/migrations/meta/
+.next/
+coverage/
+playwright-report/
+*.md
