@@ -1,0 +1,7 @@
+# Local-only placeholder credentials for docker-compose/CI are intentionally committed.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Local development and CI placeholder credentials"
+regexes = ['''local-(admin|app|auth|migrator)-password''', '''ci-(admin|app|auth|migrator)-password''', '''local-(access|secret)-key''']
