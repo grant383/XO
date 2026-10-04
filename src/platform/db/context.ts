@@ -9,15 +9,19 @@ const uuid = z.uuid();
 /** Service identities look like `worker:email` or `webhook:stripe`. */
 const serviceId = z.string().regex(/^[a-z][a-z0-9_-]*:[a-z0-9_.-]{1,60}$/);
 
-export type UserContext = { userId: string; ventureId?: string };
-export type TenantContext = { userId: string; ventureId: string };
-export type ServiceContext = { serviceId: string; ventureId?: string };
+/** `correlationId` is recorded on audit rows written inside database functions. */
+export type UserContext = { userId: string; ventureId?: string; correlationId?: string };
+export type TenantContext = { userId: string; ventureId: string; correlationId?: string };
+export type ServiceContext = { serviceId: string; ventureId?: string; correlationId?: string };
+
+const correlationId = z.string().regex(/^[A-Za-z0-9._-]{8,128}$/);
 
 type Settings = {
   actorType: "user" | "service";
   userId: string;
   serviceId: string;
   ventureId: string;
+  correlationId: string;
 };
 
 async function run<T>(settings: Settings, fn: (tx: Tx) => Promise<T>): Promise<T> {
@@ -28,7 +32,8 @@ async function run<T>(settings: Settings, fn: (tx: Tx) => Promise<T>): Promise<T
       set_config('app.actor_type', ${settings.actorType}, true),
       set_config('app.user_id', ${settings.userId}, true),
       set_config('app.service_id', ${settings.serviceId}, true),
-      set_config('app.venture_id', ${settings.ventureId}, true)`);
+      set_config('app.venture_id', ${settings.ventureId}, true),
+      set_config('app.correlation_id', ${settings.correlationId}, true)`);
     return fn(tx);
   });
 }
@@ -41,6 +46,7 @@ export async function withUser<T>(ctx: UserContext, fn: (tx: Tx) => Promise<T>):
       userId: uuid.parse(ctx.userId),
       serviceId: "",
       ventureId: ctx.ventureId === undefined ? "" : uuid.parse(ctx.ventureId),
+      correlationId: ctx.correlationId === undefined ? "" : correlationId.parse(ctx.correlationId),
     },
     fn,
   );
@@ -48,7 +54,7 @@ export async function withUser<T>(ctx: UserContext, fn: (tx: Tx) => Promise<T>):
 
 /** Authenticated user acting within one venture. Membership is still verified by RLS. */
 export async function withTenant<T>(ctx: TenantContext, fn: (tx: Tx) => Promise<T>): Promise<T> {
-  return withUser({ userId: ctx.userId, ventureId: uuid.parse(ctx.ventureId) }, fn);
+  return withUser({ ...ctx, ventureId: uuid.parse(ctx.ventureId) }, fn);
 }
 
 /** Background job / webhook with an explicit service identity, optionally scoped to one venture. */
@@ -59,6 +65,7 @@ export async function withService<T>(ctx: ServiceContext, fn: (tx: Tx) => Promis
       userId: "",
       serviceId: serviceId.parse(ctx.serviceId),
       ventureId: ctx.ventureId === undefined ? "" : uuid.parse(ctx.ventureId),
+      correlationId: ctx.correlationId === undefined ? "" : correlationId.parse(ctx.correlationId),
     },
     fn,
   );

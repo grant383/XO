@@ -29,6 +29,20 @@
       "when": 1791096701659,
       "tag": "0003_identity_store_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791099802269,
+      "tag": "0004_ventures_onboarding",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791099833115,
+      "tag": "0005_ventures_onboarding_rls",
+      "breakpoints": true
     }
   ]
 }
