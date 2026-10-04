@@ -26,6 +26,11 @@
   color: var(--status-danger);
 }
 
+.info {
+  background: var(--tint-info);
+  color: var(--status-info-text);
+}
+
 .neutral {
   background: var(--surface-default);
   border: 1px solid var(--border-subtle);

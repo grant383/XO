@@ -1,6 +1,16 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { Alert, Button, Checkbox, Icon, StatusBadge, TextField } from "@/ui";
+import {
+  Alert,
+  Avatar,
+  Button,
+  Checkbox,
+  Icon,
+  initialsOf,
+  SelectField,
+  StatusBadge,
+  TextField,
+} from "@/ui";
 
 const html = (node: React.ReactElement) => renderToStaticMarkup(node);
 
@@ -97,5 +107,48 @@ describe("decorative assets", () => {
     expect(html(<Checkbox name="agree" label="I agree" />)).toMatch(
       /<label[^>]*><input[^>]*type="checkbox"[^>]*\/>I agree<\/label>/,
     );
+  });
+});
+
+describe("SelectField", () => {
+  const options = [
+    { value: "GBP", label: "GBP — Pound sterling" },
+    { value: "EUR", label: "EUR — Euro" },
+  ];
+
+  it("labels a native select, adds the placeholder option and links errors", () => {
+    const out = html(
+      <SelectField
+        name="currency"
+        label="Reporting currency"
+        options={options}
+        placeholder="Choose a currency"
+        error="Choose a currency."
+      />,
+    );
+    expect(out).toContain('<label for="currency"');
+    expect(out).toMatch(/<select[^>]*id="currency"[^>]*name="currency"/);
+    expect(out).toContain('<option value="">Choose a currency</option>');
+    expect(out).toContain('aria-invalid="true"');
+    expect(out).toContain('aria-describedby="currency-error"');
+  });
+
+  it("has no empty option without a placeholder", () => {
+    expect(html(<SelectField name="tz" label="Timezone" options={options} />)).not.toContain(
+      'value=""',
+    );
+  });
+});
+
+describe("Avatar", () => {
+  it("derives up to two initials", () => {
+    expect(initialsOf("Sarah Mitchell")).toBe("SM");
+    expect(initialsOf("  ada   lovelace byron ")).toBe("AB");
+    expect(initialsOf("Cher")).toBe("CH");
+    expect(initialsOf("")).toBe("?");
+  });
+
+  it("is decorative: hidden from assistive technology", () => {
+    expect(html(<Avatar name="Sarah Mitchell" />)).toContain('aria-hidden="true"');
   });
 });

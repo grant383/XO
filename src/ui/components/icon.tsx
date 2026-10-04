@@ -1,32 +1,49 @@
 import Image from "next/image";
 
 /**
- * Icons are the static SVG assets exported from Figma (Controls v2, login) and
- * served from `public/ui/icons`. Sizes are the assets' own root dimensions.
+ * Icons are the static SVG assets exported from Figma (Controls v2, auth, onboarding and
+ * app shell frames), served from `public/ui/icons`. Sizes are the assets' own root
+ * dimensions. Figma bakes stroke colours into each asset, so a role-specific variant
+ * (`-button`, `-sm`, `-md`) is a separate file rather than a recoloured one.
  */
 export const ICONS = {
   "arrow-left": 14,
+  "arrow-left-button": 15,
   "arrow-right": 14,
+  "arrow-right-button": 15,
+  "badge-check": 26.88,
+  "building-2": 18,
+  "building-2-sm": 16,
   check: 12,
   "check-success": 16,
   "chevron-down": 16,
+  "chevron-down-account": 16,
+  "chevrons-up-down": 16,
   "circle-alert": 17,
   "circle-check": 18,
   "circle-x": 18,
   "clock-3": 15,
+  database: 16,
   eye: 16,
   info: 18,
+  "layout-grid": 14,
   "loader-circle": 16,
+  "loader-circle-lg": 22,
+  "lock-keyhole": 11,
   mail: 15,
   "mail-check": 28,
+  menu: 18,
   plus: 18,
   search: 16,
   "shield-check": 14,
+  "shield-check-md": 16,
   "status-danger": 5,
+  "status-info": 5,
   "status-requirement": 6,
   "status-success": 5,
   "status-warning": 5,
   "triangle-alert": 18,
+  users: 20,
   x: 14,
 } as const;
 

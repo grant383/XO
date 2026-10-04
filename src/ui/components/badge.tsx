@@ -3,12 +3,13 @@ import { cx } from "../cx";
 import styles from "./badge.module.css";
 import { Icon, type IconName } from "./icon";
 
-export type BadgeTone = "success" | "warning" | "danger" | "neutral";
+export type BadgeTone = "success" | "warning" | "danger" | "info" | "neutral";
 
 const DOT: Partial<Record<BadgeTone, IconName>> = {
   success: "status-success",
   warning: "status-warning",
   danger: "status-danger",
+  info: "status-info",
 };
 
 /** Figma Component/Status/*: a status pill whose label always states the status. */

@@ -1,0 +1,19 @@
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--avatar-surface);
+  color: var(--avatar-text);
+  font: 500 11px / 16px var(--font-sans);
+  user-select: none;
+}
+
+.round {
+  border-radius: var(--radius-full);
+}
+
+.square {
+  border-radius: var(--radius-4);
+  font: var(--type-small);
+}

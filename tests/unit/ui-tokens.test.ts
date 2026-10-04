@@ -89,6 +89,10 @@ describe("design tokens (Figma Foundations v2)", () => {
     expect(contrast(t("--text-on-accent"), t("--action-primary"))).toBeGreaterThanOrEqual(4.5);
   });
 
+  it("initials avatar text meets 4.5:1 on its fill", () => {
+    expect(contrast(t("--avatar-text"), t("--avatar-surface"))).toBeGreaterThanOrEqual(4.5);
+  });
+
   it("focus ring meets 3:1 non-text contrast on every surface", () => {
     for (const bg of surfaces) expect(contrast(t("--focus-ring"), t(bg))).toBeGreaterThanOrEqual(3);
   });

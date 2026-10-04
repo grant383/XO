@@ -59,6 +59,28 @@
   color: var(--text-muted);
 }
 
+.control {
+  position: relative;
+}
+
+.select {
+  appearance: none;
+  padding-right: var(--space-24);
+  cursor: pointer;
+}
+
+/* Native option lists render with the OS palette; keep them legible in dark mode. */
+.select option {
+  background: var(--surface-input);
+  color: var(--text-primary);
+}
+
+.chevron {
+  position: absolute;
+  right: var(--space-14);
+  pointer-events: none;
+}
+
 .hint {
   font: var(--type-small);
   color: var(--text-muted);

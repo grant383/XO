@@ -22,6 +22,7 @@
   --neutral-white: #ffffff;
   --cobalt-600: #2563eb;
   --cobalt-400: #60a5fa;
+  --cobalt-950: #172554;
   --amber-600: #d97706;
 
   /* Semantic roles */
@@ -61,10 +62,24 @@
   --tint-info: rgb(43 99 237 / 0.1);
   --tint-info-eyebrow: rgb(37 99 235 / 0.12);
   --tint-info-border: rgb(37 99 235 / 0.33);
+  --tint-info-border-strong: rgb(43 99 237 / 0.4);
+  --tint-info-tile: rgb(37 99 235 / 0.09);
+  --tint-success-border: rgb(16 185 129 / 0.33);
 
   --border-subtle: #21242e;
   --border-default: #272b33;
   --border-strong: #303541;
+
+  /* Initials avatar and venture mark (Figma cobalt/950 fill, cobalt/400 text) */
+  --avatar-surface: var(--cobalt-950);
+  --avatar-text: var(--cobalt-400);
+
+  /* App shell (Figma 54:24043): 56px sticky top bar, 248px sidebar, 76px rail, 1120px content */
+  --surface-deep: var(--neutral-void);
+  --shell-topbar-height: 56px;
+  --shell-sidebar-width: 248px;
+  --shell-rail-width: 76px;
+  --shell-content-max: 1120px;
 
   /* Spacing — 4px baseline */
   --space-0: 0;

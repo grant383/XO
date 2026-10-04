@@ -1,6 +1,7 @@
-import type { InputHTMLAttributes, ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
 import { cx } from "../cx";
 import styles from "./field.module.css";
+import { Icon } from "./icon";
 import { PasswordInput } from "./password-input";
 
 type FieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "name" | "children"> & {
@@ -52,6 +53,69 @@ export function TextField({
           <input {...inputProps} type={type} />
         </div>
       )}
+      {hint ? (
+        <p id={`${id}-hint`} className={styles.hint}>
+          {hint}
+        </p>
+      ) : null}
+      {error ? (
+        <p id={`${id}-error`} className={styles.error}>
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+type SelectProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, "id" | "name" | "children"> & {
+  name: string;
+  label: string;
+  options: ReadonlyArray<{ value: string; label: string }>;
+  /** Optional empty first option ("Choose a sector"). */
+  placeholder?: string;
+  hint?: ReactNode;
+  error?: string;
+  id?: string;
+};
+
+/**
+ * Figma Component/Form/Select (Controls v2): the Text Field frame with a trailing
+ * chevron. A native <select> keeps platform keyboard and screen-reader behaviour.
+ */
+export function SelectField({
+  name,
+  label,
+  options,
+  placeholder,
+  hint,
+  error,
+  id = name,
+  className,
+  ...rest
+}: SelectProps) {
+  return (
+    <div className={cx(styles.field, className)}>
+      <label htmlFor={id} className={styles.label}>
+        {label}
+      </label>
+      <div className={styles.control} data-invalid={error ? "true" : undefined}>
+        <select
+          {...rest}
+          id={id}
+          name={name}
+          className={cx(styles.input, styles.select)}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy(id, hint, error)}
+        >
+          {placeholder !== undefined ? <option value="">{placeholder}</option> : null}
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+        <Icon name="chevron-down" className={styles.chevron} />
+      </div>
       {hint ? (
         <p id={`${id}-hint`} className={styles.hint}>
           {hint}
