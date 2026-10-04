@@ -78,6 +78,23 @@ const config = [
       ],
     },
   },
+  {
+    // Design system (ADR-0014): presentational only — no data, auth or routing logic.
+    files: ["src/ui/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/modules/*", "@/platform/*", "@/app/*"],
+              message: "src/ui is presentational; pass data in via props.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export default config;

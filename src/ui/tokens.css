@@ -1,0 +1,117 @@
+/*
+ * DirectorXO design tokens — Figma "DirectorXO Foundations v2" (54:15162) and
+ * "Controls v2" (54:15538), file rqWc0iFUFSTdudXuO4Gm47.
+ *
+ * Primitives supply the palette; product components consume semantic roles only.
+ * Names mirror the Figma variables (`surface/base` → `--surface-base`).
+ * Breakpoints cannot be custom properties in media queries; they are documented
+ * here and used literally: sm 480 · md 768 · lg 1024 · xl 1280 · 2xl 1440.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* Primitive palette */
+  --neutral-void: #06080c;
+  --neutral-obsidian: #0b0d11;
+  --neutral-carbon: #13151b;
+  --neutral-graphite: #1c1f26;
+  --neutral-slate: #3d4350;
+  --neutral-silver: #8e93a4;
+  --neutral-mist: #c8cbd6;
+  --neutral-white: #ffffff;
+  --cobalt-600: #2563eb;
+  --cobalt-400: #60a5fa;
+  --amber-600: #d97706;
+
+  /* Semantic roles */
+  --surface-base: #090c10;
+  --surface-canvas: var(--neutral-obsidian);
+  --surface-panel: #0d0f14;
+  --surface-default: var(--neutral-carbon);
+  --surface-raised: #11151b;
+  --surface-control: #181b22;
+  --surface-input: #0d1016;
+
+  --text-primary: #f0f5fa;
+  --text-secondary: #c4cfde;
+  --text-muted: #9eabbf; /* text/muted-accessible: 4.5:1+ on every surface */
+  --text-subtle: var(--neutral-silver);
+  --text-on-accent: var(--neutral-white);
+
+  --accent-blue: #2b63ed;
+  --action-primary: var(--cobalt-600);
+  --action-link: #3b82f6;
+  --focus-ring: var(--cobalt-400);
+
+  --status-success: #0fb882;
+  --status-success-strong: #10b981;
+  --status-warning: #f59e0a;
+  --status-danger: #f03d4a;
+  --status-danger-soft: #fca5ad;
+  --status-info: var(--accent-blue);
+  /* Info text on tinted surfaces: accent-blue is 3.6:1 there, below AA for body text. */
+  --status-info-text: var(--cobalt-400);
+
+  --tint-success: rgb(15 184 130 / 0.09);
+  --tint-success-badge: rgb(16 185 129 / 0.1);
+  --tint-warning: rgb(245 158 10 / 0.09);
+  --tint-danger: rgb(240 61 74 / 0.09);
+  --tint-danger-border: rgb(240 68 82 / 0.4);
+  --tint-info: rgb(43 99 237 / 0.1);
+  --tint-info-eyebrow: rgb(37 99 235 / 0.12);
+  --tint-info-border: rgb(37 99 235 / 0.33);
+
+  --border-subtle: #21242e;
+  --border-default: #272b33;
+  --border-strong: #303541;
+
+  /* Spacing — 4px baseline */
+  --space-0: 0;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-14: 14px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-56: 56px;
+  --space-64: 64px;
+
+  /* Radius */
+  --radius-0: 0;
+  --radius-3: 3px;
+  --radius-4: 4px;
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-full: 9999px;
+
+  /* Elevation */
+  --elevation-overlay: 0 8px 32px rgb(0 0 0 / 0.25), 0 24px 80px rgb(0 0 0 / 0.35);
+  --focus-glow: 0 0 8px 2px rgb(96 165 250 / 0.4);
+
+  /* Typography — Geist communicates hierarchy; Geist Mono carries operational values */
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --type-display: 600 44px / 1.08 var(--font-sans);
+  --type-title: 600 28px / 1.2 var(--font-sans);
+  --type-page: 600 24px / 32px var(--font-sans);
+  --type-section: 600 20px / 28px var(--font-sans);
+  --type-emphasis: 600 14px / 20px var(--font-sans);
+  --type-body: 400 14px / 20px var(--font-sans);
+  --type-small: 400 12px / 18px var(--font-sans);
+  --type-data: 400 12px / 18px var(--font-mono);
+  --type-eyebrow: 600 11px / 16px var(--font-mono);
+
+  /* Control metrics */
+  --control-height: 42px;
+  --field-height: 46px;
+}

@@ -1,0 +1,43 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-12);
+  color: var(--neutral-white);
+  text-decoration: none;
+  font: 600 20px / normal var(--font-sans);
+}
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  background: var(--neutral-white);
+  border-radius: var(--radius-6);
+}
+
+.mark::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: var(--neutral-obsidian);
+  border-radius: 2px;
+}
+
+.compact {
+  gap: var(--space-8);
+  font-size: 15px;
+}
+
+.compact .mark {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-4);
+}
+
+.compact .mark::after {
+  width: 7px;
+  height: 7px;
+}
