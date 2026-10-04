@@ -23,6 +23,14 @@ export const AuthEvents = {
   passwordChangeFailed: "auth.password.change_failed",
   profileUpdated: "auth.profile.updated",
   rateLimited: "auth.rate_limited",
+  mfaChallengeIssued: "auth.mfa.challenge_issued",
+  mfaVerified: "auth.mfa.verified",
+  mfaFailed: "auth.mfa.failed",
+  mfaEnrolmentStarted: "auth.mfa.enrolment_started",
+  mfaEnabled: "auth.mfa.enabled",
+  mfaDisabled: "auth.mfa.disabled",
+  mfaRecoveryCodesRegenerated: "auth.mfa.recovery_codes_regenerated",
+  mfaChangeFailed: "auth.mfa.change_failed",
 } as const;
 
 type AuditInput = Omit<AccountAuditEvent, "ipAddress" | "userAgent" | "correlationId">;

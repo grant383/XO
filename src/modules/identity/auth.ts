@@ -1,10 +1,12 @@
 import { createHash } from "node:crypto";
 import { betterAuth } from "better-auth";
-import { APIError, createAuthMiddleware, isAPIError } from "better-auth/api";
+import { APIError, createAuthMiddleware, getSessionFromCtx, isAPIError } from "better-auth/api";
 import { verifyJWT } from "better-auth/crypto";
 import { nextCookies } from "better-auth/next-js";
+import { twoFactor } from "better-auth/plugins/two-factor";
 import {
   consumeSingleUseToken,
+  consumeTotpCode,
   identityStoreAdapter,
   revokeUserVerificationValues,
 } from "@/platform/db";
@@ -20,6 +22,7 @@ import { AuthEvents, recordAuthEvent } from "./audit";
 import { runInBackground } from "./background";
 import {
   existingAccountEmail,
+  mfaNoticeEmail,
   passwordChangedEmail,
   passwordResetEmail,
   resetPasswordUrl,
@@ -33,6 +36,7 @@ import {
   DEFAULT_RATE_LIMIT,
   DISABLED_PATHS,
   LOGIN_FAILURE_LIMIT,
+  MFA_POLICY,
   PASSWORD_POLICY,
   RATE_LIMITS,
   SESSION_POLICY,
@@ -91,6 +95,22 @@ function errorCode(returned: unknown): string | undefined {
   const code = (returned.body as { code?: unknown } | undefined)?.code;
   return typeof code === "string" ? code : String(returned.status);
 }
+
+/** Second-factor endpoints and the factor each verifies. */
+const MFA_VERIFY_PATHS: Record<string, "totp" | "recovery_code"> = {
+  "/two-factor/verify-totp": "totp",
+  "/two-factor/verify-backup-code": "recovery_code",
+};
+
+/** Endpoints that weaken account protection: they require a recent sign-in. */
+const FRESH_SESSION_PATHS = new Set(["/two-factor/disable", "/two-factor/generate-backup-codes"]);
+
+/** MFA management endpoints and the operation name used in audit metadata. */
+const MFA_MANAGE_PATHS: Record<string, string> = {
+  "/two-factor/enable": "enable",
+  "/two-factor/disable": "disable",
+  "/two-factor/generate-backup-codes": "regenerate_recovery_codes",
+};
 
 export function createIdentityAuth(config: IdentityConfig) {
   const { appUrl, secret, rateLimitStore } = config;
@@ -242,8 +262,112 @@ export function createIdentityAuth(config: IdentityConfig) {
       }
     }
 
+    if (FRESH_SESSION_PATHS.has(ctx.path)) await requireFreshSession(ctx, meta);
+
+    if (ctx.path in MFA_VERIFY_PATHS) {
+      // Code only. "Trust this device" and session-less verification are not offered
+      // (ADR-0016): every sign-in to an MFA account presents the second factor.
+      const body = (ctx.body as Record<string, unknown> | undefined) ?? {};
+      const code = body.code;
+      if (
+        Object.keys(body).some((k) => k !== "code") ||
+        typeof code !== "string" ||
+        code.length < 1 ||
+        code.length > 32
+      ) {
+        throw new APIError("BAD_REQUEST", { code: "INVALID_FIELDS", message: "Invalid request" });
+      }
+      if (ctx.path === "/two-factor/verify-totp") await enforceSingleUseTotp(ctx, code, meta);
+    }
+
     if (ctx.path === "/verify-email") await enforceSingleUseVerification(ctx.query, meta);
   });
+
+  /**
+   * Operations that weaken account protection need a sign-in within
+   * `SESSION_POLICY.freshAgeSec` (ADR-0009). Better Auth 1.7 does not check freshness on
+   * these endpoints, so it is enforced here for HTTP and server-action calls alike.
+   */
+  async function requireFreshSession(
+    ctx: Parameters<typeof getSessionFromCtx>[0] & { path: string },
+    meta: RequestMeta,
+  ) {
+    const session = await getSessionFromCtx(ctx);
+    if (!session) return; // the endpoint's own middleware answers 401
+    const age = Date.now() - new Date(session.session.createdAt).getTime();
+    if (age >= SESSION_POLICY.freshAgeSec * 1000) {
+      await recordAuthEvent(meta, {
+        action: AuthEvents.mfaChangeFailed,
+        outcome: "denied",
+        actorType: "user",
+        actorUserId: session.user.id,
+        subjectUserId: session.user.id,
+        metadata: {
+          operation: MFA_MANAGE_PATHS[ctx.path] ?? ctx.path,
+          reason: "SESSION_NOT_FRESH",
+        },
+      });
+      throw new APIError("FORBIDDEN", {
+        code: "SESSION_NOT_FRESH",
+        message: "Sign in again to continue",
+      });
+    }
+  }
+
+  /**
+   * RFC 6238 §5.2: an authenticator code is accepted once. The user comes from the
+   * session (enrolment) or the signed challenge cookie (sign-in); without either, the
+   * plugin rejects the request itself.
+   */
+  async function enforceSingleUseTotp(
+    ctx: Parameters<typeof challengeUserId>[0] & Parameters<typeof getSessionFromCtx>[0],
+    code: string,
+    meta: RequestMeta,
+  ) {
+    const session = await getSessionFromCtx(ctx);
+    const userId = session?.user.id ?? (await challengeUserId(ctx));
+    if (!userId) return;
+    const fresh = await consumeTotpCode({ userId, code, periodSec: MFA_POLICY.periodSec });
+    if (fresh) return;
+    await recordAuthEvent(meta, {
+      action: AuthEvents.mfaFailed,
+      outcome: "denied",
+      actorType: "user",
+      actorUserId: userId,
+      subjectUserId: userId,
+      metadata: {
+        method: "totp",
+        stage: session ? "enrolment" : "sign_in",
+        reason: "CODE_REPLAYED",
+      },
+    });
+    throw new APIError("UNAUTHORIZED", { code: "INVALID_CODE", message: "Invalid code" });
+  }
+
+  /**
+   * The user a pending sign-in challenge belongs to, read from the signed challenge
+   * cookie. Best-effort, for audit attribution only: null once the challenge is spent.
+   */
+  async function challengeUserId(ctx: {
+    context: {
+      createAuthCookie: (name: string) => { name: string };
+      secret: string;
+      internalAdapter: {
+        findVerificationValue: (id: string) => Promise<{ value: string } | null>;
+      };
+    };
+    getSignedCookie: (name: string, secret: string) => Promise<string | false | null>;
+  }): Promise<string | null> {
+    try {
+      const cookie = ctx.context.createAuthCookie("two_factor");
+      const identifier = await ctx.getSignedCookie(cookie.name, ctx.context.secret);
+      if (!identifier) return null;
+      const value = await ctx.context.internalAdapter.findVerificationValue(identifier);
+      return value?.value ?? null;
+    } catch {
+      return null;
+    }
+  }
 
   const afterHook = createAuthMiddleware(async (ctx) => {
     const meta = requestMeta(ctx);
@@ -257,7 +381,32 @@ export function createIdentityAuth(config: IdentityConfig) {
         if (!email) break;
         const subject = subjectKey(email, secret);
         if (!failed) {
+          // The first factor is proven, so the password-failure counter resets. The
+          // second factor has its own per-challenge and per-account limits.
           await rateLimitStore.reset(`login-fail:${subject}`).catch(() => undefined);
+          const fresh = ctx.context.newSession;
+          if (!fresh) break;
+          if ((fresh.user as { twoFactorEnabled?: boolean }).twoFactorEnabled) {
+            // The two-factor plugin (which runs after this hook) discards the session and
+            // issues a short-lived challenge instead. Sign-in completes at /auth/mfa.
+            await recordAuthEvent(meta, {
+              action: AuthEvents.mfaChallengeIssued,
+              outcome: "success",
+              actorType: "user",
+              actorUserId: fresh.user.id,
+              subjectUserId: fresh.user.id,
+            });
+          } else {
+            await recordAuthEvent(meta, {
+              action: AuthEvents.loginSucceeded,
+              outcome: "success",
+              actorType: "user",
+              actorUserId: fresh.user.id,
+              subjectUserId: fresh.user.id,
+              targetType: "session",
+              targetId: fresh.session.id,
+            });
+          }
           break;
         }
         if (code === "INVALID_EMAIL_OR_PASSWORD") {
@@ -323,6 +472,83 @@ export function createIdentityAuth(config: IdentityConfig) {
         });
         if (!failed) {
           runInBackground(sendEmail(passwordChangedEmail(user, `${appUrl}/auth/forgot-password`)));
+        }
+        break;
+      }
+      case "/two-factor/verify-totp":
+      case "/two-factor/verify-backup-code": {
+        const method = MFA_VERIFY_PATHS[ctx.path]!;
+        const sessionUser = ctx.context.session?.user;
+        const stage = sessionUser ? "enrolment" : "sign_in";
+        if (failed) {
+          const userId = sessionUser?.id ?? (await challengeUserId(ctx));
+          await recordAuthEvent(meta, {
+            action: AuthEvents.mfaFailed,
+            outcome: code === "ACCOUNT_TEMPORARILY_LOCKED" ? "denied" : "failure",
+            actorType: userId ? "user" : "anonymous",
+            actorUserId: userId,
+            subjectUserId: userId,
+            metadata: { method, stage, reason: code ?? "unknown" },
+          });
+          break;
+        }
+        const user = (returned as { user?: { id: string; name: string; email: string } } | null)
+          ?.user;
+        if (!user) break;
+        await recordAuthEvent(meta, {
+          action: AuthEvents.mfaVerified,
+          outcome: "success",
+          actorType: "user",
+          actorUserId: user.id,
+          subjectUserId: user.id,
+          metadata: { method, stage },
+        });
+        if (method === "recovery_code") {
+          runInBackground(
+            sendEmail(mfaNoticeEmail(user, "recovery-code-used", `${appUrl}/auth/forgot-password`)),
+          );
+        }
+        break;
+      }
+      case "/two-factor/enable":
+      case "/two-factor/disable":
+      case "/two-factor/generate-backup-codes": {
+        const user = ctx.context.session?.user;
+        if (!user) break;
+        const operation = MFA_MANAGE_PATHS[ctx.path]!;
+        if (failed) {
+          await recordAuthEvent(meta, {
+            action: AuthEvents.mfaChangeFailed,
+            outcome: "failure",
+            actorType: "user",
+            actorUserId: user.id,
+            subjectUserId: user.id,
+            metadata: { operation, reason: code ?? "unknown" },
+          });
+          break;
+        }
+        // Enabling and disabling are recorded when the user row changes (databaseHooks).
+        if (ctx.path === "/two-factor/enable") {
+          await recordAuthEvent(meta, {
+            action: AuthEvents.mfaEnrolmentStarted,
+            outcome: "success",
+            actorType: "user",
+            actorUserId: user.id,
+            subjectUserId: user.id,
+          });
+        } else if (ctx.path === "/two-factor/generate-backup-codes") {
+          await recordAuthEvent(meta, {
+            action: AuthEvents.mfaRecoveryCodesRegenerated,
+            outcome: "success",
+            actorType: "user",
+            actorUserId: user.id,
+            subjectUserId: user.id,
+          });
+          runInBackground(
+            sendEmail(
+              mfaNoticeEmail(user, "recovery-codes-regenerated", `${appUrl}/auth/forgot-password`),
+            ),
+          );
         }
         break;
       }
@@ -482,6 +708,44 @@ export function createIdentityAuth(config: IdentityConfig) {
 
     databaseHooks: {
       user: {
+        update: {
+          after: async (user, ctx) => {
+            const path = ctx?.path;
+            const enabled = (user as { twoFactorEnabled?: boolean }).twoFactorEnabled === true;
+            const meta = requestMeta(ctx);
+            if (path === "/two-factor/verify-totp" && enabled && ctx) {
+              // Enrolment confirmed. Sessions opened with the password alone are signed
+              // out; the current one is rotated by the plugin right after this hook.
+              const active = ctx.context.session?.session.token;
+              const open = await ctx.context.internalAdapter.listSessions(user.id);
+              for (const s of open) {
+                if (s.token !== active) await ctx.context.internalAdapter.deleteSession(s.token);
+              }
+              await recordAuthEvent(meta, {
+                action: AuthEvents.mfaEnabled,
+                outcome: "success",
+                actorType: "user",
+                actorUserId: user.id,
+                subjectUserId: user.id,
+                metadata: { method: "totp", otherSessionsRevoked: open.length - 1 },
+              });
+              runInBackground(
+                sendEmail(mfaNoticeEmail(user, "enabled", `${appUrl}/auth/forgot-password`)),
+              );
+            } else if (path === "/two-factor/disable" && !enabled) {
+              await recordAuthEvent(meta, {
+                action: AuthEvents.mfaDisabled,
+                outcome: "success",
+                actorType: "user",
+                actorUserId: user.id,
+                subjectUserId: user.id,
+              });
+              runInBackground(
+                sendEmail(mfaNoticeEmail(user, "disabled", `${appUrl}/auth/forgot-password`)),
+              );
+            }
+          },
+        },
         create: {
           after: async (user, ctx) => {
             await recordAuthEvent(requestMeta(ctx), {
@@ -497,16 +761,21 @@ export function createIdentityAuth(config: IdentityConfig) {
       session: {
         create: {
           after: async (session, ctx) => {
-            const login = ctx?.path === "/sign-in/email";
+            const path = ctx?.path;
+            // Password sign-in is recorded in the after hook, which knows whether the
+            // session is kept or exchanged for an MFA challenge.
+            if (path === "/sign-in/email") return;
+            // A second factor completing a pending sign-in (no session before it).
+            const secondFactor = path && !ctx?.context.session ? MFA_VERIFY_PATHS[path] : undefined;
             await recordAuthEvent(requestMeta(ctx), {
-              action: login ? AuthEvents.loginSucceeded : AuthEvents.sessionCreated,
+              action: secondFactor ? AuthEvents.loginSucceeded : AuthEvents.sessionCreated,
               outcome: "success",
               actorType: "user",
               actorUserId: session.userId,
               subjectUserId: session.userId,
               targetType: "session",
               targetId: session.id,
-              metadata: login ? {} : { path: ctx?.path ?? "internal" },
+              metadata: secondFactor ? { secondFactor } : { path: path ?? "internal" },
             });
           },
         },
@@ -525,6 +794,9 @@ export function createIdentityAuth(config: IdentityConfig) {
         delete: {
           after: async (session, ctx) => {
             const path = ctx?.path;
+            // The password-only session the two-factor plugin discards when it issues a
+            // challenge: never returned to the browser, so not a revocation.
+            if (path === "/sign-in/email") return;
             // Sign-out is authorised by the session's own signed cookie, so its owner is
             // the actor even though Better Auth does not load the session into context.
             const actor = path === "/sign-out" ? session.userId : ctx?.context.session?.user.id;
@@ -539,9 +811,13 @@ export function createIdentityAuth(config: IdentityConfig) {
                 ? "password_reset"
                 : path === "/change-password"
                   ? "password_change"
-                  : path?.startsWith("/revoke")
-                    ? "user_request"
-                    : (path ?? "internal");
+                  : path === "/two-factor/verify-totp"
+                    ? "mfa_enabled"
+                    : path === "/two-factor/disable"
+                      ? "mfa_disabled"
+                      : path?.startsWith("/revoke")
+                        ? "user_request"
+                        : (path ?? "internal");
             await recordAuthEvent(requestMeta(ctx), {
               action,
               outcome: "success",
@@ -574,8 +850,28 @@ export function createIdentityAuth(config: IdentityConfig) {
       },
     },
 
-    // Must remain last: forwards Set-Cookie from `auth.api` calls in server actions.
-    plugins: [nextCookies()],
+    plugins: [
+      // TOTP with encrypted recovery codes (ADR-0016). Secrets and codes are encrypted
+      // with the auth secret before storage; email/SMS one-time codes are not offered.
+      twoFactor({
+        issuer: MFA_POLICY.issuer,
+        totpOptions: { digits: MFA_POLICY.digits, period: MFA_POLICY.periodSec },
+        backupCodeOptions: {
+          amount: MFA_POLICY.recoveryCodeCount,
+          length: MFA_POLICY.recoveryCodeLength,
+          storeBackupCodes: "encrypted",
+        },
+        skipVerificationOnEnable: false,
+        twoFactorCookieMaxAge: MFA_POLICY.challengeTtlSec,
+        accountLockout: {
+          enabled: true,
+          maxFailedAttempts: MFA_POLICY.lockoutAfterFailures,
+          durationSeconds: MFA_POLICY.lockoutSec,
+        },
+      }),
+      // Must remain last: forwards Set-Cookie from `auth.api` calls in server actions.
+      nextCookies(),
+    ],
   });
 }
 

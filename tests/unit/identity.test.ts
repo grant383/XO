@@ -9,8 +9,19 @@ import {
   verificationEmail,
   verifyEmailUrl,
 } from "@/modules/identity/emails";
-import { loginInput, registerInput, resetPasswordInput } from "@/modules/identity/flows";
-import { DISABLED_PATHS, PASSWORD_POLICY, SESSION_POLICY } from "@/modules/identity/policy";
+import {
+  loginInput,
+  mfaChallengeInput,
+  registerInput,
+  resetPasswordInput,
+} from "@/modules/identity/flows";
+import {
+  DISABLED_PATHS,
+  MFA_POLICY,
+  PASSWORD_POLICY,
+  RATE_LIMITS,
+  SESSION_POLICY,
+} from "@/modules/identity/policy";
 
 const JWT = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImFAYi5jIn0.c2lnbmF0dXJlLXZhbHVl";
 
@@ -142,5 +153,49 @@ describe("policy invariants", () => {
     for (const path of ["/sign-in/social", "/change-email", "/delete-user", "/update-session"]) {
       expect(DISABLED_PATHS).toContain(path);
     }
+  });
+});
+
+describe("MFA input and policy", () => {
+  it("normalises authenticator and recovery codes and rejects anything else", () => {
+    expect(mfaChallengeInput.parse({ method: "totp", code: " 123 456 " })).toEqual({
+      method: "totp",
+      code: "123456",
+    });
+    expect(mfaChallengeInput.parse({ method: "recovery", code: " AbCde-12345 " }).code).toBe(
+      "AbCde-12345",
+    );
+    expect(mfaChallengeInput.parse({ method: "recovery", code: "AbCde12345" }).code).toBe(
+      "AbCde12345",
+    );
+    for (const bad of [
+      { method: "totp", code: "12345" },
+      { method: "totp", code: "12345a" },
+      { method: "recovery", code: "short" },
+      { method: "recovery", code: "abcde-12345-x" },
+      { method: "email", code: "123456" },
+    ]) {
+      expect(mfaChallengeInput.safeParse(bad).success, JSON.stringify(bad)).toBe(false);
+    }
+  });
+
+  it("rate-limits every second-factor endpoint and disables OTP and secret read-back", () => {
+    for (const path of [
+      "/two-factor/verify-totp",
+      "/two-factor/verify-backup-code",
+      "/two-factor/enable",
+      "/two-factor/disable",
+      "/two-factor/generate-backup-codes",
+    ]) {
+      expect(RATE_LIMITS[path], path).toBeDefined();
+    }
+    expect(DISABLED_PATHS).toEqual(
+      expect.arrayContaining([
+        "/two-factor/send-otp",
+        "/two-factor/verify-otp",
+        "/two-factor/get-totp-uri",
+      ]),
+    );
+    expect(MFA_POLICY.challengeTtlSec).toBeLessThanOrEqual(SESSION_POLICY.freshAgeSec);
   });
 });

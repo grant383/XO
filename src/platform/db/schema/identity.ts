@@ -1,4 +1,13 @@
-import { boolean, index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  index,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { citext, id, timestamps } from "./types";
 
 /**
@@ -94,4 +103,27 @@ export const authConsumedTokens = pgTable(
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   },
   (t) => [index("auth_consumed_tokens_expires_idx").on(t.expiresAt)],
+);
+
+/**
+ * TOTP multi-factor enrolment (ADR-0016). One row per user. `secret` and `backup_codes`
+ * (recovery codes) are encrypted by Better Auth with the auth secret before they reach
+ * the database. `verified` is false between enrolment start and the first valid code.
+ * Reachable only by `dxo_auth`.
+ */
+export const twoFactors = pgTable(
+  "two_factors",
+  {
+    id: id(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    secret: text("secret").notNull(),
+    backupCodes: text("backup_codes").notNull(),
+    verified: boolean("verified").notNull().default(false),
+    failedVerificationCount: integer("failed_verification_count").notNull().default(0),
+    lockedUntil: timestamp("locked_until", { withTimezone: true }),
+    ...timestamps(),
+  },
+  (t) => [uniqueIndex("two_factors_user_uq").on(t.userId)],
 );

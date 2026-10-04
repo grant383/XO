@@ -32,6 +32,8 @@ export type AuthenticatedSession = {
   email: string;
   name: string;
   emailVerified: boolean;
+  /** TOTP multi-factor authentication is enrolled and confirmed (ADR-0016). */
+  twoFactorEnabled: boolean;
   createdAt: Date;
   expiresAt: Date;
 };
@@ -63,6 +65,7 @@ export async function getSession(headers: Headers): Promise<AuthenticatedSession
     email: user.email,
     name: user.name,
     emailVerified: user.emailVerified,
+    twoFactorEnabled: user.twoFactorEnabled === true,
     createdAt: new Date(session.createdAt),
     expiresAt: new Date(session.expiresAt),
   };

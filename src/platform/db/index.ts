@@ -4,8 +4,12 @@ export {
   identityStoreAdapter,
   appendAccountAuditEvent,
   consumeSingleUseToken,
+  consumeTotpCode,
+  listActiveSessions,
+  sessionTokenFor,
   revokeUserVerificationValues,
   type AccountAuditEvent,
+  type StoredSession,
 } from "./identity-store";
 export { closePools } from "./internal/clients";
 export { pgCode, pgMessage } from "./errors";

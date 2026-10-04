@@ -122,6 +122,32 @@ describe("session management", () => {
     expect((await api("/get-session", { jar: laptop.jar })).body).not.toBeNull();
   });
 
+  it("lists and revokes devices for a session older than the freshness window", async () => {
+    const u = await createVerifiedUser(t.mailbox, "old-session");
+    const laptop = await signIn(u.email, u.password);
+    const phone = await signIn(u.email, u.password);
+    // Better Auth's /list-sessions refuses sessions older than 15 minutes; device
+    // management must keep working for a long-lived (up to 30-day) session.
+    await admin`update sessions set created_at = now() - interval '3 days' where user_id = ${u.userId}`;
+
+    const sessions = await listSessions(headersFor(laptop.jar.header()));
+    expect(sessions).toHaveLength(2);
+    expect(sessions[0]!.lastActiveAt).toBeInstanceOf(Date);
+    expect(await revokeSession("not-a-uuid", headersFor(laptop.jar.header()))).toMatchObject({
+      ok: false,
+      code: "VALIDATION",
+    });
+    const phoneId = sessions.find((s) => !s.current)!.id;
+    expect(await revokeSession(phoneId, headersFor(laptop.jar.header()))).toMatchObject({
+      ok: true,
+    });
+    expect((await api("/get-session", { jar: phone.jar })).body).toBeNull();
+    const revoked = (await auditFor(admin, u.userId)).findLast(
+      (e) => e.action === "auth.session.revoked",
+    );
+    expect(revoked).toMatchObject({ target_id: phoneId, metadata: { reason: "user_request" } });
+  });
+
   it("changing the password revokes all other sessions, rotates the current one and notifies the user", async () => {
     const u = await createVerifiedUser(t.mailbox, "change-pw");
     const current = await signIn(u.email, u.password);

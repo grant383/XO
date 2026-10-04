@@ -14,7 +14,13 @@ let app: Sql;
 let auth: Sql;
 let f: Awaited<ReturnType<typeof seedTwoVentures>>;
 
-const IDENTITY_TABLES = ["sessions", "accounts", "verifications", "auth_consumed_tokens"] as const;
+const IDENTITY_TABLES = [
+  "sessions",
+  "accounts",
+  "verifications",
+  "auth_consumed_tokens",
+  "two_factors",
+] as const;
 
 beforeAll(async () => {
   admin = adminSql();
@@ -49,6 +55,20 @@ describe("dxo_app (runtime) cannot reach the identity store", () => {
         await tx`select set_config('app.actor_type', 'user', true),
                         set_config('app.user_id', ${f.user.alice}, true)`;
         return tx`select token from sessions`;
+      }),
+      RLS_VIOLATION,
+    );
+  });
+
+  it("cannot read MFA secrets or recovery codes, even as the owning user", async () => {
+    await admin`insert into two_factors (user_id, secret, backup_codes, verified)
+                values (${f.user.alice}, 'enc-secret', 'enc-codes', true)
+                on conflict (user_id) do nothing`;
+    await expectPgError(
+      app.begin(async (tx) => {
+        await tx`select set_config('app.actor_type', 'user', true),
+                        set_config('app.user_id', ${f.user.alice}, true)`;
+        return tx`select secret, backup_codes from two_factors`;
       }),
       RLS_VIOLATION,
     );

@@ -57,6 +57,20 @@
       "when": 1791117640448,
       "tag": "0007_memberships_rbac_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791150203923,
+      "tag": "0008_two_factor",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791150212816,
+      "tag": "0009_two_factor_rls",
+      "breakpoints": true
     }
   ]
 }

@@ -22,6 +22,25 @@ export const SESSION_POLICY = {
   freshAgeSec: 15 * MINUTE,
 } as const;
 
+/**
+ * TOTP multi-factor authentication (ADR-0016). RFC 6238 defaults that every mainstream
+ * authenticator app supports.
+ */
+export const MFA_POLICY = {
+  issuer: "DirectorXO",
+  digits: 6,
+  periodSec: 30,
+  /** A pending sign-in challenge (first factor passed) lasts this long. */
+  challengeTtlSec: 10 * MINUTE,
+  /** Wrong codes allowed per sign-in challenge before the user must sign in again. */
+  attemptsPerChallenge: 5,
+  /** Consecutive wrong codes across challenges before the second factor locks. */
+  lockoutAfterFailures: 10,
+  lockoutSec: 15 * MINUTE,
+  recoveryCodeCount: 10,
+  recoveryCodeLength: 10,
+} as const;
+
 export const PASSWORD_POLICY = { minLength: 12, maxLength: 128 } as const;
 
 export const TOKEN_POLICY = {
@@ -57,6 +76,11 @@ export const RATE_LIMITS: Record<string, PathLimits> = {
   "/reset-password": { ip: { windowSec: 15 * MINUTE, max: 10 } },
   "/verify-email": { ip: { windowSec: 15 * MINUTE, max: 20 } },
   "/change-password": { ip: { windowSec: 15 * MINUTE, max: 10 } },
+  "/two-factor/verify-totp": { ip: { windowSec: 15 * MINUTE, max: 20 } },
+  "/two-factor/verify-backup-code": { ip: { windowSec: 15 * MINUTE, max: 10 } },
+  "/two-factor/enable": { ip: { windowSec: 15 * MINUTE, max: 10 } },
+  "/two-factor/disable": { ip: { windowSec: 15 * MINUTE, max: 10 } },
+  "/two-factor/generate-backup-codes": { ip: { windowSec: 15 * MINUTE, max: 10 } },
 };
 export const DEFAULT_RATE_LIMIT: RateLimitRule = { windowSec: MINUTE, max: 120 };
 
@@ -84,4 +108,9 @@ export const DISABLED_PATHS = [
   "/verify-password",
   // Email links open DirectorXO pages that POST the token; the GET redirect is unused.
   "/reset-password/:token",
+  // MFA is TOTP only (ADR-0016): no email/SMS one-time codes. The TOTP secret is shown
+  // once, during enrolment, and cannot be read back afterwards.
+  "/two-factor/send-otp",
+  "/two-factor/verify-otp",
+  "/two-factor/get-totp-uri",
 ];

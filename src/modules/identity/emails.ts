@@ -92,3 +92,49 @@ export function passwordChangedEmail(
     ]),
   };
 }
+
+export type MfaNotice =
+  "enabled" | "disabled" | "recovery-codes-regenerated" | "recovery-code-used";
+
+const MFA_NOTICES: Record<MfaNotice, { subject: string; title: string; body: string }> = {
+  enabled: {
+    subject: "Two-step verification is on for your DirectorXO account",
+    title: "Two-step verification turned on",
+    body: "Two-step verification was just turned on for your DirectorXO account. Other sessions were signed out.",
+  },
+  disabled: {
+    subject: "Two-step verification was turned off for your DirectorXO account",
+    title: "Two-step verification turned off",
+    body: "Two-step verification was just turned off for your DirectorXO account.",
+  },
+  "recovery-codes-regenerated": {
+    subject: "New DirectorXO recovery codes were created",
+    title: "New recovery codes",
+    body: "New recovery codes were just created for your DirectorXO account. Your previous codes no longer work.",
+  },
+  "recovery-code-used": {
+    subject: "A DirectorXO recovery code was used to sign in",
+    title: "Recovery code used",
+    body: "A recovery code was just used to sign in to your DirectorXO account. Each code works once.",
+  },
+};
+
+/** Security notice for MFA changes. Never includes codes, secrets or links with tokens. */
+export function mfaNoticeEmail(
+  to: { name: string; email: string },
+  notice: MfaNotice,
+  resetUrl: string,
+): EmailMessage {
+  const n = MFA_NOTICES[notice];
+  return {
+    to: to.email,
+    category: `auth.mfa-${notice}`,
+    subject: n.subject,
+    text: `Hi ${to.name},\n\n${n.body}\n\nIf this was not you, reset your password immediately: ${resetUrl}`,
+    html: layout(n.title, [
+      `Hi ${escapeHtml(to.name)},`,
+      escapeHtml(n.body),
+      `If this was not you, <a href="${escapeHtml(resetUrl)}">reset your password</a> immediately.`,
+    ]),
+  };
+}
