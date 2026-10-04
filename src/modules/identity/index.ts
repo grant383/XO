@@ -1,0 +1,46 @@
+/**
+ * Identity module: authentication, sessions and the profile identity foundation.
+ * Better Auth provides identity/session primitives only; venture membership and RBAC
+ * live in DirectorXO domain modules (ADR-0009).
+ */
+export {
+  getAuth,
+  getSession,
+  requireSession,
+  setAuthForTests,
+  UnauthenticatedError,
+  type AuthenticatedSession,
+} from "./service";
+export { createIdentityAuth, type IdentityAuth, type IdentityConfig } from "./auth";
+export {
+  changePassword,
+  getProfile,
+  listSessions,
+  login,
+  logout,
+  register,
+  requestPasswordReset,
+  resendVerificationEmail,
+  resetPassword,
+  revokeOtherSessions,
+  revokeSession,
+  updateName,
+  verifyEmail,
+  type FlowErrorCode,
+  type FlowResult,
+  type Profile,
+  type SessionSummary,
+} from "./flows";
+export { AuthEvents } from "./audit";
+export { settleBackgroundTasks } from "./background";
+export { CORRELATION_HEADER } from "./request-meta";
+export { scrubText, scrubValue } from "./log-scrub";
+export {
+  AUTH_BASE_PATH,
+  COOKIE_PREFIX,
+  LOGIN_FAILURE_LIMIT,
+  PASSWORD_POLICY,
+  RATE_LIMITS,
+  SESSION_POLICY,
+  TOKEN_POLICY,
+} from "./policy";

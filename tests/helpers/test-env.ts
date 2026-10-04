@@ -20,6 +20,7 @@ export function testDatabaseUrls() {
     AUTH_DATABASE_URL: withRole("dxo_auth", passwords.auth),
     MIGRATION_DATABASE_URL: withRole("dxo_migrator", passwords.migrator),
     DB_POOL_MAX: "4",
+    ...testAuthEnv(),
   };
 }
 
@@ -28,5 +29,17 @@ export function rolePasswords() {
     app: process.env.DB_APP_PASSWORD ?? "local-app-password",
     auth: process.env.DB_AUTH_PASSWORD ?? "local-auth-password",
     migrator: process.env.DB_MIGRATOR_PASSWORD ?? "local-migrator-password",
+  };
+}
+
+/** Deterministic, non-secret values for authentication integration tests. */
+export function testAuthEnv() {
+  return {
+    APP_URL: "http://localhost:3000",
+    AUTH_SECRET: "test-only-auth-secret-0123456789-abcdefghijklmnop",
+    EMAIL_PROVIDER: "memory",
+    EMAIL_FROM: "DirectorXO <no-reply@directorxo.test>",
+    REDIS_URL: process.env.REDIS_URL ?? "redis://localhost:63799",
+    LOG_LEVEL: "warn",
   };
 }
