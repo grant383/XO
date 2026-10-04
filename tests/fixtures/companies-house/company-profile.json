@@ -1,0 +1,18 @@
+{
+  "company_name": "DIRECTORXO TEST LIMITED",
+  "company_number": "01234567",
+  "company_status": "active",
+  "type": "ltd",
+  "date_of_creation": "2019-04-01",
+  "jurisdiction": "england-wales",
+  "has_charges": false,
+  "registered_office_address": {
+    "address_line_1": "1 Test Street",
+    "locality": "London",
+    "postal_code": "EC1A 1AA",
+    "country": "United Kingdom"
+  },
+  "sic_codes": ["62020"],
+  "accounts": { "accounting_reference_date": { "day": "31", "month": "03" } },
+  "links": { "self": "/company/01234567" }
+}

@@ -88,3 +88,11 @@ export const emailEnv = defineEnv(
       message: "production requires EMAIL_PROVIDER=sendgrid",
     }),
 );
+
+/** Companies House lookup is optional: without a key, onboarding proceeds manually. */
+export const companiesHouseEnv = defineEnv(
+  z.object({
+    COMPANIES_HOUSE_API_KEY: z.string().min(10).optional(),
+    COMPANIES_HOUSE_API_URL: z.url({ protocol: /^https?$/ }).optional(),
+  }),
+);
