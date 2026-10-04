@@ -1,84 +1,73 @@
 "use client";
 
-import { useActionState, type ReactNode } from "react";
+import { useActionState, useEffect, useId, useRef, type ReactNode } from "react";
+import { Alert, Button, ErrorSummary, SelectField, TextField, type ButtonVariant } from "@/ui";
 import { idleTeamState, type TeamFormState } from "./form-state";
+import styles from "./team.module.css";
 
 type Action = (prev: TeamFormState, data: FormData) => Promise<TeamFormState>;
 type Option = { value: string; label: string };
 
-function Status({ state, id }: { state: TeamFormState; id?: string }) {
-  if (state.status === "idle") return null;
-  return state.status === "error" ? (
-    <p role="alert" id={id}>
-      {state.message}
-    </p>
-  ) : (
-    <p role="status" aria-live="polite" id={id}>
-      {state.message}
-    </p>
-  );
-}
-
 /** Invite a member by email with a role the actor may assign. */
 export function InviteForm({ action, roles }: { action: Action; roles: Option[] }) {
   const [state, formAction, pending] = useActionState(action, idleTeamState);
+  const summaryRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (state.status === "error") summaryRef.current?.focus();
+  }, [state]);
   const errors = state.status === "error" ? (state.fieldErrors ?? {}) : {};
   const values = state.status === "error" ? state.values : undefined;
+  const hasFieldErrors = Object.keys(errors).length > 0;
   return (
-    <form action={formAction} key={state.status === "success" ? state.message : "invite"}>
-      <Status state={state} />
-      <p>
-        <label htmlFor="invite-email">Email address</label>
-        <br />
-        <input
+    <form
+      action={formAction}
+      className={styles.inviteForm}
+      key={state.status === "success" ? state.message : "invite"}
+    >
+      {state.status === "error" ? (
+        <ErrorSummary
+          ref={summaryRef}
+          title="We couldn’t send the invitation"
+          detail={hasFieldErrors ? undefined : state.message}
+          fieldErrors={
+            hasFieldErrors
+              ? Object.fromEntries(Object.entries(errors).map(([k, v]) => [`invite-${k}`, v]))
+              : undefined
+          }
+        />
+      ) : null}
+      {state.status === "success" ? <Alert tone="success" title={state.message} /> : null}
+      <div className={styles.inviteFields}>
+        <TextField
           id="invite-email"
           name="email"
+          label="Email address"
           type="email"
           required
           maxLength={320}
           autoComplete="off"
           defaultValue={values?.email}
-          aria-invalid={errors.email ? true : undefined}
-          aria-describedby={errors.email ? "invite-email-error" : undefined}
+          error={errors.email}
         />
-        {errors.email ? (
-          <small id="invite-email-error" role="alert">
-            {errors.email}
-          </small>
-        ) : null}
-      </p>
-      <p>
-        <label htmlFor="invite-role">Role</label>
-        <br />
-        <select
+        <SelectField
           id="invite-role"
           name="role"
+          label="Role"
           required
+          options={roles}
           defaultValue={values?.role ?? roles.at(-1)?.value}
-          aria-invalid={errors.role ? true : undefined}
-          aria-describedby={errors.role ? "invite-role-error" : undefined}
-        >
-          {roles.map((r) => (
-            <option key={r.value} value={r.value}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-        {errors.role ? (
-          <small id="invite-role-error" role="alert">
-            {errors.role}
-          </small>
-        ) : null}
-      </p>
-      <button type="submit" disabled={pending} aria-busy={pending}>
-        {pending ? "Sending…" : "Send invitation"}
-      </button>
+          error={errors.role}
+        />
+        <Button type="submit" loading={pending} loadingLabel="Sending…">
+          Send invitation
+        </Button>
+      </div>
     </form>
   );
 }
 
 /**
- * A small row-level form (revoke, change role, suspend, approve...). Hidden inputs carry
+ * A row-level form (revoke, change role, suspend, approve...). Hidden inputs carry
  * references only; the server re-authorises everything.
  */
 export function RowActionForm({
@@ -86,30 +75,42 @@ export function RowActionForm({
   hidden,
   label,
   pendingLabel,
+  variant = "secondary",
   children,
 }: {
   action: Action;
   hidden: Record<string, string>;
-  label: string;
+  label: ReactNode;
   pendingLabel: string;
+  variant?: ButtonVariant;
   children?: ReactNode;
 }) {
   const [state, formAction, pending] = useActionState(action, idleTeamState);
   return (
-    <form action={formAction} style={{ display: "inline-block", marginRight: 8 }}>
+    <form action={formAction} className={styles.rowForm}>
       {Object.entries(hidden).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}
-      {children}
-      <button type="submit" disabled={pending} aria-busy={pending}>
-        {pending ? pendingLabel : label}
-      </button>
-      <Status state={state} />
+      <div className={styles.rowControls}>
+        {children}
+        <Button type="submit" variant={variant} loading={pending} loadingLabel={pendingLabel}>
+          {label}
+        </Button>
+      </div>
+      {state.status === "error" ? (
+        <p role="alert" className={styles.rowError}>
+          {state.message}
+        </p>
+      ) : state.status === "success" ? (
+        <p role="status" className={styles.rowSuccess}>
+          {state.message}
+        </p>
+      ) : null}
     </form>
   );
 }
 
-/** Role select used inside a RowActionForm. */
+/** Role select used inside a RowActionForm; the label is visually hidden. */
 export function RoleSelect({
   id,
   label,
@@ -122,8 +123,8 @@ export function RoleSelect({
   defaultValue?: string;
 }) {
   return (
-    <>
-      <label htmlFor={id} style={{ position: "absolute", left: -10000 }}>
+    <span className={styles.roleSelect}>
+      <label htmlFor={id} className="visually-hidden">
         {label}
       </label>
       <select id={id} name="role" defaultValue={defaultValue}>
@@ -132,7 +133,35 @@ export function RoleSelect({
             {r.label}
           </option>
         ))}
-      </select>{" "}
-    </>
+      </select>
+    </span>
+  );
+}
+
+/**
+ * Figma "Manage" button: a disclosure revealing the member's role and status actions.
+ * Escape closes it and returns focus to the button.
+ */
+export function ManageMenu({ label, children }: { label: string; children: ReactNode }) {
+  const ref = useRef<HTMLDetailsElement>(null);
+  const panelId = useId();
+  return (
+    <details
+      ref={ref}
+      className={styles.manage}
+      onKeyDown={(e) => {
+        if (e.key === "Escape" && ref.current?.open) {
+          ref.current.open = false;
+          ref.current.querySelector("summary")?.focus();
+        }
+      }}
+    >
+      <summary className={styles.manageButton} aria-controls={panelId}>
+        Manage<span className="visually-hidden"> {label}</span>
+      </summary>
+      <div id={panelId} className={styles.managePanel}>
+        {children}
+      </div>
+    </details>
   );
 }
