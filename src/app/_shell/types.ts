@@ -1,0 +1,5 @@
+/** Data the server passes to the client shell. Labels only: no authority lives here. */
+export type ShellVenture = { id: string; name: string; roleLabel: string };
+export type ShellUser = { name: string; email: string };
+export type ShellNavItem = { href: string; label: string; exact?: boolean };
+export type ShellNavSection = { label: string; items: ShellNavItem[] };

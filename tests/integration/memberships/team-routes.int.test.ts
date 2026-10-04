@@ -23,9 +23,9 @@ vi.mock("@/modules/identity", async (importOriginal) => ({
   login: async () => ({ ok: true, data: undefined }),
 }));
 
-const { default: TeamPage } = await import("@/app/v/[ventureId]/settings/team/page");
+const { default: TeamPage } = await import("@/app/v/[ventureId]/(shell)/settings/team/page");
 const { NoVentureAccess } = await import("@/app/v/[ventureId]/no-access");
-const teamActions = await import("@/app/v/[ventureId]/settings/team/actions");
+const teamActions = await import("@/app/v/[ventureId]/(shell)/settings/team/actions");
 const { default: RequestAccessPage } = await import("@/app/v/[ventureId]/request-access/page");
 const { requestAccessAction } = await import("@/app/v/[ventureId]/request-access/actions");
 const { default: InvitationPage } = await import("@/app/invite/[token]/page");

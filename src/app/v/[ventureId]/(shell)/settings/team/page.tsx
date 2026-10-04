@@ -9,8 +9,8 @@ import {
   VenturePermissionError,
   VentureStateError,
 } from "@/modules/ventures";
-import { requireActor } from "../../../../actor";
-import { NoVentureAccess } from "../../no-access";
+import { requireActor } from "../../../../../actor";
+import { NoVentureAccess } from "../../../no-access";
 import {
   approveRequestAction,
   changeRoleAction,

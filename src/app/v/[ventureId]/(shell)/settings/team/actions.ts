@@ -17,7 +17,7 @@ import {
   VenturePermissionError,
   VentureStateError,
 } from "@/modules/ventures";
-import { requireActor } from "../../../../actor";
+import { requireActor } from "../../../../../actor";
 import type { TeamFormState } from "./form-state";
 
 /**
