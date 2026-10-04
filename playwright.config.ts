@@ -11,9 +11,15 @@ const baseURL = `http://localhost:${PORT}`;
 export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: false,
+  // One worker: every journey shares a single dev server, which runs out of memory on small
+  // machines and CI runners when several browsers compile routes at once.
+  workers: 1,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
+  // Journeys span several server actions and, on a cold dev server, first compiles.
+  timeout: 120_000,
+  expect: { timeout: 15_000 },
   use: { baseURL, trace: "retain-on-failure" },
   projects: [
     {

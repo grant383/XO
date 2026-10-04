@@ -90,3 +90,29 @@ export async function signIn(page: Page, user: TestUser, next?: string) {
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/auth/login"));
 }
+
+/** Completes onboarding through the Figma screens; returns the activated venture id. */
+export async function onboardVenture(page: Page, name: string): Promise<string> {
+  await page.goto("/onboarding");
+  await page.getByLabel("Business name").fill(name);
+  await page.getByRole("button", { name: "Start setup" }).click();
+  await page.waitForURL(/\/onboarding\/[0-9a-f-]+\/business$/);
+  await page.getByLabel("Sector").selectOption({ index: 1 });
+  await page.getByLabel("Financial year starts").selectOption("4");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.waitForURL(/\/data-connections$/);
+  await page.getByRole("button", { name: "Review & confirm" }).click();
+  await page.waitForURL(/\/review$/);
+  await page.getByRole("button", { name: "Create my workspace" }).click();
+  await expect(page.getByRole("heading", { name: "Your workspace is ready" })).toBeVisible();
+  await page.getByRole("link", { name: "Enter workspace" }).click();
+  await page.waitForURL(/\/v\/[0-9a-f-]+$/);
+  return new URL(page.url()).pathname.split("/")[2]!;
+}
+
+/** Opens venture navigation: the sidebar is always visible on desktop, a sheet on mobile. */
+export async function openNavigation(page: Page) {
+  const trigger = page.getByRole("button", { name: "Open menu" });
+  if (await trigger.isVisible()) await trigger.click();
+  return page.getByRole("dialog", { name: "Menu" }).or(page.getByRole("complementary"));
+}
