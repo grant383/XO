@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Avatar, Brand, Icon } from "@/ui";
+import { Icon } from "@/ui";
+import { AccountChrome } from "../_chrome/account-chrome";
 import { requireActor } from "../actor";
-import styles from "./onboarding.module.css";
 
 export const metadata: Metadata = {
   title: "Set up your venture",
@@ -16,21 +16,16 @@ export const metadata: Metadata = {
 export default async function OnboardingLayout({ children }: { children: ReactNode }) {
   const actor = await requireActor();
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <Brand />
-        <div className={styles.account}>
-          <Avatar name={actor.name} />
-          <span className={styles.accountName}>{actor.name}</span>
-        </div>
-      </header>
-      <main className={styles.body}>
-        {children}
-        <p className={styles.footer}>
+    <AccountChrome
+      name={actor.name}
+      footer={
+        <>
           <Icon name="lock-keyhole" />
           Progress is saved each time you continue to the next step.
-        </p>
-      </main>
-    </div>
+        </>
+      }
+    >
+      {children}
+    </AccountChrome>
   );
 }

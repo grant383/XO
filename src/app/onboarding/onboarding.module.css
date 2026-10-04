@@ -1,56 +1,5 @@
 /* Onboarding chrome and setup card (Figma 33:3378, 33:3447, 39:164, 54:27638, 54:27717). */
 
-.page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100dvh;
-  background: var(--surface-canvas);
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-16);
-  height: 72px;
-  padding: 0 var(--space-48);
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.account {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  font: 500 13px / normal var(--font-sans);
-  color: var(--neutral-white);
-}
-
-.accountName {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.body {
-  display: flex;
-  flex: 1 0 auto;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-32);
-  padding: 44px var(--space-16) var(--space-32);
-}
-
-.footer {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font: 400 11px / normal var(--font-sans);
-  color: var(--text-muted);
-  text-align: center;
-}
-
 .card {
   display: flex;
   flex-direction: column;
@@ -537,15 +486,6 @@
 }
 
 @media (max-width: 767px) {
-  .header {
-    height: var(--shell-topbar-height);
-    padding: 0 var(--space-16);
-  }
-
-  .body {
-    padding: var(--space-24) var(--space-16);
-  }
-
   .card,
   .cardWide {
     padding: var(--space-20);

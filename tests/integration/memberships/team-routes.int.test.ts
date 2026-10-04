@@ -236,7 +236,7 @@ describe("/v/[ventureId]/request-access", () => {
       status: "sent",
     });
     expect(text(await RequestAccessPage({ params: Promise.resolve({ ventureId }) }))).toContain(
-      "Request access",
+      "<RequestAccessForm>",
     );
 
     signInAs(people.viewer);
