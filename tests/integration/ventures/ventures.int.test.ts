@@ -19,7 +19,7 @@ import {
   VenturePermissionError,
   VentureStateError,
 } from "@/modules/ventures";
-import { adminSql, seedTwoVentures } from "../../helpers/db";
+import { adminSql, forceOwnerMembershipStatus, seedTwoVentures } from "../../helpers/db";
 import { createUser, fixtureRegistry, VALID_BUSINESS } from "../../helpers/ventures";
 
 let admin: Sql;
@@ -186,7 +186,7 @@ describe("cross-venture isolation", () => {
     const ventureId = await draft(owner);
     expect((await saveBusinessDetails(owner, ventureId, VALID_BUSINESS, registry)).ok).toBe(true);
 
-    await admin`update venture_memberships set status = 'removed' where venture_id = ${ventureId}`;
+    await forceOwnerMembershipStatus(admin, ventureId, "removed");
     await expect(getOnboarding(owner, ventureId)).rejects.toBeInstanceOf(VentureNotFoundError);
     await expect(completeDataConnections(owner, ventureId)).rejects.toBeInstanceOf(
       VentureNotFoundError,

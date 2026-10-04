@@ -3,7 +3,13 @@ import { eq, sql } from "drizzle-orm";
 import type { Sql } from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closePools, schema, withTenant, withUser } from "@/platform/db";
-import { adminSql, expectPgError, RLS_VIOLATION, seedTwoVentures } from "../helpers/db";
+import {
+  adminSql,
+  expectPgError,
+  forceOwnerMembershipStatus,
+  RLS_VIOLATION,
+  seedTwoVentures,
+} from "../helpers/db";
 
 /**
  * Database-level guarantees for venture creation, lifecycle and onboarding (ADR-0012).
@@ -271,9 +277,9 @@ describe("app.complete_venture_onboarding", () => {
     await expectPgError(complete(owner, ventureId, f.ventureA), "DXV03");
     await expectPgError(complete(f.user.alice, randomUUID()), "DXV03");
 
-    await admin`update venture_memberships set status = 'suspended' where venture_id = ${ventureId}`;
+    await forceOwnerMembershipStatus(admin, ventureId, "suspended");
     await expectPgError(complete(owner, ventureId), "DXV03");
-    await admin`update venture_memberships set status = 'active' where venture_id = ${ventureId}`;
+    await forceOwnerMembershipStatus(admin, ventureId, "active");
   });
 
   it("completes onboarding and activates the venture atomically, with audit records", async () => {

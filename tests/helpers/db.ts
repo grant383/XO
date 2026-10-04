@@ -59,6 +59,25 @@ export async function seedTwoVentures(sql: postgres.Sql) {
   return { user, ventureA, ventureB, tag };
 }
 
+/**
+ * Simulates a state the product can never reach — an Owner who is suspended or removed
+ * (e.g. by a future break-glass support procedure) — so tests can prove that access checks
+ * still fail closed for it. The Owner invariant trigger (migration 0007) rejects this for
+ * every role, so the fixture skips triggers for this one superuser transaction only.
+ */
+export async function forceOwnerMembershipStatus(
+  sql: postgres.Sql,
+  ventureId: string,
+  status: "active" | "suspended" | "removed",
+) {
+  await sql.begin(async (tx) => {
+    await tx`set local session_replication_role = replica`;
+    await tx`update venture_memberships set status = ${status},
+              removed_at = case when ${status} = 'removed' then now() end
+              where venture_id = ${ventureId} and role = 'owner'`;
+  });
+}
+
 /** Unwraps Drizzle's query error to the underlying PostgreSQL error. */
 export function pgError(error: unknown): { code?: string; message: string } {
   let current: unknown = error;
