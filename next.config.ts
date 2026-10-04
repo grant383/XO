@@ -9,6 +9,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["192.168.1.72"],
   output: "standalone",
   poweredByHeader: false,
   typedRoutes: true,
