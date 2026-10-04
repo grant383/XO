@@ -168,7 +168,13 @@ These were open between the spec, ADRs and Figma; they are now decided (spec §5
 
 ## Known design-sync items
 
-Figma labels that differ from the canonical values above. Update Figma to match; none blocks implementation.
+Figma labels that differed from the canonical values above. None blocks implementation.
+
+**Status (Oct 2026):** items 1–12 have been applied in the Figma file. Routes, permissions, phases and role labels were corrected in the Master Implementation Matrix (54:29298), the domain matrices (50:9967, 50:10242, 50:10477), the API (19:1684) and security (19:2078) frames, and the Team and Permissions, Accept invitation, Request access, Access request submitted and 403 screens. Canonical routes are recorded as Dev Mode annotations on the affected frames. Variables (127), native components (51) and the 60 capability rows are unchanged. The list below is kept as a record.
+
+**Open (needs design work, not label changes):**
+- **Request access / Access request submitted (54:27340, 54:27489):** the screens still depict an existing member requesting a higher permission, with justification, a named approver, a request reference and approval tracking. P0 (ADR-0013) is a signed-in non-member requesting venture access with no venture disclosure; the reviewer chooses the role. Role labels were canonicalised and the conflict is annotated on both frames.
+- Item 13 (API labels) is implementation work, not a Figma item.
 
 1. **Accept invitation route:** Figma `/auth/invitations/[token]` → canonical `/invite/[token]`.
 2. **Request access routes:** Figma `/v/[ventureId]/settings/request-access` and `/…/submitted` → canonical `/v/[ventureId]/request-access` (submitted is a state).
