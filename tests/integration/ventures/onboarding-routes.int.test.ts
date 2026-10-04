@@ -204,9 +204,8 @@ describe("review completion", () => {
     );
     expect((await ventureState(ventureId)).status).toBe("draft");
 
-    expect(redirectTo(await digestOf(() => completeOnboardingAction(ventureId)))).toBe(
-      "/?onboarded=1",
-    );
+    // Completion returns the "workspace ready" UX state; activation already happened server-side.
+    expect(await completeOnboardingAction(ventureId)).toEqual({ status: "complete" });
     expect(await ventureState(ventureId)).toMatchObject({
       status: "active",
       current_step: "completed",

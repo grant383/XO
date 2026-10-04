@@ -1,12 +1,16 @@
-import Link from "next/link";
+import { ButtonLink } from "@/ui";
+import { SetupCard, SetupHeading } from "../parts";
 
-/** Shown to venture members who are not the Owner (P0 error pages arrive in step 10). */
+/** Shown to venture members who are not the Owner. */
 export function ForbiddenNotice() {
   return (
-    <>
-      <h1>You do not have permission to set up this venture</h1>
-      <p>Only the venture Owner can complete onboarding.</p>
-      <Link href="/">Go to home</Link>
-    </>
+    <SetupCard>
+      <SetupHeading title="You do not have permission to set up this venture">
+        Only the venture Owner can complete onboarding.
+      </SetupHeading>
+      <ButtonLink href="/" variant="secondary">
+        Go to home
+      </ButtonLink>
+    </SetupCard>
   );
 }

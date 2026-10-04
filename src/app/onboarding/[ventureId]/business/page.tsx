@@ -3,8 +3,8 @@ import { COMMON_CURRENCIES, CURRENCIES, MONTHS, SECTORS, TIMEZONES } from "@/mod
 import { lookupCompanyAction, saveBusinessAction } from "../../actions";
 import { BusinessForm } from "../../forms";
 import { loadOnboardingPage } from "../../guard";
+import { Divider, SetupCard, SetupHeading, StepProgress } from "../../parts";
 import { ForbiddenNotice } from "../forbidden-notice";
-import { StepIndicator } from "../steps";
 
 export const metadata: Metadata = { title: "Business details" };
 export const dynamic = "force-dynamic";
@@ -13,6 +13,7 @@ type Props = { params: Promise<{ ventureId: string }> };
 
 const currencyName = new Intl.DisplayNames(["en-GB"], { type: "currency" });
 
+/** Business setup (Figma 33:3378), over the existing ventures module. */
 export default async function BusinessStepPage({ params }: Props) {
   const { ventureId } = await params;
   const ctx = await loadOnboardingPage(ventureId);
@@ -28,9 +29,13 @@ export default async function BusinessStepPage({ params }: Props) {
   }));
 
   return (
-    <>
-      <StepIndicator view={ctx.view} current="business" />
-      <h1>Business details</h1>
+    <SetupCard>
+      <StepProgress step={1} label="Business details" />
+      <SetupHeading title={`Tell us how ${v.name} operates`}>
+        These details set your venture’s reporting currency, timezone and financial year. You can
+        change them later.
+      </SetupHeading>
+      <Divider />
       <BusinessForm
         action={saveBusinessAction.bind(null, ventureId)}
         lookup={lookupCompanyAction.bind(null, ventureId)}
@@ -45,9 +50,9 @@ export default async function BusinessStepPage({ params }: Props) {
         }}
         sectors={SECTORS.map((s) => ({ value: s.code, label: s.label }))}
         currencies={currencies}
-        timezones={[...TIMEZONES].sort()}
+        timezones={[...TIMEZONES].sort().map((tz) => ({ value: tz, label: tz }))}
         months={MONTHS.map((m, i) => ({ value: String(i + 1), label: m }))}
       />
-    </>
+    </SetupCard>
   );
 }

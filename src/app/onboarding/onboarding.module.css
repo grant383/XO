@@ -1,0 +1,589 @@
+/* Onboarding chrome and setup card (Figma 33:3378, 33:3447, 39:164, 54:27638, 54:27717). */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--surface-canvas);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  height: 72px;
+  padding: 0 var(--space-48);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font: 500 13px / normal var(--font-sans);
+  color: var(--neutral-white);
+}
+
+.accountName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.body {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-32);
+  padding: 44px var(--space-16) var(--space-32);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: 400 11px / normal var(--font-sans);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  width: 100%;
+  max-width: 840px;
+  padding: var(--space-32);
+  background: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-12);
+}
+
+.cardWide {
+  max-width: 900px;
+  padding: 28px;
+  gap: var(--space-20);
+}
+
+.progressHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.progressCopy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  font: 400 11px / normal var(--font-mono);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.progressStep {
+  font-weight: 600;
+  color: var(--action-link);
+}
+
+.track {
+  height: 5px;
+  overflow: hidden;
+  background: var(--border-subtle);
+  border-radius: 100px;
+}
+
+.fill {
+  height: 100%;
+  background: var(--action-primary);
+  border-radius: 100px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.heading h1 {
+  font: var(--type-title);
+  color: var(--neutral-white);
+  overflow-wrap: anywhere;
+}
+
+.lede {
+  font: var(--type-body);
+  line-height: 1.5;
+  color: var(--text-subtle);
+}
+
+.divider {
+  height: 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px var(--space-16);
+}
+
+.lookupRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-8);
+}
+
+.lookupRow > :first-child {
+  flex: 1 1 auto;
+}
+
+.lookupRow button {
+  min-height: var(--field-height);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.actionsEnd {
+  justify-content: flex-end;
+}
+
+.forward {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Data sources / summary cards */
+.sources {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-12);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.source {
+  display: flex;
+  align-items: center;
+  gap: var(--space-14);
+  min-width: 0;
+  padding: var(--space-16);
+  background: var(--surface-control);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+}
+
+.source[data-tone="success"] {
+  border-color: var(--tint-success-border);
+}
+
+.sourceFull {
+  grid-column: 1 / -1;
+}
+
+.tile {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: var(--tint-info-tile);
+  border-radius: var(--radius-6);
+}
+
+.tile[data-tone="success"] {
+  background: var(--tint-success);
+}
+
+.tileSm {
+  width: 32px;
+  height: 32px;
+}
+
+.sourceCopy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.kicker {
+  font: 600 11px / normal var(--font-mono);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.sourceName {
+  font: 600 14px / normal var(--font-sans);
+  color: var(--neutral-white);
+}
+
+.sourceDetail {
+  font: 400 11px / 1.4 var(--font-sans);
+  color: var(--text-muted);
+}
+
+.summaryBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: 10px var(--space-14);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-6);
+  font: 400 12px / normal var(--font-sans);
+  color: var(--text-subtle);
+}
+
+.summaryBar strong {
+  font-weight: 400;
+  color: var(--status-success-strong);
+}
+
+/* Review summary card */
+.summaryCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+  padding: var(--space-16);
+  background: var(--surface-control);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+}
+
+.summaryCard[data-tone="success"] {
+  border-color: var(--tint-success-border);
+}
+
+.summaryHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editLink {
+  font: 600 12px / normal var(--font-sans);
+  color: var(--action-link);
+  text-decoration: none;
+}
+
+.editLink:hover {
+  text-decoration: underline;
+}
+
+.summaryTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.summaryTitle {
+  font: 600 15px / normal var(--font-sans);
+  color: var(--neutral-white);
+  overflow-wrap: anywhere;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4) var(--space-12);
+  margin: 0;
+  font: 400 11px / 1.4 var(--font-sans);
+}
+
+.factRow {
+  display: contents;
+}
+
+.facts dt {
+  color: var(--text-muted);
+}
+
+.facts dd {
+  margin: 0;
+  color: var(--neutral-mist);
+  overflow-wrap: anywhere;
+}
+
+/* Drafts list on the start page */
+.drafts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.draft {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-16);
+  background: var(--surface-control);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+  color: var(--neutral-white);
+  font: 600 14px / normal var(--font-sans);
+  text-decoration: none;
+}
+
+.draft:hover {
+  border-color: var(--border-strong);
+}
+
+.sectionTitle {
+  font: 600 11px / normal var(--font-mono);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Creating workspace / completion states */
+.stateBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  background: var(--surface-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-8);
+  text-align: center;
+}
+
+.stateIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--tint-info);
+  border-radius: var(--radius-8);
+}
+
+.stateIcon img {
+  animation: spin 900ms linear infinite;
+}
+
+.stateTitle {
+  font: var(--type-section);
+  color: var(--text-primary);
+}
+
+.stateCopy {
+  font: var(--type-small);
+  color: var(--text-muted);
+}
+
+.stateStatus {
+  font: var(--type-data);
+  color: var(--status-info-text);
+  text-transform: uppercase;
+}
+
+.successHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+}
+
+.successIcon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: var(--tint-success);
+  border: 1px solid var(--tint-success-border);
+  border-radius: var(--radius-12);
+}
+
+.successCopy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.successTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.successTitleRow h1 {
+  font: 600 32px / 40px var(--font-sans);
+  color: var(--text-primary);
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-12);
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+  padding: var(--space-16);
+  background: var(--surface-base);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-8);
+}
+
+.metricLabel {
+  font: var(--type-data);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.metricValue {
+  font: var(--type-section);
+  color: var(--text-primary);
+}
+
+.metricValue[data-tone="success"] {
+  color: var(--status-success);
+}
+
+.metricDetail {
+  font: var(--type-small);
+  color: var(--text-muted);
+}
+
+.recommended {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.recommendedLabel {
+  font: var(--type-data);
+  color: var(--status-info-text);
+  text-transform: uppercase;
+}
+
+.actionCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  max-width: 280px;
+  padding: var(--space-16);
+  background: var(--neutral-graphite);
+  border: 1px solid var(--tint-info-border-strong);
+  border-radius: var(--radius-8);
+  color: inherit;
+  text-decoration: none;
+}
+
+.actionCard:hover {
+  border-color: var(--accent-blue);
+}
+
+.actionTitle {
+  font: var(--type-emphasis);
+  color: var(--text-primary);
+}
+
+.actionCopy {
+  font: var(--type-small);
+  color: var(--text-muted);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 767px) {
+  .header {
+    height: var(--shell-topbar-height);
+    padding: 0 var(--space-16);
+  }
+
+  .body {
+    padding: var(--space-24) var(--space-16);
+  }
+
+  .card,
+  .cardWide {
+    padding: var(--space-20);
+  }
+
+  .heading h1,
+  .successTitleRow h1 {
+    font: var(--type-page);
+  }
+
+  .grid,
+  .sources,
+  .metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .successHead {
+    align-items: flex-start;
+  }
+
+  .successIcon {
+    width: 48px;
+    height: 48px;
+  }
+
+  /* Figma 54:24043: actions stack full-width on mobile with the primary action first. */
+  .actions,
+  .forward {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .actions > *,
+  .forward > * {
+    width: 100%;
+  }
+
+  .actionCard {
+    max-width: none;
+  }
+}

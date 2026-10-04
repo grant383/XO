@@ -125,5 +125,6 @@ export async function completeOnboardingAction(ventureId: string): Promise<Onboa
   }
   if (!result.ok)
     return { status: "error", message: result.message, fieldErrors: result.fieldErrors };
-  redirect("/?onboarded=1");
+  // The review page renders the "workspace ready" UX state; the venture is already active.
+  return { status: "complete" };
 }
