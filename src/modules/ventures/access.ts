@@ -2,10 +2,11 @@ import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { schema, withTenant, withUser } from "@/platform/db";
 import { VentureNotFoundError, VenturePermissionError, VentureStateError } from "./errors";
+import { can, rolesWith, type Capability, type VentureRole } from "./rbac";
 
 const { ventures, ventureMemberships } = schema;
 
-export type VentureRole = "owner" | "admin" | "manager" | "operator" | "viewer";
+export type { VentureRole } from "./rbac";
 export type VentureStatus = "draft" | "active" | "suspended" | "archived";
 
 /** Who is acting. Resolved from the authenticated session by the app layer. */
@@ -59,14 +60,15 @@ export async function listDraftVentures(actor: Actor): Promise<VentureSummary[]>
   return (await listMyVentures(actor)).filter((v) => v.status === "draft" && v.role === "owner");
 }
 
-type ResolveOptions = { roles?: readonly VentureRole[]; statuses?: readonly VentureStatus[] };
+type ResolveOptions = { capability?: Capability; statuses?: readonly VentureStatus[] };
 
 /**
  * Resolves a venture id from a route for the actor. Never trusts the id: membership and
- * role are read inside a tenant-scoped transaction, so RLS independently confirms access.
+ * role are read inside a tenant-scoped transaction on every call (no caching), so RLS
+ * independently confirms access and role/membership changes apply to the next request.
  *
  * @throws VentureNotFoundError unknown id, malformed id, or no active membership
- * @throws VenturePermissionError member without one of `roles`
+ * @throws VenturePermissionError member whose role lacks `capability`
  * @throws VentureStateError venture status not in `statuses`
  */
 export async function resolveVenture(
@@ -97,8 +99,8 @@ export async function resolveVenture(
       .where(eq(ventures.id, parsed.data)),
   );
   if (!row) throw new VentureNotFoundError();
-  if (options.roles && !options.roles.includes(row.role)) {
-    throw new VenturePermissionError(options.roles);
+  if (options.capability && !can(row.role, options.capability)) {
+    throw new VenturePermissionError(rolesWith(options.capability));
   }
   if (options.statuses && !options.statuses.includes(row.status)) {
     throw new VentureStateError(row.status);
@@ -110,6 +112,10 @@ export async function resolveVenture(
  * Venture switching foundation: resolves the venture selected in a product route
  * (`/v/[ventureId]`). Only active ventures are selectable; drafts belong to onboarding.
  */
-export async function resolveSelectedVenture(actor: Actor, id: string): Promise<VentureAccess> {
-  return resolveVenture(actor, id, { statuses: ["active"] });
+export async function resolveSelectedVenture(
+  actor: Actor,
+  id: string,
+  capability: Capability = "venture:view",
+): Promise<VentureAccess> {
+  return resolveVenture(actor, id, { capability, statuses: ["active"] });
 }

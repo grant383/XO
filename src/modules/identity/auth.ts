@@ -38,6 +38,7 @@ import {
   SESSION_POLICY,
   TOKEN_POLICY,
 } from "./policy";
+import { safeNextPath } from "./redirects";
 import { requestMeta, type RequestMeta } from "./request-meta";
 
 export type IdentityConfig = {
@@ -418,11 +419,16 @@ export function createIdentityAuth(config: IdentityConfig) {
       sendOnSignIn: true,
       autoSignInAfterVerification: false,
       expiresIn: TOKEN_POLICY.emailVerificationTtlSec,
-      sendVerificationEmail: async ({ user, token }) => {
+      sendVerificationEmail: async ({ user, token, url }) => {
+        // A validated sign-up `callbackURL` (e.g. a pending invitation) is carried through
+        // verification so the user returns to it after signing in.
+        const callback = safeNextPath(new URL(url).searchParams.get("callbackURL"));
+        const next = callback === "/" ? null : callback; // Better Auth's default
+
         await sendEmail(
           verificationEmail(
             user,
-            verifyEmailUrl(appUrl, token),
+            verifyEmailUrl(appUrl, token, next),
             TOKEN_POLICY.emailVerificationTtlSec / 3600,
           ),
         );

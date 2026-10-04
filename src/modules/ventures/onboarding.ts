@@ -17,6 +17,7 @@ import {
   VentureStateError,
 } from "./errors";
 import { businessDetailsInput, ventureNameInput, type BusinessDetails } from "./policy";
+import { rolesWith } from "./rbac";
 import { companyRegistry } from "./registry";
 
 const { ventures, ventureOnboarding, auditLog } = schema;
@@ -46,7 +47,7 @@ const fail = (
 ): ActionResult<never> => ({ ok: false, code, message, ...(fieldErrors ? { fieldErrors } : {}) });
 
 /** Onboarding actions require the active Owner of a draft venture. */
-const OWNER_OF_DRAFT = { roles: ["owner"], statuses: ["draft"] } as const;
+const OWNER_OF_DRAFT = { capability: "venture:onboard", statuses: ["draft"] } as const;
 
 async function recordVentureEvent(
   tx: Tx,
@@ -491,7 +492,7 @@ export async function completeOnboarding(actor: Actor, ventureId: string): Promi
         break;
       }
       case "DXV03":
-        throw new VenturePermissionError(["owner"]);
+        throw new VenturePermissionError(rolesWith("venture:onboard"));
       case "DXV04":
         result = fail("INVALID_STATE", "This venture has already been set up.");
         break;

@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { schema, withUser } from "@/platform/db";
 import { PASSWORD_POLICY } from "./policy";
+import { safeNextPath } from "./redirects";
 import { getAuth, requireSession } from "./service";
 
 /**
@@ -105,12 +106,23 @@ function mapError(error: unknown, fallback: FlowErrorCode = "UNEXPECTED"): FlowR
   }
 }
 
-/** Always reports success for a well-formed request, whether or not the email exists. */
-export async function register(input: unknown, headers: Headers): Promise<FlowResult> {
+/**
+ * Always reports success for a well-formed request, whether or not the email exists.
+ * `next` (validated by `safeNextPath`) is carried through the verification email.
+ */
+export async function register(
+  input: unknown,
+  headers: Headers,
+  next?: string | null,
+): Promise<FlowResult> {
   const parsed = registerInput.safeParse(input);
   if (!parsed.success) return validationFailure(parsed.error);
+  const callbackURL = safeNextPath(next);
   try {
-    await getAuth().api.signUpEmail({ body: parsed.data, headers });
+    await getAuth().api.signUpEmail({
+      body: { ...parsed.data, ...(callbackURL ? { callbackURL } : {}) },
+      headers,
+    });
     return { ok: true, data: undefined };
   } catch (error) {
     return mapError(error);

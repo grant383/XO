@@ -1,24 +1,10 @@
-import type { EmailMessage } from "@/platform/email";
+import { emailLayout, escapeHtml, type EmailMessage } from "@/platform/email";
 
-const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-
-function layout(title: string, paragraphs: string[], action?: { label: string; url: string }) {
-  const body = paragraphs.map((p) => `<p>${p}</p>`).join("\n");
-  const button = action
-    ? `<p><a href="${escapeHtml(action.url)}" style="display:inline-block;padding:12px 20px;background:#111827;color:#ffffff;text-decoration:none;border-radius:6px">${escapeHtml(action.label)}</a></p>
-<p style="font-size:12px;color:#6b7280">If the button does not work, copy this link into your browser:<br>${escapeHtml(action.url)}</p>`
-    : "";
-  return `<!doctype html><html lang="en-GB"><body style="font-family:system-ui,sans-serif;color:#111827;max-width:560px;margin:0 auto;padding:24px">
-<h1 style="font-size:20px">${escapeHtml(title)}</h1>
-${body}
-${button}
-<p style="font-size:12px;color:#6b7280">DirectorXO</p>
-</body></html>`;
-}
+const layout = emailLayout;
 
 /** Page that consumes the token on an explicit POST, so link scanners cannot burn it. */
-export const verifyEmailUrl = (appUrl: string, token: string) =>
-  `${appUrl}/auth/verify-email?token=${encodeURIComponent(token)}`;
+export const verifyEmailUrl = (appUrl: string, token: string, next?: string | null) =>
+  `${appUrl}/auth/verify-email?token=${encodeURIComponent(token)}${next ? `&next=${encodeURIComponent(next)}` : ""}`;
 export const resetPasswordUrl = (appUrl: string, token: string) =>
   `${appUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
 

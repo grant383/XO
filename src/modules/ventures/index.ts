@@ -1,6 +1,7 @@
 /**
  * Ventures module: venture creation, lifecycle, access resolution (venture switching
- * foundation) and onboarding. Venture membership and RBAC are DirectorXO-owned (ADR-0007);
+ * foundation), onboarding and the canonical RBAC policy (`rbac.ts`). Venture membership and
+ * RBAC are DirectorXO-owned (ADR-0007, ADR-0013);
  * PostgreSQL RLS independently enforces every read and write here.
  */
 export {
@@ -33,6 +34,19 @@ export {
   type OnboardingView,
 } from "./onboarding";
 export { VentureNotFoundError, VenturePermissionError, VentureStateError } from "./errors";
+export {
+  assignableRoles,
+  can,
+  canChangeMember,
+  canManageRole,
+  capabilitiesOf,
+  CAPABILITIES,
+  isVentureRole,
+  ROLE_LABELS,
+  rolesWith,
+  VENTURE_ROLES,
+  type Capability,
+} from "./rbac";
 export {
   businessDetailsInput,
   COMMON_CURRENCIES,

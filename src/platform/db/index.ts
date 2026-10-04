@@ -8,4 +8,5 @@ export {
   type AccountAuditEvent,
 } from "./identity-store";
 export { closePools } from "./internal/clients";
+export { pgCode, pgMessage } from "./errors";
 export * as schema from "./schema";

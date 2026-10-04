@@ -8,6 +8,7 @@ import { parseAddress, type EmailMessage, type EmailTransport, type SendResult }
 export type { EmailMessage, EmailTransport, SendResult } from "./types";
 export { EmailDeliveryError, parseAddress } from "./types";
 export { MemoryTransport, type CapturedEmail } from "./memory";
+export { emailLayout, escapeHtml } from "./layout";
 export { SendGridTransport } from "./sendgrid";
 export { SmtpTransport } from "./smtp";
 

@@ -35,6 +35,7 @@ export { AuthEvents } from "./audit";
 export { settleBackgroundTasks } from "./background";
 export { CORRELATION_HEADER } from "./request-meta";
 export { scrubText, scrubValue } from "./log-scrub";
+export { safeNextPath, withNext } from "./redirects";
 export {
   AUTH_BASE_PATH,
   COOKIE_PREFIX,
