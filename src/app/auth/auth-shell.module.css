@@ -1,0 +1,132 @@
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 760fr) minmax(0, 680fr);
+  min-height: 100dvh;
+  background: var(--surface-canvas);
+}
+
+.story {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-48);
+  padding: var(--space-40) var(--space-56);
+  background: var(--surface-panel);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  max-width: 590px;
+}
+
+.display {
+  font: var(--type-display);
+  color: var(--neutral-white);
+}
+
+.lede {
+  max-width: 520px;
+  font: var(--type-body);
+  line-height: 1.6;
+  color: var(--text-subtle);
+}
+
+.signal {
+  width: 80px;
+  height: 3px;
+  background: var(--action-primary);
+  border-radius: 100px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-12);
+  margin: 0;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-14);
+  background: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+}
+
+.metric dt {
+  font: 700 11px / normal var(--font-sans);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.metric dd {
+  margin: 0;
+  font: 500 13px / normal var(--font-sans);
+  color: var(--neutral-white);
+}
+
+.metric dd[data-tone="success"] {
+  color: var(--status-success-strong);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-40);
+  padding: var(--space-56);
+}
+
+.utility {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.panelBrand {
+  display: none;
+  margin-right: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  width: 100%;
+  max-width: 440px;
+}
+
+.footer {
+  font: 400 11px / normal var(--font-sans);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Tablet and mobile: the product story collapses; the panel carries the brand. */
+@media (max-width: 1023px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .story {
+    display: none;
+  }
+
+  .panelBrand {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 767px) {
+  .panel {
+    padding: var(--space-24) var(--space-16);
+    gap: var(--space-32);
+  }
+}

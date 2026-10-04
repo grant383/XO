@@ -1,47 +1,66 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PASSWORD_POLICY } from "@/modules/identity";
+import { ButtonLink } from "@/ui";
 import { resetPasswordAction } from "../actions";
 import { AuthForm } from "../auth-form";
+import { AuthHeading, BackLink, PasswordRequirements, SecurityNote } from "../auth-parts";
+import { AuthShell, STORIES } from "../auth-shell";
 
 // The URL carries a single-use token: never send it in a Referer header.
 export const metadata: Metadata = { title: "Set new password", referrer: "no-referrer" };
 
 type Props = { searchParams: Promise<{ token?: string | string[] }> };
 
-/** The token is consumed only when the form is submitted (POST), never on page load. */
+/** Figma 33:3315. The token is consumed only when the form is submitted (POST), never on load. */
 export default async function ResetPasswordPage({ searchParams }: Props) {
   const { token } = await searchParams;
   if (typeof token !== "string" || token.length === 0) {
     return (
-      <>
-        <h1>Link not valid</h1>
-        <p>This reset link is invalid or incomplete.</p>
-        <Link href="/auth/forgot-password">Request a new link</Link>
-      </>
+      <AuthShell story={STORIES.reset}>
+        <AuthHeading title="Link not valid">This reset link is invalid or incomplete.</AuthHeading>
+        <ButtonLink href="/auth/forgot-password" block>
+          Request a new link
+        </ButtonLink>
+      </AuthShell>
     );
   }
   return (
-    <>
-      <h1>Set a new password</h1>
-      <p>Setting a new password signs you out on every device.</p>
+    <AuthShell story={STORIES.reset}>
+      <BackLink href="/auth/login">Return to login</BackLink>
+      <AuthHeading title="Set a new password">
+        This password will replace the one previously used for your DirectorXO account.
+      </AuthHeading>
       <AuthForm
         action={resetPasswordAction}
-        submitLabel="Set new password"
+        submitLabel="Save new password"
+        pendingLabel="Saving…"
+        errorTitle="We couldn’t reset your password"
         hidden={{ token }}
-        next={{ href: "/auth/login", label: "Sign in" }}
+        success={{ kind: "message", next: { href: "/auth/login", label: "Sign in" } }}
         fields={[
           {
             name: "newPassword",
             label: "New password",
             type: "password",
             autoComplete: "new-password",
+            placeholder: "Enter new password",
             minLength: PASSWORD_POLICY.minLength,
             maxLength: PASSWORD_POLICY.maxLength,
-            hint: `At least ${PASSWORD_POLICY.minLength} characters.`,
+          },
+          {
+            name: "confirmPassword",
+            label: "Confirm password",
+            type: "password",
+            autoComplete: "new-password",
+            placeholder: "Re-enter new password",
+            maxLength: PASSWORD_POLICY.maxLength,
           },
         ]}
+        beforeSubmit={<PasswordRequirements {...PASSWORD_POLICY} />}
+        afterSubmit={
+          <SecurityNote>All your active sessions will be signed out after you save.</SecurityNote>
+        }
       />
-    </>
+    </AuthShell>
   );
 }

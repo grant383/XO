@@ -10,6 +10,7 @@ import {
   logout,
   register,
   requestPasswordReset,
+  resendVerificationEmail,
   resetPassword,
   safeNextPath,
   verifyEmail,
@@ -40,8 +41,23 @@ export async function registerAction(_prev: FormState, data: FormData): Promise<
     await requestHeaders(),
     safeNextPath(field(data, "next")),
   );
-  // Identical message whether or not the address already has an account.
-  return toState(result, "Check your inbox for a link to verify your email address.");
+  // Identical response whether or not the address already has an account. The echoed
+  // email is the user's own input, shown on the "check your inbox" state.
+  const state = toState(result, "Check your inbox for a link to verify your email address.");
+  return state.status === "success"
+    ? { ...state, email: field(data, "email").trim().slice(0, 320) }
+    : state;
+}
+
+export async function resendVerificationAction(
+  _prev: FormState,
+  data: FormData,
+): Promise<FormState> {
+  const result = await resendVerificationEmail(
+    { email: field(data, "email") },
+    await requestHeaders(),
+  );
+  return toState(result, "If that address needs verifying, we have sent a new link.");
 }
 
 export async function loginAction(_prev: FormState, data: FormData): Promise<FormState> {
@@ -66,6 +82,14 @@ export async function forgotPasswordAction(_prev: FormState, data: FormData): Pr
 }
 
 export async function resetPasswordAction(_prev: FormState, data: FormData): Promise<FormState> {
+  // Confirmation is a typing check only; the policy is enforced by the identity flow.
+  if (field(data, "newPassword") !== field(data, "confirmPassword")) {
+    return {
+      status: "error",
+      message: "Check the highlighted fields and try again.",
+      fieldErrors: { confirmPassword: "The passwords do not match." },
+    };
+  }
   const result = await resetPassword(
     { token: field(data, "token"), newPassword: field(data, "newPassword") },
     await requestHeaders(),

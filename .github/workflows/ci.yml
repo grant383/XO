@@ -79,6 +79,65 @@ jobs:
           test ! -s /tmp/drift || (echo "Schema changes without a committed migration" && exit 1)
       - run: pnpm test:db
 
+  e2e:
+    name: E2E and accessibility (Playwright)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: dxo_admin
+          POSTGRES_PASSWORD: ci-admin-password
+          POSTGRES_DB: directorxo
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U dxo_admin -d directorxo"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:8-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      mailpit:
+        image: axllent/mailpit:latest
+        ports: ["1025:1025", "8025:8025"]
+    env:
+      CI: "true"
+      ADMIN_DATABASE_URL: postgresql://dxo_admin:ci-admin-password@localhost:5432/directorxo
+      DATABASE_URL: postgresql://dxo_app:ci-app-password@localhost:5432/directorxo
+      AUTH_DATABASE_URL: postgresql://dxo_auth:ci-auth-password@localhost:5432/directorxo
+      MIGRATION_DATABASE_URL: postgresql://dxo_migrator:ci-migrator-password@localhost:5432/directorxo
+      DB_APP_PASSWORD: ci-app-password
+      DB_AUTH_PASSWORD: ci-auth-password
+      DB_MIGRATOR_PASSWORD: ci-migrator-password
+      REDIS_URL: redis://localhost:6379
+      EMAIL_PROVIDER: smtp
+      SMTP_URL: smtp://localhost:1025
+      EMAIL_FROM: "DirectorXO <no-reply@localhost>"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      # Throwaway per-run secrets: never committed, never reused.
+      - name: Generate ephemeral secrets
+        run: |
+          echo "AUTH_SECRET=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+          echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+      - run: pnpm db:bootstrap
+      - run: pnpm db:migrate
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
   build:
     name: Production build
     runs-on: ubuntu-latest
