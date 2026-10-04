@@ -15,6 +15,20 @@
       "when": 1791065787658,
       "tag": "0001_rls_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791096694757,
+      "tag": "0002_identity_store",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791096701659,
+      "tag": "0003_identity_store_rls",
+      "breakpoints": true
     }
   ]
 }
