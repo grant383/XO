@@ -74,6 +74,11 @@ export const STORIES = {
     title: "Return to command securely.",
     lede: "Choose a strong new password without interrupting the work already in motion across your business.",
   },
+  invite: {
+    eyebrow: "Team invitation · Verified access",
+    title: "Join a venture with confidence.",
+    lede: "Confirm who invited you, the role you have been assigned, and the identity that will be used before joining a private DirectorXO workspace.",
+  },
   verify: {
     eyebrow: "Identity check · One last step",
     title: "Secure the command seat.",

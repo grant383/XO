@@ -1,0 +1,95 @@
+/* Accept team invitation (Figma 54:27078), inside the auth split layout. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  text-align: center;
+}
+
+.heading h1 {
+  font: 600 32px / 40px var(--font-sans);
+  color: var(--text-primary);
+}
+
+.heading p {
+  font: var(--type-body);
+  color: var(--text-muted);
+}
+
+.stateIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: var(--tint-info);
+  border: 1px solid var(--tint-info-border-strong);
+  border-radius: var(--radius-12);
+}
+
+.stateIcon[data-tone="warning"] {
+  background: var(--tint-warning);
+  border-color: var(--status-warning);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin: 0;
+  padding: var(--space-16);
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-8);
+}
+
+.detail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-12);
+}
+
+.detail dt {
+  font: var(--type-small);
+  color: var(--text-muted);
+}
+
+.detail dd {
+  margin: 0;
+  font: var(--type-emphasis);
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.detail dd[data-tone="role"] {
+  color: var(--action-link);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.note {
+  font: var(--type-small);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .heading h1 {
+    font: var(--type-page);
+  }
+}

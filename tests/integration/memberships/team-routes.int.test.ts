@@ -89,6 +89,8 @@ function text(node: unknown): string {
       const { type, props } = n as ReactElement<Record<string, unknown>>;
       if (typeof type === "function") out.push(`<${type.name}>`);
       if (typeof props.href === "string") out.push(props.href);
+      // Headings and alerts carry their text in a `title` prop.
+      if (typeof props.title === "string") out.push(props.title);
       walk(props.children);
     }
   };
@@ -304,7 +306,7 @@ describe("/invite/[token]", () => {
     expect(text(await InvitationPage({ params: Promise.resolve({ token }) }))).toContain(
       "<AcceptInvitationForm>",
     );
-    expect(redirectTo(await digestOf(() => acceptInvitationAction(token)))).toBe("/?joined=1");
+    expect(redirectTo(await digestOf(() => acceptInvitationAction(token)))).toBe(`/v/${ventureId}`);
     expect((await membershipOf(admin, ventureId, invitee.userId))!.role).toBe("operator");
     expect(await acceptInvitationAction(token)).toEqual({
       status: "error",

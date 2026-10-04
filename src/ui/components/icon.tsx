@@ -43,6 +43,7 @@ export const ICONS = {
   "status-success": 5,
   "status-warning": 5,
   "triangle-alert": 18,
+  "user-plus": 26.88,
   users: 20,
   x: 14,
 } as const;
