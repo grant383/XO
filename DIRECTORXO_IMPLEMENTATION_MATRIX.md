@@ -1,6 +1,6 @@
 # DirectorXO Implementation Matrix
 
-Route-to-delivery tracker for the 60 approved DirectorXO capabilities. Rows mirror the Figma **Master Implementation Matrix** (file `rqWc0iFUFSTdudXuO4Gm47`, node `54:29298`, "Spec v1.0 · Oct 2026 · 8 domains · 60 rows"). Status reflects the repository on branch `p0/foundation` after P0 step 5.
+Route-to-delivery tracker for the 60 approved DirectorXO capabilities. Rows mirror the Figma **Master Implementation Matrix** (file `rqWc0iFUFSTdudXuO4Gm47`, node `54:29298`, "Spec v1.0 · Oct 2026 · 8 domains · 60 rows"). Status reflects the repository on branch `p0/foundation` after P0 step 5 and the UI foundations (ADR-0014).
 
 ## How to read this matrix
 
@@ -24,7 +24,7 @@ Design-sync items are corrections owed to Figma. They are **not implementation b
 | **Not started** | No implementation beyond shared foundations. |
 | **Deferred** | Deliberately moved out of its listed phase by a recorded decision. |
 
-No capability is **Implemented** yet: no screen has its approved Figma visual or Playwright coverage.
+Five auth capabilities are **Implemented**: they have the approved Figma visual, desktop and mobile layouts, and Playwright E2E with axe accessibility checks (ADR-0014). No other screen has its Figma visual yet.
 
 ### Permission order (spec §7)
 
@@ -32,28 +32,28 @@ Public → Authenticated → Viewer+ → Operator+ → Manager+ → Admin+ → O
 
 ## Summary
 
-| Domain | Rows | Foundation | In progress | Not started | Deferred |
-|---|---|---|---|---|---|
-| 01 Auth & Onboarding | 15 | 8 | 3 | 4 | 0 |
-| 02 Command | 3 | 0 | 0 | 3 | 0 |
-| 03 Build | 15 | 0 | 0 | 15 | 0 |
-| 04 Operate | 8 | 0 | 0 | 8 | 0 |
-| 05 Intelligence | 1 | 0 | 0 | 1 | 0 |
-| 06 Portfolio | 3 | 0 | 0 | 3 | 0 |
-| 07 System | 8 | 3 | 1 | 4 | 0 |
-| 08 States | 7 | 0 | 4 | 3 | 0 |
-| **Total** | **60** | **11** | **8** | **41** | **0** |
+| Domain | Rows | Implemented | Foundation | In progress | Not started | Deferred |
+|---|---|---|---|---|---|---|
+| 01 Auth & Onboarding | 15 | 5 | 3 | 3 | 4 | 0 |
+| 02 Command | 3 | 0 | 0 | 0 | 3 | 0 |
+| 03 Build | 15 | 0 | 0 | 0 | 15 | 0 |
+| 04 Operate | 8 | 0 | 0 | 0 | 8 | 0 |
+| 05 Intelligence | 1 | 0 | 0 | 0 | 1 | 0 |
+| 06 Portfolio | 3 | 0 | 0 | 0 | 3 | 0 |
+| 07 System | 8 | 0 | 3 | 1 | 4 | 0 |
+| 08 States | 7 | 0 | 0 | 4 | 3 | 0 |
+| **Total** | **60** | **5** | **6** | **8** | **41** | **0** |
 
 ## 01 Auth & Onboarding
 
 | # | Capability | Product area | Phase | Route | Figma node | Backend module | API / server action | Required permission | RLS / authorization boundary | Test requirement | Current implementation status | Notes / dependencies |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Login | Auth | P0 | `/auth/login` | 31:3441 | `identity` | `loginAction` → `identity.login` → Better Auth `POST /api/v1/auth/sign-in/email` | Public | Better Auth as `dxo_auth`; per-IP and per-account rate limits; account lockout; Origin/CSRF checks forced on (ADR-0009) | E2E + auth | Foundation | Integration-tested. Honours a validated `next` path (ADR-0013). Figma API label `POST /api/v1/auth/login` differs from the implemented Better Auth path. Figma: Ready. |
-| 2 | Login error | Auth | P0 | `/auth/login/error` | 31:3549 | `identity` | as Login | Public | Identical response for unknown account and wrong password; lockout | E2E + lockout | In progress | Errors render inline on `/auth/login`; the `/auth/login/error` route does not exist. Lockout is implemented and tested. Figma: Ready. |
-| 3 | Forgot password | Auth | P0 | `/auth/forgot-password` | 31:3503 | `identity` | `forgotPasswordAction` → `requestPasswordReset` → `POST /api/v1/auth/request-password-reset` | Public | Non-enumerating response; IP and account rate limits | E2E + rate limit | Foundation | Figma API label `POST /api/v1/auth/password/forgot`. Figma: Ready. |
-| 4 | Set new password | Auth | P0 | `/auth/reset-password` | 33:3315 | `identity` | `resetPasswordAction` → `resetPassword` → `POST /api/v1/auth/reset-password` | Public with valid token | Hashed, single-use, 30-minute token; reset revokes all sessions | token + validation | Foundation | Token consumed only on explicit POST. Figma: Ready. |
-| 5 | Create account | Auth | P0 | `/auth/register` | 33:3202 | `identity` | `registerAction` → `register` → `POST /api/v1/auth/sign-up/email` | Public | Duplicate email returns a synthetic success (no enumeration); rate limits | E2E + validation | Foundation | Carries a validated `next` (e.g. `/invite/[token]`) through the verification email. Figma API label `POST /api/v1/users`. Figma: Ready. |
-| 6 | Verify email | Auth | P0 | `/auth/verify-email` | 33:3266 | `identity` | `verifyEmailAction` → `verifyEmail` → Better Auth `/api/v1/auth/verify-email` | Public with valid token | Single-use JWT recorded in `auth_consumed_tokens` | token + idempotency | Foundation | Figma lists the permission as Authenticated; spec §8 says Public with valid token, and the implementation follows the spec. Figma: Ready. |
+| 1 | Login | Auth | P0 | `/auth/login` | 31:3441 | `identity` | `loginAction` → `identity.login` → Better Auth `POST /api/v1/auth/sign-in/email` | Public | Better Auth as `dxo_auth`; per-IP and per-account rate limits; account lockout; Origin/CSRF checks forced on (ADR-0009) | E2E + auth | Implemented | Integration-tested. Figma visual and Playwright E2E + axe (desktop, mobile) in `tests/e2e/auth.spec.ts` (ADR-0014). Honours a validated `next` path (ADR-0013). SSO and "Remember me" are not built (design-sync 14). Figma API label `POST /api/v1/auth/login` differs from the implemented Better Auth path. Figma: Ready. |
+| 2 | Login error | Auth | P0 | `/auth/login/error` | 31:3549 | `identity` | as Login | Public | Identical response for unknown account and wrong password; lockout | E2E + lockout | In progress | The Figma failed-sign-in state renders inline on `/auth/login` with a focused error summary (E2E-tested); the `/auth/login/error` route does not exist. Lockout is implemented and tested. Remaining attempts are not shown (design-sync 18). Figma: Ready. |
+| 3 | Forgot password | Auth | P0 | `/auth/forgot-password` | 31:3503 | `identity` | `forgotPasswordAction` → `requestPasswordReset` → `POST /api/v1/auth/request-password-reset` | Public | Non-enumerating response; IP and account rate limits | E2E + rate limit | Implemented | Figma visual and Playwright E2E + axe (desktop, mobile) in `tests/e2e/auth.spec.ts` (ADR-0014). Figma API label `POST /api/v1/auth/password/forgot`. Figma: Ready. |
+| 4 | Set new password | Auth | P0 | `/auth/reset-password` | 33:3315 | `identity` | `resetPasswordAction` → `resetPassword` → `POST /api/v1/auth/reset-password` | Public with valid token | Hashed, single-use, 30-minute token; reset revokes all sessions | token + validation | Implemented | Token consumed only on explicit POST. Figma visual and Playwright E2E + axe (desktop, mobile) in `tests/e2e/auth.spec.ts` (ADR-0014). Confirm-password check in `resetPasswordAction`; requirements panel states the enforced policy (design-sync 15). Figma: Ready. |
+| 5 | Create account | Auth | P0 | `/auth/register` | 33:3202 | `identity` | `registerAction` → `register` → `POST /api/v1/auth/sign-up/email` | Public | Duplicate email returns a synthetic success (no enumeration); rate limits | E2E + validation | Implemented | Figma visual and Playwright E2E + axe (desktop, mobile) in `tests/e2e/auth.spec.ts` (ADR-0014). Success shows the Figma "Check your inbox" state (33:3266) with resend (`resendVerificationAction`). Carries a validated `next` (e.g. `/invite/[token]`) through the verification email. Figma API label `POST /api/v1/users`. Figma: Ready. |
+| 6 | Verify email | Auth | P0 | `/auth/verify-email` | 33:3266 | `identity` | `verifyEmailAction` → `verifyEmail` → Better Auth `/api/v1/auth/verify-email` | Public with valid token | Single-use JWT recorded in `auth_consumed_tokens` | token + idempotency | Implemented | Figma visual and Playwright E2E + axe (desktop, mobile) in `tests/e2e/auth.spec.ts` (ADR-0014). Figma lists the permission as Authenticated; spec §8 says Public with valid token, and the implementation follows the spec. Figma: Ready. |
 | 7 | Accept invitation | Auth / Team | P0 | `/invite/[token]` | 54:27078 | `memberships` | `previewInvitation`; `acceptInvitationAction` → `acceptInvitation` → `app.accept_venture_invitation()` | Invited user: signed in, email verified, email equals invited address | SECURITY DEFINER function; token stored as SHA-256 digest only; atomic membership creation with audit; RLS on `venture_invitations` | E2E + auth | Foundation | ADR-0013 route (canonical). Figma route `/auth/invitations/[token]` and API `POST /api/v1/invitations/accept` are superseded (server action only). Figma: New P0. |
 | 8 | MFA | Auth | P0 | `/auth/mfa` | 54:27145 | `identity` (Figma: `auth-security`) | planned: TOTP verify/enrol via Better Auth (Figma label `POST /api/v1/auth/mfa/verify`) | Authenticated (first factor verified; second factor pending or being enrolled) | Planned: TOTP via Better Auth (ADR-0009); recovery codes | E2E + recovery | Not started | **Step 6.** `users.two_factor_enabled` exists. Covers challenge, setup and recovery. Figma: New P0. |
 | 9 | Session expired | Auth | P0 | `/auth/session-expired` | 54:27222 | `identity` (sessions) | None: database-backed sessions, no refresh-token API (ADR-0009) | Public | Idle (7 d) and absolute (30 d) expiry enforced server-side on every request | E2E + redirect | Not started | **Step 6** (session/device management). Expiry is enforced and tested; expired sessions currently go to `/auth/login`. Figma `POST /api/v1/auth/refresh` will not be built. Figma: New P0. |
@@ -151,7 +151,7 @@ All Build rows are P2 and Not started. Spec routes are canonical; the Figma rout
 These approved Figma frames and spec items are foundations or specifications, not capability rows:
 
 - **App shell:** responsive behaviour 54:24043; desktop, tablet and mobile 54:24284–54:24286. Spec §12 lists "Global application shell and venture switcher" as P0. The venture-switching service exists (`listSwitchableVentures`, `resolveSelectedVenture`); the shell UI does not.
-- **Design system:** Foundations v2 54:15162, Controls v2 54:15538, Product Patterns v2 54:15959, UI foundations 39:457. No `src/ui` implementation yet.
+- **Design system:** Foundations v2 54:15162, Controls v2 54:15538, Product Patterns v2 54:15959, UI foundations 39:457. Implemented in `src/ui` (tokens, Geist fonts, Button, Text Field, Checkbox, Alert, Status badge, error summary, Figma icon assets) per ADR-0014. Product Patterns v2 components arrive with the screens that use them.
 - **Technical specification frames:** spec §9 (`/internal/specs/*`, nodes 19:4–19:2323).
 
 ## Resolved decisions
@@ -171,6 +171,13 @@ These were open between the spec, ADRs and Figma; they are now decided (spec §5
 Figma labels that differed from the canonical values above. None blocks implementation.
 
 **Status (Oct 2026):** items 1–12 have been applied in the Figma file. Routes, permissions, phases and role labels were corrected in the Master Implementation Matrix (54:29298), the domain matrices (50:9967, 50:10242, 50:10477), the API (19:1684) and security (19:2078) frames, and the Team and Permissions, Accept invitation, Request access, Access request submitted and 403 screens. Canonical routes are recorded as Dev Mode annotations on the affected frames. Variables (127), native components (51) and the 60 capability rows are unchanged. The list below is kept as a record.
+
+**Open (copy and controls that differ from the backend, ADR-0014):**
+14. **SSO, "Remember me" and Terms checkbox** (31:3441, 33:3202): not in the spec or backend; not built.
+15. **Password requirements** (33:3202, 33:3315): Figma "10+ characters, upper/lower, number and symbol" → enforced policy 12–128 characters (ADR-0009).
+16. **Verification link lifetime** (33:3266): Figma "30 minutes" → 24 hours (`TOKEN_POLICY`).
+17. **Auth trust metrics** (auth story panel): Figma sample data ("£1M growth", "Balanced") and "Encryption: End-to-end" → TLS in transit, secure auth and role-based access. The app does not provide end-to-end encryption.
+18. **Failed sign-in** (31:3549): "You have 4 attempts remaining" → non-enumerating message; remaining attempts are not disclosed.
 
 **Open (needs design work, not label changes):**
 - **Request access / Access request submitted (54:27340, 54:27489):** the screens still depict an existing member requesting a higher permission, with justification, a named approver, a request reference and approval tracking. P0 (ADR-0013) is a signed-in non-member requesting venture access with no venture disclosure; the reviewer chooses the role. Role labels were canonicalised and the conflict is annotated on both frames.
