@@ -62,6 +62,8 @@ DirectorXO
 - Initial venture setup uses `/onboarding/*`: `/onboarding` starts a new draft venture or resumes an owned draft at its persisted step; each onboarding step is venture-scoped at `/onboarding/[ventureId]/*`.
 - The venture ID is part of every onboarding step route because venture context is security-sensitive. The route ID is only a reference: the server resolves and authorises it (active membership, Owner role, draft status) on every request and action, with PostgreSQL RLS confirming access independently. It is never taken from browser state.
 - Venture-scoped product routes use `/v/[ventureId]/*`.
+- Team invitation acceptance uses `/invite/[token]`. The token is the only identifier in the link. Invitation details are shown only to the signed-in, email-verified account the invitation was addressed to, and acceptance is an explicit POST (ADR-0013).
+- The permission-denied request-access flow uses `/v/[ventureId]/request-access`. Its page and outcome are identical whether or not the venture exists; "request submitted" is a state of this route, not a separate route (ADR-0013).
 - Portfolio routes use `/portfolio/*`.
 - Account-level settings use `/settings/*`.
 - Venture integrations use `/v/[ventureId]/settings/integrations`.
@@ -113,6 +115,14 @@ Core workflows support keyboard navigation, WCAG 2.2 AA contrast, desktop, table
 | Operator | Day-to-day record creation and updates in assigned domains |
 | Viewer | Read-only access to permitted venture data |
 
+These five roles are the only venture roles; there is no generic "Member" role. Role rules enforced in P0 (ADR-0013):
+
+- Each venture has exactly one Owner. The Owner role is assigned only when the venture is created. The Owner cannot be demoted, suspended or removed. Ownership transfer is not part of P0.
+- The Owner manages Admin, Manager, Operator and Viewer memberships. Admins manage Manager, Operator and Viewer memberships only; they cannot manage the Owner or other Admins.
+- Nobody changes their own role or membership status.
+- Permissions are derived from the role and re-evaluated against PostgreSQL on every protected request. They are never cached in a way that permits stale access.
+- Membership status is `active`, `suspended` (deactivated, reversible) or `removed`. Pending invitations are invitation records, not memberships.
+
 Matrix notation:
 
 - Public — no authenticated session required.
@@ -137,6 +147,9 @@ Matrix notation:
 | 33:3378 | Business setup onboarding | `/onboarding/[ventureId]/business` | Onboarding | Owner | P0 |
 | 33:3447 | Connect business data onboarding | `/onboarding/[ventureId]/data-connections` | Onboarding | Owner | P0 |
 | 39:164 | Review and confirm onboarding | `/onboarding/[ventureId]/review` | Onboarding | Owner | P0 |
+| 54:27078 | Accept team invitation | `/invite/[token]` | Memberships | Invited user (signed in as the invited, verified email) | P0 |
+| 54:27340 | Request access | `/v/[ventureId]/request-access` | Memberships | Authenticated | P0 |
+| 54:27489 | Access request submitted | `/v/[ventureId]/request-access` (submitted state) | Memberships | Authenticated | P0 |
 | 8:651 | Command Centre | `/v/[ventureId]/command` | Command | Viewer+ | P1 |
 | 29:1087 | £1M Growth Command | `/v/[ventureId]/command/growth-1m` | Command | Viewer+ | P1 |
 | 3:255 | DirectorXO dashboard | legacy redirect to Command | Legacy | Viewer+ | Deprecated |
@@ -229,11 +242,11 @@ The AI Copilot screen name does not authorize ML forecasting in Release 1. In P2
 
 ### P0 Required
 - Global application shell and venture switcher.
-- Accept team invitation.
+- Accept team invitation (`/invite/[token]`).
 - MFA setup and recovery.
 - Session and device management.
 - Venture creation and switching.
-- Permission-denied request-access flow.
+- Permission-denied request-access flow (`/v/[ventureId]/request-access`).
 
 ### P1 Required
 - Integration OAuth callback.

@@ -6,7 +6,7 @@
 ## Context
 Spec §7 defines five venture roles; §8 places Team and Permissions at `/v/[ventureId]/settings/team` (Admin+); §12 lists "Accept team invitation" and "Permission-denied request-access flow" as P0 screens without routes; §15 requires server-side RBAC, independent RLS, and that permission changes invalidate cached authorisation; §19 P0 exit criteria require inviting a member and assigning a role. ADR-0007 already reserves Owner rows from table writes and lets Admins manage Manager/Operator/Viewer only.
 
-`DIRECTORXO_IMPLEMENTATION_MATRIX.md` is referenced as a source of truth but is not present in the repository; this ADR records the decisions taken from the product specification alone.
+When this ADR was written, `DIRECTORXO_IMPLEMENTATION_MATRIX.md` was not in the repository, so these decisions were taken from the product specification alone. The matrix has since been recreated from the Figma Master Implementation Matrix (node 54:29298). Its Figma routes for invitations and access requests differ from this ADR, and this ADR's routes are canonical (see the matrix's open disagreements).
 
 ## Decision
 
@@ -36,13 +36,13 @@ A trigger on `venture_memberships` applies to every role, including definers and
 - Created and revoked by Owner/Admin under RLS. Email is sent after commit; a delivery failure is reported to the inviter and leaves a revocable invitation.
 - Acceptance only through `app.accept_venture_invitation(token_hash)` (SECURITY DEFINER), which locks the invitation and, in one transaction, re-checks: pending, not expired, signed-in user's **verified** email equals the invited address (case-insensitive), venture still active, inviter still an active member allowed to grant that role, and the user is not already an active or suspended member. It then creates (or reactivates) the membership, marks the invitation accepted and writes audit records. Any failure leaves no membership; failures are recorded as account-level `venture.invitation.accept_failed` events.
 - `app.preview_venture_invitation` discloses venture name, role and inviter only to the invited account.
-- Route: `/invite/[token]` (not defined by the spec; chosen for the P0 "Accept team invitation" screen). Acceptance is an explicit POST so mail scanners cannot consume the token. The page sends `Referrer-Policy: no-referrer`.
+- Route: `/invite/[token]`. Chosen for the P0 "Accept team invitation" screen (Figma 54:27078) and now canonical in spec §5 and §8; it supersedes Figma's `/auth/invitations/[token]`. Acceptance is an explicit POST so mail scanners cannot consume the token. The page sends `Referrer-Policy: no-referrer`.
 - New users: sign-in and registration carry a validated `next` path (`safeNextPath`: same-origin path of unreserved characters only). Registration passes it as Better Auth `callbackURL`; the verification email links to `/auth/verify-email?…&next=/invite/…`, whose success link signs in back to the invitation. Email verification remains mandatory; unverified identities cannot accept. The invitation itself persists server-side until expiry, so the original email link also keeps working.
 
 ### Access requests (`venture_access_requests`)
-- Route: `/v/[ventureId]/request-access` (follows the `/v/[ventureId]/*` convention; not defined by the spec). Venture pages show non-members and unknown ventures the same "no access — request access" state.
+- Route: `/v/[ventureId]/request-access`, following the `/v/[ventureId]/*` convention. It is now canonical in spec §5 and §8 for Figma 54:27340, and "submitted" (54:27489) is a state of this route. It supersedes Figma's `/v/[ventureId]/settings/request-access` and `/…/submitted`. Venture pages show non-members and unknown ventures the same "no access — request access" state.
 - Created only by `app.request_venture_access(venture_id)` (SECURITY DEFINER). The outcome is identical for unknown, non-active, already-joined, suspended, duplicate and over-limit (10 pending per requester) cases, and the requester cannot read requests, so the flow cannot discover ventures or their state. The requester's name and email are snapshotted so reviewers can identify a non-member without widening `users` visibility.
-- Owner/Admin review under RLS. Approval is one transaction: re-read reviewer role, check the request is still pending, create or reactivate the membership with the reviewer-chosen role (Admin cannot grant Admin), mark approved with reviewer, audit. Rejection records the reviewer and is audited. The requester is not notified (deferred to notifications, step 8).
+- Owner/Admin review under RLS. Approval is one transaction: re-read reviewer role, check the request is still pending, create or reactivate the membership with the reviewer-chosen role (Admin cannot grant Admin), mark approved with reviewer, audit. Rejection records the reviewer and is audited. The requester is not notified (deferred to the P0 audit and notification foundation).
 
 ### RLS design (migration 0007)
 | Table | dxo_app SELECT | INSERT | UPDATE | DELETE |
@@ -68,4 +68,4 @@ Jobs run as a service identity scoped to one venture. A job acting for a user mu
 ## Consequences
 - Team management requires an active venture (drafts are Owner-only onboarding).
 - REST endpoints under `/api/v1/memberships` are not added in P0 step 5; server actions call the same module services (ADR-0006).
-- Requesters and invitees receive no notification of decisions until the notification foundation (step 8).
+- Requesters and invitees receive no notification of decisions until the P0 audit and notification foundation.
