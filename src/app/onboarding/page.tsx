@@ -1,16 +1,16 @@
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
-import { listDraftVentures } from "@/modules/ventures";
+import { listDraftOnboarding } from "@/modules/ventures";
 import { createVentureAction } from "./actions";
 import { CreateVentureForm } from "./forms";
-import { requireActor, stepPath } from "./guard";
+import { requireActor, resumePath } from "./guard";
 
 export const dynamic = "force-dynamic";
 
-/** Onboarding entry: resume a draft venture or create a new one. */
+/** Onboarding entry: resume a draft at its persisted step, or create a new venture. */
 export default async function OnboardingStartPage() {
   const actor = await requireActor();
-  const drafts = await listDraftVentures(actor);
+  const drafts = await listDraftOnboarding(actor);
   return (
     <>
       <h1>Set up a venture</h1>
@@ -20,7 +20,7 @@ export default async function OnboardingStartPage() {
           <ul>
             {drafts.map((v) => (
               <li key={v.id}>
-                <Link href={stepPath(v.id, "business")}>{v.name}</Link>
+                <Link href={resumePath(v.id, v.currentStep)}>{v.name}</Link>
               </li>
             ))}
           </ul>

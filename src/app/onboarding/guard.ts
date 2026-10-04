@@ -43,5 +43,4 @@ export async function loadOnboardingPage(ventureId: string): Promise<OnboardingP
   }
 }
 
-export const stepPath = (ventureId: string, step: "business" | "data-connections" | "review") =>
-  `/onboarding/${ventureId}/${step}` as const;
+export { resumePath, stepPath } from "./routes";

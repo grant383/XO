@@ -8,8 +8,14 @@ import {
   type CompanyRegistry,
 } from "@/platform/integrations/companies-house";
 import { logger } from "@/platform/observability/logger";
-import { resolveVenture, type Actor, type VentureAccess } from "./access";
-import { pgCode, pgMessage, VentureNotFoundError, VenturePermissionError } from "./errors";
+import { listDraftVentures, resolveVenture, type Actor, type VentureAccess } from "./access";
+import {
+  pgCode,
+  pgMessage,
+  VentureNotFoundError,
+  VenturePermissionError,
+  VentureStateError,
+} from "./errors";
 import { businessDetailsInput, ventureNameInput, type BusinessDetails } from "./policy";
 import { companyRegistry } from "./registry";
 
@@ -187,6 +193,32 @@ async function readOnboarding(access: VentureAccess): Promise<OnboardingView> {
 /** Onboarding state for the Owner of a draft venture. */
 export async function getOnboarding(actor: Actor, ventureId: string): Promise<OnboardingView> {
   return readOnboarding(await resolveVenture(actor, ventureId, OWNER_OF_DRAFT));
+}
+
+export type DraftOnboarding = { id: string; name: string; currentStep: OnboardingStep };
+
+/**
+ * Owned drafts with their persisted onboarding step, for resuming setup. Each draft is
+ * re-resolved under RLS; one that stops being an owned draft meanwhile is left out.
+ */
+export async function listDraftOnboarding(actor: Actor): Promise<DraftOnboarding[]> {
+  const out: DraftOnboarding[] = [];
+  for (const draft of await listDraftVentures(actor)) {
+    try {
+      const view = await getOnboarding(actor, draft.id);
+      out.push({ id: draft.id, name: view.venture.name, currentStep: view.onboarding.currentStep });
+    } catch (error) {
+      if (
+        error instanceof VentureNotFoundError ||
+        error instanceof VenturePermissionError ||
+        error instanceof VentureStateError
+      ) {
+        continue;
+      }
+      throw error;
+    }
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------

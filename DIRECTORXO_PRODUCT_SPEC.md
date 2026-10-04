@@ -59,7 +59,8 @@ DirectorXO
 ## 5. Canonical Route Conventions
 
 - Auth routes use `/auth/*`.
-- Initial venture setup uses `/onboarding/*`.
+- Initial venture setup uses `/onboarding/*`: `/onboarding` starts a new draft venture or resumes an owned draft at its persisted step; each onboarding step is venture-scoped at `/onboarding/[ventureId]/*`.
+- The venture ID is part of every onboarding step route because venture context is security-sensitive. The route ID is only a reference: the server resolves and authorises it (active membership, Owner role, draft status) on every request and action, with PostgreSQL RLS confirming access independently. It is never taken from browser state.
 - Venture-scoped product routes use `/v/[ventureId]/*`.
 - Portfolio routes use `/portfolio/*`.
 - Account-level settings use `/settings/*`.
@@ -133,9 +134,9 @@ Matrix notation:
 | 33:3315 | Set new password | `/auth/reset-password` | Auth | Public with valid token | P0 |
 | 33:3202 | Create account | `/auth/register` | Auth | Public | P0 |
 | 33:3266 | Verify email | `/auth/verify-email` | Auth | Public with valid token | P0 |
-| 33:3378 | Business setup onboarding | `/onboarding/business` | Onboarding | Authenticated | P0 |
-| 33:3447 | Connect business data onboarding | `/onboarding/data-connections` | Onboarding | Owner | P0 |
-| 39:164 | Review and confirm onboarding | `/onboarding/review` | Onboarding | Owner | P0 |
+| 33:3378 | Business setup onboarding | `/onboarding/[ventureId]/business` | Onboarding | Owner | P0 |
+| 33:3447 | Connect business data onboarding | `/onboarding/[ventureId]/data-connections` | Onboarding | Owner | P0 |
+| 39:164 | Review and confirm onboarding | `/onboarding/[ventureId]/review` | Onboarding | Owner | P0 |
 | 8:651 | Command Centre | `/v/[ventureId]/command` | Command | Viewer+ | P1 |
 | 29:1087 | £1M Growth Command | `/v/[ventureId]/command/growth-1m` | Command | Viewer+ | P1 |
 | 3:255 | DirectorXO dashboard | legacy redirect to Command | Legacy | Viewer+ | Deprecated |
