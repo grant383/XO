@@ -5,7 +5,7 @@ import { z } from "zod";
  * what it uses, so `next build` does not require production secrets. Error messages
  * list variable names only, never values.
  */
-function defineEnv<S extends z.ZodObject>(schema: S): () => z.infer<S> {
+function defineEnv<S extends z.ZodType>(schema: S): () => z.infer<S> {
   let cached: z.infer<S> | undefined;
   return () => {
     if (cached) return cached;
@@ -43,4 +43,48 @@ export const redisEnv = defineEnv(
   z.object({
     REDIS_URL: z.url({ protocol: /^rediss?$/ }),
   }),
+);
+
+export const authEnv = defineEnv(
+  z
+    .object({
+      NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+      APP_URL: z.url(),
+      /** Signs session cookies and verification tokens. Rotate via ADR-0009 procedure. */
+      AUTH_SECRET: z.string().min(32),
+    })
+    // Secure cookies require TLS: production must be served over https.
+    .refine((env) => env.NODE_ENV !== "production" || env.APP_URL.startsWith("https://"), {
+      path: ["APP_URL"],
+      message: "production requires an https APP_URL",
+    }),
+);
+
+/**
+ * Transactional email. `smtp` targets Mailpit locally; `sendgrid` is used in staging and
+ * production; `memory` captures messages in-process for automated tests only.
+ */
+export const emailEnv = defineEnv(
+  z
+    .discriminatedUnion("EMAIL_PROVIDER", [
+      z.object({
+        EMAIL_PROVIDER: z.literal("smtp"),
+        SMTP_URL: z.url({ protocol: /^smtps?$/ }),
+      }),
+      z.object({
+        EMAIL_PROVIDER: z.literal("sendgrid"),
+        SENDGRID_API_KEY: z.string().min(20),
+      }),
+      z.object({ EMAIL_PROVIDER: z.literal("memory") }),
+    ])
+    .and(
+      z.object({
+        NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+        EMAIL_FROM: z.string().min(3),
+      }),
+    )
+    .refine((env) => !(env.NODE_ENV === "production" && env.EMAIL_PROVIDER !== "sendgrid"), {
+      path: ["EMAIL_PROVIDER"],
+      message: "production requires EMAIL_PROVIDER=sendgrid",
+    }),
 );
