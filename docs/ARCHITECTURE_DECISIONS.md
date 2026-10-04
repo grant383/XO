@@ -50,3 +50,4 @@ Status: Accepted
 | [0009](adr/0009-authentication-better-auth.md) | Authentication with Better Auth | Accepted |
 | [0010](adr/0010-hosting-railway.md) | Hosting on Railway; RPO/RTO | Accepted |
 | [0011](adr/0011-billing-accounts.md) | Billing accounts separate from venture ownership | Accepted |
+| [0013](adr/0013-memberships-rbac-invitations.md) | Memberships, RBAC, invitations and access requests | Accepted |
