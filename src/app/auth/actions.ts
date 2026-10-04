@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { headers } from "next/headers";
+import type { Route } from "next";
 import { redirect } from "next/navigation";
 import {
   CORRELATION_HEADER,
@@ -10,6 +11,7 @@ import {
   register,
   requestPasswordReset,
   resetPassword,
+  safeNextPath,
   verifyEmail,
   type FlowResult,
 } from "@/modules/identity";
@@ -36,6 +38,7 @@ export async function registerAction(_prev: FormState, data: FormData): Promise<
   const result = await register(
     { name: field(data, "name"), email: field(data, "email"), password: field(data, "password") },
     await requestHeaders(),
+    safeNextPath(field(data, "next")),
   );
   // Identical message whether or not the address already has an account.
   return toState(result, "Check your inbox for a link to verify your email address.");
@@ -47,7 +50,8 @@ export async function loginAction(_prev: FormState, data: FormData): Promise<For
     await requestHeaders(),
   );
   if (!result.ok) return toState(result, "");
-  redirect("/");
+  // Only validated same-origin paths (e.g. a pending invitation); never an external URL.
+  redirect((safeNextPath(field(data, "next")) ?? "/") as Route);
 }
 
 export async function forgotPasswordAction(_prev: FormState, data: FormData): Promise<FormState> {

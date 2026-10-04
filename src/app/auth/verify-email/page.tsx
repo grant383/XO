@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { safeNextPath, withNext } from "@/modules/identity";
 import { verifyEmailAction } from "../actions";
 import { AuthForm } from "../auth-form";
 
 // The URL carries a single-use token: never send it in a Referer header.
 export const metadata: Metadata = { title: "Verify email", referrer: "no-referrer" };
 
-type Props = { searchParams: Promise<{ token?: string | string[] }> };
+type Props = { searchParams: Promise<{ token?: string | string[]; next?: string | string[] }> };
 
 /**
  * Verification happens on an explicit button press (POST), not on page load, so email
  * security scanners that pre-fetch links cannot consume the single-use token.
  */
 export default async function VerifyEmailPage({ searchParams }: Props) {
-  const { token } = await searchParams;
+  const { token, next } = await searchParams;
   if (typeof token !== "string" || token.length === 0) {
     return (
       <>
@@ -30,7 +31,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
         action={verifyEmailAction}
         submitLabel="Verify email address"
         hidden={{ token }}
-        next={{ href: "/auth/login", label: "Sign in" }}
+        next={{ href: withNext("/auth/login", safeNextPath(next)), label: "Sign in" }}
         fields={[]}
       />
     </>

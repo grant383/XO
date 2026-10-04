@@ -1,7 +1,8 @@
+import type { Route } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { getSession } from "@/modules/identity";
-import { listMyVentures } from "@/modules/ventures";
+import { can, listMyVentures, ROLE_LABELS } from "@/modules/ventures";
 import { logoutAction } from "./auth/actions";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +35,13 @@ export default async function HomePage() {
         <ul>
           {active.map((v) => (
             <li key={v.id}>
-              {v.name} ({v.role})
+              {v.name} ({ROLE_LABELS[v.role]})
+              {can(v.role, "team:view") ? (
+                <>
+                  {" "}
+                  — <Link href={`/v/${v.id}/settings/team` as Route}>Team and permissions</Link>
+                </>
+              ) : null}
             </li>
           ))}
         </ul>

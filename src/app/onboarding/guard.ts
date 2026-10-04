@@ -1,7 +1,4 @@
-import { randomUUID } from "node:crypto";
-import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { CORRELATION_HEADER, getSession } from "@/modules/identity";
 import {
   getOnboarding,
   VentureNotFoundError,
@@ -10,18 +7,7 @@ import {
   type Actor,
   type OnboardingView,
 } from "@/modules/ventures";
-
-/** The authenticated actor for this request; redirects to sign-in when there is none. */
-export async function requireActor(): Promise<Actor> {
-  const h = await headers();
-  const session = await getSession(h);
-  if (!session) redirect("/auth/login");
-  const incoming = h.get(CORRELATION_HEADER);
-  return {
-    userId: session.userId,
-    correlationId: incoming && /^[A-Za-z0-9._-]{8,128}$/.test(incoming) ? incoming : randomUUID(),
-  };
-}
+import { requireActor } from "../actor";
 
 export type OnboardingPageContext =
   { kind: "ok"; actor: Actor; view: OnboardingView } | { kind: "forbidden" };
@@ -43,4 +29,5 @@ export async function loadOnboardingPage(ventureId: string): Promise<OnboardingP
   }
 }
 
+export { requireActor };
 export { resumePath, stepPath } from "./routes";

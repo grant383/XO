@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import { useActionState } from "react";
 import { idle, type FormState } from "./form-state";
@@ -19,8 +20,8 @@ type Props = {
   fields: FieldSpec[];
   submitLabel: string;
   hidden?: Record<string, string>;
-  /** Shown with the success message (e.g. a link to sign in). */
-  next?: { href: "/auth/login"; label: string };
+  /** Shown with the success message (e.g. a link to sign in, built by `withNext`). */
+  next?: { href: string; label: string };
 };
 
 /** Minimal accessible P0 form. Visual design follows the approved Figma in a later step. */
@@ -31,7 +32,7 @@ export function AuthForm({ action, fields, submitLabel, hidden, next }: Props) {
     return (
       <div role="status" aria-live="polite">
         <p>{state.message}</p>
-        {next ? <Link href={next.href}>{next.label}</Link> : null}
+        {next ? <Link href={next.href as Route}>{next.label}</Link> : null}
       </div>
     );
   }
