@@ -45,12 +45,26 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U dxo_admin -d directorxo_test"
           --health-interval 5s --health-timeout 3s --health-retries 20
+      # Auth rate limiting (integration tests exercise the Redis store).
+      redis:
+        image: redis:8-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      # SMTP sink for the email adapter integration test.
+      mailpit:
+        image: axllent/mailpit:latest
+        ports: ["1025:1025", "8025:8025"]
     env:
       CI: "true"
       TEST_ADMIN_DATABASE_URL: postgresql://dxo_admin:ci-admin-password@localhost:5432/directorxo_test
       DB_APP_PASSWORD: ci-app-password
       DB_AUTH_PASSWORD: ci-auth-password
       DB_MIGRATOR_PASSWORD: ci-migrator-password
+      REDIS_URL: redis://localhost:6379
+      SMTP_URL: smtp://localhost:1025
+      MAILPIT_API_URL: http://localhost:8025
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
