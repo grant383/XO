@@ -14,13 +14,17 @@ const session = vi.hoisted(() => ({
   current: null as { userId: string; email: string; name: string } | null,
 }));
 
-vi.mock("next/headers", () => ({ headers: async () => new Headers() }));
+vi.mock("next/headers", () => ({
+  headers: async () => new Headers(),
+  cookies: async () => ({ getAll: () => [] }),
+}));
 vi.mock("next/cache", () => ({ revalidatePath: () => undefined }));
 vi.mock("@/modules/identity", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/modules/identity")>()),
   getSession: async () => (session.current ? { ...session.current, emailVerified: true } : null),
   logout: async () => ({ ok: true, data: undefined }),
-  login: async () => ({ ok: true, data: undefined }),
+  login: async () => ({ ok: true, data: { mfaRequired: false } }),
+  hasSessionCookie: async () => false,
 }));
 
 const { default: TeamPage } = await import("@/app/v/[ventureId]/(shell)/settings/team/page");

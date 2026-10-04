@@ -1,6 +1,6 @@
 # ADR-0009 — Authentication with Better Auth
 
-- Status: Accepted (decision D1); implemented in P0 step 3 (MFA in step 6)
+- Status: Accepted (decision D1); implemented in P0 step 3; TOTP MFA implemented in step 6 (ADR-0016)
 - Date: 2026-10-03 (updated 2026-10-04 with step 3 implementation decisions)
 
 ## Context
@@ -74,7 +74,7 @@ Better Auth's logger is bridged to pino through a scrubber that removes email ad
 Profile reads go through `withUser` (`dxo_app` plus RLS: self or co-members). Only `name` can be updated, through Better Auth `/update-user`. Users can list sessions (without tokens) and revoke one or all others.
 
 ## Consequences
-- Rotating `AUTH_SECRET` invalidates every session and outstanding verification link.
+- Rotating `AUTH_SECRET` invalidates every session and outstanding verification link, and makes stored TOTP secrets and backup codes undecryptable unless the previous secret is kept through Better Auth's versioned `secrets` option (ADR-0016).
 - Lockout can be triggered against a known address by a third party (a bounded 15-minute denial of service). MFA (step 6) and, if needed, CAPTCHA on repeated lockouts are the mitigations.
 - Verify/reset tokens travel in query strings, so edge or proxy access logs that record full URLs will contain them. Exposure is bounded by single use and short TTLs. Moving tokens into the URL fragment would remove this but requires JavaScript; to be revisited with the Figma auth screens.
 - Session tokens are stored in plaintext in `sessions` (Better Auth design), reachable only by `dxo_auth`.

@@ -17,11 +17,16 @@ import { createUser, VALID_BUSINESS } from "../../helpers/ventures";
  */
 const session = vi.hoisted(() => ({ userId: null as string | null }));
 
-vi.mock("next/headers", () => ({ headers: async () => new Headers() }));
-vi.mock("@/modules/identity", () => ({
+vi.mock("next/headers", () => ({
+  headers: async () => new Headers(),
+  cookies: async () => ({ getAll: () => [] }),
+}));
+vi.mock("@/modules/identity", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/modules/identity")>()),
   CORRELATION_HEADER: "x-correlation-id",
   getSession: async () =>
     session.userId ? { userId: session.userId, name: "Test", email: "t@example.test" } : null,
+  hasSessionCookie: async () => false,
 }));
 
 const { loadOnboardingPage, resumePath } = await import("@/app/onboarding/guard");
@@ -150,7 +155,10 @@ describe("forged or inaccessible venture ids", () => {
 
   it("requires a session", async () => {
     const { ventureId } = await draftFor("anon");
-    expect(redirectTo(await digestOf(() => loadOnboardingPage(ventureId)))).toBe("/auth/login");
+    // Pages return to themselves after sign-in; actions re-render the page that posted them.
+    expect(redirectTo(await digestOf(() => loadOnboardingPage(ventureId)))).toBe(
+      `/auth/login?next=${encodeURIComponent(`/onboarding/${ventureId}`)}`,
+    );
     expect(redirectTo(await digestOf(() => completeOnboardingAction(ventureId)))).toBe(
       "/auth/login",
     );

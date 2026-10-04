@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useId } from "react";
 import { Avatar, Icon } from "@/ui";
 import { logoutAction } from "../auth/actions";
@@ -9,8 +10,7 @@ import { usePopover } from "./use-popover";
 
 /**
  * Figma Component/Navigation/Account Control. Account-level only (54:24043 contract): it
- * never carries venture navigation. P0 offers sign-out; profile and security settings
- * arrive with the profile/security step.
+ * never carries venture navigation: Profile & Security and sign-out.
  */
 export function AccountMenu({
   user,
@@ -50,6 +50,9 @@ export function AccountMenu({
       <div id={panelId} className={`${styles.popover} ${styles.popoverEnd}`} hidden={!open}>
         <p className={styles.popoverLabel}>Signed in as</p>
         <p className={styles.popoverEmail}>{user.email}</p>
+        <Link href="/settings/profile-security" className={styles.popoverAction}>
+          Profile &amp; Security
+        </Link>
         <form action={logoutAction}>
           <button type="submit" className={styles.popoverAction}>
             Sign out

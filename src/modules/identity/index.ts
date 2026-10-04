@@ -18,6 +18,7 @@ export {
   confirmMfaEnrolment,
   disableMfa,
   getMfaStatus,
+  getPasswordChangedAt,
   getProfile,
   hasMfaChallenge,
   listSessions,

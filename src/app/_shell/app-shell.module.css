@@ -122,6 +122,19 @@
   cursor: pointer;
 }
 
+/* No venture in context (account pages): a neutral mark in place of the venture mark. */
+.switcherPlaceholder {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--surface-control);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-6);
+}
+
 .switcherButton:hover,
 .accountButton:hover {
   border-color: var(--border-strong);

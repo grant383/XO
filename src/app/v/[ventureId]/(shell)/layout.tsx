@@ -29,12 +29,12 @@ function navigationFor(access: VentureAccess): ShellNavSection[] {
   const sections: ShellNavSection[] = [
     { label: "Venture", items: [{ href: base, label: "Home", exact: true }] },
   ];
+  // Profile & Security is account-level (/settings/*), open to every signed-in user.
+  const system = [{ href: "/settings/profile-security", label: "Profile & Security" }];
   if (can(access.role, "team:view")) {
-    sections.push({
-      label: "System",
-      items: [{ href: `${base}/settings/team`, label: "Team & permissions" }],
-    });
+    system.push({ href: `${base}/settings/team`, label: "Team & permissions" });
   }
+  sections.push({ label: "System", items: system });
   return sections;
 }
 

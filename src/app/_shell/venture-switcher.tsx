@@ -17,7 +17,8 @@ export function VentureSwitcher({
   current,
   ventures,
 }: {
-  current: ShellVenture;
+  /** Null on account-level pages: the switcher then only offers the user's ventures. */
+  current: ShellVenture | null;
   ventures: ShellVenture[];
 }) {
   const { open, toggle, rootRef, triggerRef } = usePopover();
@@ -30,13 +31,23 @@ export function VentureSwitcher({
         className={styles.switcherButton}
         aria-expanded={open}
         aria-controls={panelId}
-        aria-label={`Current venture: ${current.name}. Switch venture`}
+        aria-label={
+          current ? `Current venture: ${current.name}. Switch venture` : "Choose a venture"
+        }
         onClick={toggle}
       >
-        <Avatar name={current.name} size={32} shape="square" />
+        {current ? (
+          <Avatar name={current.name} size={32} shape="square" />
+        ) : (
+          <span className={styles.switcherPlaceholder} aria-hidden="true">
+            <Icon name="building-2-sm" />
+          </span>
+        )}
         <span className={styles.switcherCopy}>
-          <span className={styles.switcherName}>{current.name}</span>
-          <span className={styles.switcherContext}>{current.roleLabel}</span>
+          <span className={styles.switcherName}>{current ? current.name : "Your ventures"}</span>
+          <span className={styles.switcherContext}>
+            {current ? current.roleLabel : "Choose a venture"}
+          </span>
         </span>
         <Icon name="chevrons-up-down" className={styles.switcherChevron} />
       </button>
@@ -47,8 +58,11 @@ export function VentureSwitcher({
             <li key={v.id}>
               <Link
                 href={`/v/${v.id}` as Route}
-                className={cx(styles.popoverItem, v.id === current.id && styles.popoverItemCurrent)}
-                aria-current={v.id === current.id ? "page" : undefined}
+                className={cx(
+                  styles.popoverItem,
+                  v.id === current?.id && styles.popoverItemCurrent,
+                )}
+                aria-current={v.id === current?.id ? "page" : undefined}
               >
                 <Avatar name={v.name} size={24} shape="square" />
                 <span className={styles.popoverItemCopy}>

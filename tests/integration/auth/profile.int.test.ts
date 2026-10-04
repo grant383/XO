@@ -2,6 +2,7 @@ import type { Sql } from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closePools } from "@/platform/db";
 import {
+  getPasswordChangedAt,
   getProfile,
   listSessions,
   register,
@@ -87,6 +88,28 @@ describe("profile identity foundation", () => {
     const [row] =
       await admin`select email, image, email_verified from users where id = ${u.userId}`;
     expect(row).toMatchObject({ email: u.email, image: null, email_verified: true });
+  });
+
+  it("reports when the password last changed, for the signed-in user only", async () => {
+    const u = await createVerifiedUser(t.mailbox, "pw-date");
+    const { jar } = await signIn(u.email, u.password);
+    // Backdate the credential (the touch trigger is bypassed for this fixture only).
+    await admin.begin(async (tx) => {
+      await tx`set local session_replication_role = replica`;
+      await tx`update accounts set updated_at = now() - interval '40 days'
+               where user_id = ${u.userId}`;
+    });
+    const before = await getPasswordChangedAt(headersFor(jar.header()));
+    expect(before!.getTime()).toBeLessThan(Date.now() - 39 * 86_400_000);
+
+    const res = await api("/change-password", {
+      body: { currentPassword: u.password, newPassword: "a-changed-passphrase-2" },
+      jar,
+    });
+    expect(res.status).toBe(200);
+    const after = await getPasswordChangedAt(headersFor(jar.header()));
+    expect(after!.getTime()).toBeGreaterThan(Date.now() - 60_000);
+    await expect(getPasswordChangedAt(new Headers())).rejects.toBeInstanceOf(UnauthenticatedError);
   });
 
   it("rejects unauthenticated profile updates", async () => {

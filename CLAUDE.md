@@ -63,7 +63,7 @@ A screen or capability is not complete until applicable requirements in the prod
 
 ## First implementation target
 
-**Step numbering:** the current P0 execution-step numbering takes precedence over the older numbered checklist below. Steps 1–4 (tooling/CI, database roles and RLS, authentication/sessions/email/rate limiting, venture lifecycle/onboarding/switching) and Step 5 (memberships, RBAC, invitations, access requests) are complete. **Step 6 = MFA, recovery, session/device management.** References such as "step 6" in ADRs and the implementation matrix use the execution numbering.
+**Step numbering:** the current P0 execution-step numbering takes precedence over the older numbered checklist below. Steps 1–4 (tooling/CI, database roles and RLS, authentication/sessions/email/rate limiting, venture lifecycle/onboarding/switching), Step 5 (memberships, RBAC, invitations, access requests) and **Step 6 (MFA, recovery, session/device management, ADR-0016)** are complete. References such as "step 6" in ADRs and the implementation matrix use the execution numbering.
 
 P0 Foundation (original checklist; scope reference only, not execution order):
 1. application shell/design foundations;

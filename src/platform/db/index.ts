@@ -5,6 +5,7 @@ export {
   appendAccountAuditEvent,
   consumeSingleUseToken,
   consumeTotpCode,
+  credentialUpdatedAt,
   listActiveSessions,
   sessionTokenFor,
   revokeUserVerificationValues,

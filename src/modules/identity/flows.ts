@@ -1,7 +1,13 @@
 import { isAPIError } from "better-auth/api";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { listActiveSessions, schema, sessionTokenFor, withUser } from "@/platform/db";
+import {
+  credentialUpdatedAt,
+  listActiveSessions,
+  schema,
+  sessionTokenFor,
+  withUser,
+} from "@/platform/db";
 import { PASSWORD_POLICY } from "./policy";
 import { safeNextPath } from "./redirects";
 import { getAuth, requireSession } from "./service";
@@ -297,6 +303,12 @@ export async function getProfile(headers: Headers): Promise<Profile> {
   const profile = rows[0];
   if (!profile) throw new Error("Profile not visible for the authenticated user");
   return profile;
+}
+
+/** When the signed-in user's password last changed, for "Last changed …" displays. */
+export async function getPasswordChangedAt(headers: Headers): Promise<Date | null> {
+  const session = await requireSession(headers);
+  return credentialUpdatedAt(session.userId);
 }
 
 export async function updateName(input: unknown, headers: Headers): Promise<FlowResult> {

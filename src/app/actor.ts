@@ -1,9 +1,24 @@
 import { randomUUID } from "node:crypto";
 import type { Route } from "next";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { CORRELATION_HEADER, getSession, hasSessionCookie, withNext } from "@/modules/identity";
 import type { Actor } from "@/modules/ventures";
+
+/**
+ * Request headers for identity reads, with the Cookie header rebuilt from `cookies()`.
+ * When a server action rotates the session cookie (password change, MFA on/off), Next.js
+ * re-renders the route in the same response and syncs `cookies()` with the new value, but
+ * not `headers()`. Reading the session from raw headers there would see the revoked
+ * session and send the user to /auth/session-expired.
+ */
+export async function identityHeaders(): Promise<Headers> {
+  const h = new Headers(await headers());
+  const jar = (await cookies()).getAll();
+  if (jar.length === 0) h.delete("cookie");
+  else h.set("cookie", jar.map((c) => `${c.name}=${encodeURIComponent(c.value)}`).join("; "));
+  return h;
+}
 
 /**
  * Where a request without a valid session goes: `/auth/session-expired` when its session
@@ -23,7 +38,7 @@ export async function signInPath(h: Headers, next?: string): Promise<Route> {
 export async function requireActor(
   next?: string,
 ): Promise<Actor & { email: string; name: string }> {
-  const h = await headers();
+  const h = await identityHeaders();
   const session = await getSession(h);
   if (!session) redirect(await signInPath(h, next));
   const incoming = h.get(CORRELATION_HEADER);

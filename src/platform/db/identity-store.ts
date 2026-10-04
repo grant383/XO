@@ -162,3 +162,12 @@ export async function sessionTokenFor(userId: string, sessionId: string): Promis
     .where(and(eq(sessions.id, sessionId), eq(sessions.userId, userId)));
   return rows[0]?.token ?? null;
 }
+
+/** When the user's password credential last changed (set at sign-up, touched on change). */
+export async function credentialUpdatedAt(userId: string): Promise<Date | null> {
+  const rows = await authPoolDb()
+    .select({ updatedAt: accounts.updatedAt })
+    .from(accounts)
+    .where(and(eq(accounts.userId, userId), eq(accounts.providerId, "credential")));
+  return rows[0]?.updatedAt ?? null;
+}

@@ -6,11 +6,12 @@ import { Brand, Icon } from "@/ui";
 import { AccountMenu } from "./account-menu";
 import styles from "./app-shell.module.css";
 import { CurrentPage, NavLink } from "./nav-link";
-import type { ShellNavSection, ShellUser, ShellVenture } from "./types";
+import { ACCOUNT_CONTEXT, type ShellNavSection, type ShellUser, type ShellVenture } from "./types";
 import { VentureSwitcher } from "./venture-switcher";
 
 type Props = {
-  venture: ShellVenture;
+  /** Null on account-level pages, which show no venture context. */
+  venture: ShellVenture | null;
   ventures: ShellVenture[];
   user: ShellUser;
   nav: ShellNavSection[];
@@ -60,7 +61,10 @@ export function AppShell({ venture, ventures, user, nav, children }: Props) {
       <a href="#main" className={styles.skipLink}>
         Skip to content
       </a>
-      <aside className={styles.sidebar} aria-label="Venture navigation">
+      <aside
+        className={styles.sidebar}
+        aria-label={venture ? "Venture navigation" : "Account navigation"}
+      >
         <Navigation venture={venture} ventures={ventures} nav={nav} />
       </aside>
 
@@ -96,17 +100,17 @@ export function AppShell({ venture, ventures, user, nav, children }: Props) {
             <Icon name="menu" />
           </button>
           <p className={styles.context}>
-            <span className={styles.contextVenture}>{venture.name}</span>
+            <span className={styles.contextVenture}>{venture?.name ?? ACCOUNT_CONTEXT}</span>
             <span className={styles.contextDivider} aria-hidden="true">
               /
             </span>
             <CurrentPage sections={nav} />
           </p>
           <div className={styles.accountWide}>
-            <AccountMenu user={user} context={venture.roleLabel} />
+            <AccountMenu user={user} context={venture?.roleLabel ?? ACCOUNT_CONTEXT} />
           </div>
           <div className={styles.accountNarrow}>
-            <AccountMenu user={user} context={venture.roleLabel} compact />
+            <AccountMenu user={user} context={venture?.roleLabel ?? ACCOUNT_CONTEXT} compact />
           </div>
         </header>
         <main id="main" className={styles.main} tabIndex={-1}>

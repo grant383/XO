@@ -52,3 +52,5 @@ Status: Accepted
 | [0011](adr/0011-billing-accounts.md) | Billing accounts separate from venture ownership | Accepted |
 | [0013](adr/0013-memberships-rbac-invitations.md) | Memberships, RBAC, invitations and access requests | Accepted |
 | [0014](adr/0014-ui-foundations-design-tokens.md) | UI foundations: design tokens, components and E2E | Accepted |
+| [0015](adr/0015-app-shell-error-states-journey-e2e.md) | Application shell, error states and journey E2E | Accepted |
+| [0016](adr/0016-mfa-recovery-session-management.md) | MFA, account recovery and session/device management | Accepted |
