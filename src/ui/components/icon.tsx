@@ -25,6 +25,7 @@ export const ICONS = {
   "clock-3": 15,
   database: 16,
   eye: 16,
+  inbox: 22,
   info: 18,
   "layout-grid": 14,
   "loader-circle": 16,
@@ -46,6 +47,7 @@ export const ICONS = {
   "status-warning": 5,
   "triangle-alert": 18,
   "user-plus": 26.88,
+  "user-plus-button": 15,
   users: 20,
   x: 14,
 } as const;

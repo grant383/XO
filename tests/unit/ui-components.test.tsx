@@ -5,8 +5,10 @@ import {
   Avatar,
   Button,
   Checkbox,
+  EmptyState,
   Icon,
   initialsOf,
+  LoadingState,
   SelectField,
   StatusBadge,
   TextField,
@@ -150,5 +152,28 @@ describe("Avatar", () => {
 
   it("is decorative: hidden from assistive technology", () => {
     expect(html(<Avatar name="Sarah Mitchell" />)).toContain('aria-hidden="true"');
+  });
+});
+
+describe("EmptyState and LoadingState", () => {
+  it("renders the empty state heading at the requested level with its action", () => {
+    const out = html(
+      <EmptyState
+        as="h1"
+        title="Nothing here yet"
+        description="Add a record."
+        action={<a href="/x">Go</a>}
+      />,
+    );
+    expect(out).toContain("<h1");
+    expect(out).toContain("Nothing here yet");
+    expect(out).toContain('href="/x"');
+    expect(out).not.toContain('role="status"');
+  });
+
+  it("announces loading politely", () => {
+    const out = html(<LoadingState title="Loading" status="Loading…" />);
+    expect(out).toContain('role="status"');
+    expect(out).toContain('aria-live="polite"');
   });
 });

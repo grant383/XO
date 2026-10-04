@@ -109,6 +109,7 @@
   --radius-full: 9999px;
 
   /* Elevation */
+  --overlay-backdrop: rgb(6 8 12 / 0.72);
   --elevation-overlay: 0 8px 32px rgb(0 0 0 / 0.25), 0 24px 80px rgb(0 0 0 / 0.35);
   --focus-glow: 0 0 8px 2px rgb(96 165 250 / 0.4);
 
