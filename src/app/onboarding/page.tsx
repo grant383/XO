@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 /** Onboarding entry: resume a draft at its persisted step, or create a new venture. */
 export default async function OnboardingStartPage() {
-  const actor = await requireActor();
+  const actor = await requireActor("/onboarding");
   const drafts = await listDraftOnboarding(actor);
   return (
     <SetupCard>

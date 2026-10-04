@@ -6,6 +6,7 @@
 export {
   getAuth,
   getSession,
+  hasSessionCookie,
   requireSession,
   setAuthForTests,
   UnauthenticatedError,

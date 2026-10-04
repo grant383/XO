@@ -71,6 +71,18 @@ export async function getSession(headers: Headers): Promise<AuthenticatedSession
   };
 }
 
+/**
+ * Whether the request still carries a session cookie. With no valid session, this tells
+ * an ended session (expired or revoked: show /auth/session-expired) apart from a visitor
+ * who never signed in. Presence only; it grants nothing.
+ */
+export async function hasSessionCookie(headers: Headers): Promise<boolean> {
+  const context = await getAuth().$context;
+  const name = context.authCookies.sessionToken.name;
+  const cookies = headers.get("cookie") ?? "";
+  return cookies.split(";").some((c) => c.trim().startsWith(`${name}=`));
+}
+
 export class UnauthenticatedError extends Error {
   constructor() {
     super("Authentication required");

@@ -33,6 +33,6 @@ export default defineConfig({
     url: `${baseURL}/api/health/live`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    env: { APP_URL: baseURL },
+    env: { APP_URL: baseURL, NEXT_DIST_DIR: ".next-e2e" },
   },
 });

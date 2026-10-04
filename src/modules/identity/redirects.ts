@@ -13,7 +13,10 @@ export function safeNextPath(value: unknown): string | null {
 }
 
 /** `/auth/login` (or another auth page) carrying a validated `next` destination. */
-export function withNext(path: "/auth/login" | "/auth/register", next: unknown): string {
+export function withNext(
+  path: "/auth/login" | "/auth/register" | "/auth/mfa" | "/auth/session-expired",
+  next: unknown,
+): string {
   const safe = safeNextPath(next);
   return safe ? `${path}?next=${encodeURIComponent(safe)}` : path;
 }

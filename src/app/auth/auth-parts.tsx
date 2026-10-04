@@ -100,9 +100,15 @@ export function PasswordRequirements({
   );
 }
 
-export function StateIcon({ name }: { name: IconName }) {
+export function StateIcon({
+  name,
+  tone = "info",
+}: {
+  name: IconName;
+  tone?: "info" | "warning" | "success";
+}) {
   return (
-    <span className={styles.stateIcon} aria-hidden="true">
+    <span className={cx(styles.stateIcon, styles[`state-${tone}`])} aria-hidden="true">
       <Icon name={name} />
     </span>
   );

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
  * centred setup card. Each page still authenticates and authorises on its own.
  */
 export default async function OnboardingLayout({ children }: { children: ReactNode }) {
-  const actor = await requireActor();
+  const actor = await requireActor("/onboarding");
   return (
     <AccountChrome
       name={actor.name}

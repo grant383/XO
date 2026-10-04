@@ -22,7 +22,14 @@ const config = [
   ...nextVitals,
   ...nextTs,
   {
-    ignores: [".next/**", "node_modules/**", "coverage/**", "db/migrations/**", "next-env.d.ts"],
+    ignores: [
+      ".next/**",
+      ".next-e2e/**",
+      "node_modules/**",
+      "coverage/**",
+      "db/migrations/**",
+      "next-env.d.ts",
+    ],
   },
   {
     files: ["src/app/**", "worker/**"],

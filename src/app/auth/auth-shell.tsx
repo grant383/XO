@@ -79,6 +79,21 @@ export const STORIES = {
     title: "Join a venture with confidence.",
     lede: "Confirm who invited you, the role you have been assigned, and the identity that will be used before joining a private DirectorXO workspace.",
   },
+  mfa: {
+    eyebrow: "Multi-factor authentication",
+    title: "Prove it’s really you.",
+    lede: "A second factor keeps your strategic plans and connected business data protected even if a password is compromised.",
+  },
+  sessionExpired: {
+    eyebrow: "Session security · Reauthentication",
+    title: "Pause safely. Resume exactly where you left off.",
+    lede: "DirectorXO ends inactive sessions to protect private operating data while preserving your intended destination.",
+  },
+  resetComplete: {
+    eyebrow: "Account recovery · Complete",
+    title: "Your access is secure again.",
+    lede: "The reset is complete. Sign in with your new password to continue to the protected DirectorXO workspace.",
+  },
   verify: {
     eyebrow: "Identity check · One last step",
     title: "Secure the command seat.",

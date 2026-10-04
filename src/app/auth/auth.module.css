@@ -167,3 +167,13 @@
 .pathButton:hover {
   text-decoration: underline;
 }
+
+.state-warning {
+  background: var(--tint-warning);
+  border-color: var(--tint-warning-border);
+}
+
+.state-success {
+  background: var(--tint-success);
+  border-color: var(--tint-success-border);
+}

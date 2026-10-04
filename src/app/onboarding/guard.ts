@@ -18,7 +18,7 @@ export type OnboardingPageContext =
  * (no enumeration); completed ventures leave onboarding.
  */
 export async function loadOnboardingPage(ventureId: string): Promise<OnboardingPageContext> {
-  const actor = await requireActor();
+  const actor = await requireActor(`/onboarding/${ventureId}`);
   try {
     return { kind: "ok", actor, view: await getOnboarding(actor, ventureId) };
   } catch (error) {

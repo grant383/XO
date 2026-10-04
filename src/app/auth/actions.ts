@@ -14,6 +14,8 @@ import {
   resetPassword,
   safeNextPath,
   verifyEmail,
+  verifyMfaChallenge,
+  withNext,
   type FlowResult,
 } from "@/modules/identity";
 import type { FormState } from "./form-state";
@@ -30,9 +32,14 @@ const field = (data: FormData, name: string) => {
   return typeof value === "string" ? value : "";
 };
 
-function toState(result: FlowResult, successMessage: string): FormState {
+function toState(result: FlowResult<unknown>, successMessage: string): FormState {
   if (result.ok) return { status: "success", message: successMessage };
-  return { status: "error", message: result.message, fieldErrors: result.fieldErrors };
+  return {
+    status: "error",
+    message: result.message,
+    fieldErrors: result.fieldErrors,
+    code: result.code,
+  };
 }
 
 export async function registerAction(_prev: FormState, data: FormData): Promise<FormState> {
@@ -67,6 +74,19 @@ export async function loginAction(_prev: FormState, data: FormData): Promise<For
   );
   if (!result.ok) return toState(result, "");
   // Only validated same-origin paths (e.g. a pending invitation); never an external URL.
+  const next = safeNextPath(field(data, "next"));
+  // MFA accounts have no session yet: a signed challenge cookie leads to the second step.
+  if (result.data.mfaRequired) redirect(withNext("/auth/mfa", next) as Route);
+  redirect((next ?? "/") as Route);
+}
+
+export async function verifyMfaAction(_prev: FormState, data: FormData): Promise<FormState> {
+  const method = field(data, "method") === "recovery" ? "recovery" : "totp";
+  const result = await verifyMfaChallenge(
+    { method, code: field(data, "code") },
+    await requestHeaders(),
+  );
+  if (!result.ok) return toState(result, "");
   redirect((safeNextPath(field(data, "next")) ?? "/") as Route);
 }
 
@@ -94,7 +114,8 @@ export async function resetPasswordAction(_prev: FormState, data: FormData): Pro
     { token: field(data, "token"), newPassword: field(data, "newPassword") },
     await requestHeaders(),
   );
-  return toState(result, "Your password has been reset and every device has been signed out.");
+  if (!result.ok) return toState(result, "");
+  redirect("/auth/reset-password/success");
 }
 
 export async function verifyEmailAction(_prev: FormState, data: FormData): Promise<FormState> {
