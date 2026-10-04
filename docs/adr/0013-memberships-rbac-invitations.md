@@ -6,7 +6,7 @@
 ## Context
 Spec §7 defines five venture roles; §8 places Team and Permissions at `/v/[ventureId]/settings/team` (Admin+); §12 lists "Accept team invitation" and "Permission-denied request-access flow" as P0 screens without routes; §15 requires server-side RBAC, independent RLS, and that permission changes invalidate cached authorisation; §19 P0 exit criteria require inviting a member and assigning a role. ADR-0007 already reserves Owner rows from table writes and lets Admins manage Manager/Operator/Viewer only.
 
-When this ADR was written, `DIRECTORXO_IMPLEMENTATION_MATRIX.md` was not in the repository, so these decisions were taken from the product specification alone. The matrix has since been recreated from the Figma Master Implementation Matrix (node 54:29298). Its Figma routes for invitations and access requests differ from this ADR, and this ADR's routes are canonical (see the matrix's open disagreements).
+When this ADR was written, `DIRECTORXO_IMPLEMENTATION_MATRIX.md` was not in the repository, so these decisions were taken from the product specification alone. The matrix has since been recreated from the Figma Master Implementation Matrix (node 54:29298). Its Figma routes for invitations and access requests differ from this ADR, and this ADR's routes are canonical (tracked as known design-sync items in the matrix).
 
 ## Decision
 

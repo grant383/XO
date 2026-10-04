@@ -4,13 +4,15 @@ Route-to-delivery tracker for the 60 approved DirectorXO capabilities. Rows mirr
 
 ## How to read this matrix
 
-Precedence (CLAUDE.md, ADR-0004): `DIRECTORXO_PRODUCT_SPEC.md` governs routes, permissions and phases. The Figma matrix governs capability scope and visual handoff. Where they differ:
+Precedence (CLAUDE.md): 1. `DIRECTORXO_PRODUCT_SPEC.md`, 2. this matrix, 3. approved Figma, 4. ADRs, 5. existing implementation. The Figma Master Implementation Matrix defines the capability scope. Where its labels differ from the spec:
 
 - the **Route** and **Required permission** columns show the spec's canonical value;
 - the Figma value is recorded in **Notes**;
-- every difference is listed under [Open disagreements](#open-disagreements).
+- every difference is listed under [Known design-sync items](#known-design-sync-items).
 
-A route marked *(Figma; not in spec)* is a Figma proposal that the spec does not define yet. It is not canonical until the spec adopts it.
+Design-sync items are corrections owed to Figma. They are **not implementation blockers**. Implementation follows the spec.
+
+"Step N" refers to the current P0 execution numbering (CLAUDE.md). Step 6 = MFA, recovery, session/device management.
 
 ### Status values
 
@@ -53,14 +55,14 @@ Public → Authenticated → Viewer+ → Operator+ → Manager+ → Admin+ → O
 | 5 | Create account | Auth | P0 | `/auth/register` | 33:3202 | `identity` | `registerAction` → `register` → `POST /api/v1/auth/sign-up/email` | Public | Duplicate email returns a synthetic success (no enumeration); rate limits | E2E + validation | Foundation | Carries a validated `next` (e.g. `/invite/[token]`) through the verification email. Figma API label `POST /api/v1/users`. Figma: Ready. |
 | 6 | Verify email | Auth | P0 | `/auth/verify-email` | 33:3266 | `identity` | `verifyEmailAction` → `verifyEmail` → Better Auth `/api/v1/auth/verify-email` | Public with valid token | Single-use JWT recorded in `auth_consumed_tokens` | token + idempotency | Foundation | Figma lists the permission as Authenticated; spec §8 says Public with valid token, and the implementation follows the spec. Figma: Ready. |
 | 7 | Accept invitation | Auth / Team | P0 | `/invite/[token]` | 54:27078 | `memberships` | `previewInvitation`; `acceptInvitationAction` → `acceptInvitation` → `app.accept_venture_invitation()` | Invited user: signed in, email verified, email equals invited address | SECURITY DEFINER function; token stored as SHA-256 digest only; atomic membership creation with audit; RLS on `venture_invitations` | E2E + auth | Foundation | ADR-0013 route (canonical). Figma route `/auth/invitations/[token]` and API `POST /api/v1/invitations/accept` are superseded (server action only). Figma: New P0. |
-| 8 | MFA | Auth | P0 | `/auth/mfa` *(Figma; not in spec)* | 54:27145 | `identity` (Figma: `auth-security`) | planned: Figma `POST /api/v1/auth/mfa/verify` | Authenticated | Planned: TOTP via Better Auth (ADR-0009) | E2E + recovery | Not started | P0 MFA step (ADR-0009). `users.two_factor_enabled` exists. Spec §12 lists "MFA setup and recovery" without a route. Figma: New P0. |
-| 9 | Session expired | Auth | P0 | `/auth/session-expired` *(Figma; not in spec)* | 54:27222 | `identity` (sessions) | Figma `POST /api/v1/auth/refresh` | Expired session | Idle (7 d) and absolute (30 d) expiry enforced server-side on every request | E2E + redirect | Not started | Expiry is enforced and tested; expired sessions are sent to `/auth/login` with no dedicated screen. Figma's refresh API conflicts with ADR-0009 (database sessions, no refresh tokens). Figma: New P0. |
-| 10 | Password reset success | Auth | P0 | `/auth/reset-password/success` *(Figma; not in spec)* | 54:27280 | `identity` | Figma `GET /api/v1/auth/reset-status` | Public | — | E2E + auth | In progress | Success is shown inline on `/auth/reset-password`; no dedicated route. Figma: New P0. |
+| 8 | MFA | Auth | P0 | `/auth/mfa` | 54:27145 | `identity` (Figma: `auth-security`) | planned: TOTP verify/enrol via Better Auth (Figma label `POST /api/v1/auth/mfa/verify`) | Authenticated (first factor verified; second factor pending or being enrolled) | Planned: TOTP via Better Auth (ADR-0009); recovery codes | E2E + recovery | Not started | **Step 6.** `users.two_factor_enabled` exists. Covers challenge, setup and recovery. Figma: New P0. |
+| 9 | Session expired | Auth | P0 | `/auth/session-expired` | 54:27222 | `identity` (sessions) | None: database-backed sessions, no refresh-token API (ADR-0009) | Public | Idle (7 d) and absolute (30 d) expiry enforced server-side on every request | E2E + redirect | Not started | **Step 6** (session/device management). Expiry is enforced and tested; expired sessions currently go to `/auth/login`. Figma `POST /api/v1/auth/refresh` will not be built. Figma: New P0. |
+| 10 | Password reset success | Auth | P0 | `/auth/reset-password/success` | 54:27280 | `identity` | Result of `resetPasswordAction` (Figma label `GET /api/v1/auth/reset-status`) | Public | Reveals nothing about the token or account | E2E + auth | In progress | **Step 6** (recovery). Success is currently shown inline on `/auth/reset-password`. Figma: New P0. |
 | 11 | Business setup | Onboarding | P0 | `/onboarding/[ventureId]/business` | 33:3378 | `ventures` | `saveBusinessAction` → `saveBusinessDetails`; `lookupCompanyAction` | Owner (`venture:onboard`) of a draft venture | `resolveVenture` with capability; RLS `venture_onboarding` owner-only update; audit | CRUD + validation | Foundation | Figma route `/onboarding/business` and permission Authenticated superseded by spec §5/§8 (venture-scoped, Owner). Figma API `PUT /api/v1/onboarding/business` not implemented. Figma: Ready. |
 | 12 | Data connections | Onboarding | P0 | `/onboarding/[ventureId]/data-connections` | 33:3447 | `ventures`; Companies House adapter | `completeDataConnectionsAction` → `completeDataConnections` | Owner | As Business setup | OAuth + idempotency | In progress | Connection-status review step is implemented. Provider OAuth connect (Figma `POST /api/v1/integrations/connect`) depends on P1 integrations. Figma module `integrations`; Figma route `/onboarding/data-connections`. Figma: Ready. |
 | 13 | Review onboarding | Onboarding | P0 | `/onboarding/[ventureId]/review` | 39:164 | `ventures` | `completeOnboardingAction` → `completeOnboarding` → `app.complete_venture_onboarding()` | Owner | Definer function revalidates Owner, steps and settings; draft → active only here; audit | E2E + validation | Foundation | Figma route `/onboarding/review`. Figma: Ready. |
-| 14 | Creating workspace | Onboarding | P0 | `/onboarding/creating-workspace` *(Figma; not in spec)* | 54:27638 | Figma: `workspace-bootstrap` (not created) | Figma `POST /api/v1/ventures/bootstrap` | Authenticated | — | job + idempotency | Not started | Venture creation is synchronous and idempotent (`app.create_venture` with a request id) at `/onboarding`; there is no bootstrap job or progress screen. Depends on the BullMQ worker. Figma: New P0. |
-| 15 | Onboarding complete | Onboarding | P0 | `/onboarding/complete` *(Figma; not in spec)* | 54:27717 | Figma: `workspace-bootstrap` (not created) | Figma `GET /api/v1/ventures/bootstrap` | Owner | — | E2E + readiness | Not started | Completion currently redirects to `/?onboarded=1`. Figma: New P0. |
+| 14 | Creating workspace | Onboarding | P0 | UX state of onboarding (no route; Figma `/onboarding/creating-workspace`) | 54:27638 | `ventures` (Figma: `workspace-bootstrap`) | `createVentureAction` → `createDraftVenture` → `app.create_venture()` (Figma label `POST /api/v1/ventures/bootstrap`) | Authenticated | UX state only, not security state: venture status and onboarding progress stay server-authoritative (spec §5) | job + idempotency | Not started | Creation is synchronous and idempotent (request id) at `/onboarding`; the progress state is not built. A bootstrap job would need the BullMQ worker. Figma: New P0. |
+| 15 | Onboarding complete | Onboarding | P0 | UX state of onboarding (no route; Figma `/onboarding/complete`) | 54:27717 | `ventures` (Figma: `workspace-bootstrap`) | Result of `completeOnboardingAction` → `app.complete_venture_onboarding()` | Owner | UX state only, not security state: activation happens only in the definer function (spec §5) | E2E + readiness | Not started | Completion currently redirects to `/?onboarded=1`; the completion state is not built. Figma: New P0. |
 
 ## 02 Command
 
@@ -130,7 +132,7 @@ All Build rows are P2 and Not started. Spec routes are canonical; the Figma rout
 | 50 | Help & Support | System | P0 | `/support` | 33:4290 | `support` | `/api/v1/support` | Authenticated | — | CRUD + validation | Not started | Figma route `/settings/help`; **Figma phase P1 vs spec P0**. Figma: Ready. |
 | 51 | Integrations | System | P1 | `/v/[ventureId]/settings/integrations` | 14:1443 | `integrations` | `/api/v1/integrations` | Admin+ | Venture RLS; encrypted credentials; signed, deduplicated webhooks | webhook + idempotency | Not started | The Companies House adapter (P0 onboarding) exists behind a stable interface. Figma: Ready. |
 | 52 | Request Access | System / Team | P0 | `/v/[ventureId]/request-access` | 54:27340 | `memberships` | `requestAccessAction` → `requestAccess` → `app.request_venture_access()` | Authenticated | Definer function; identical outcome whether or not the venture exists; requesters cannot read requests | RLS + permission | Foundation | ADR-0013 route (canonical). Figma route `/v/[ventureId]/settings/request-access` and API `POST /api/v1/access-requests` superseded (server action only). Figma: New P0. |
-| 53 | Access Request Submitted | System / Team | P0 | `/v/[ventureId]/request-access` (submitted state) | 54:27489 | `memberships` | `requestAccessAction` result | Requester | Same as Request Access | E2E + permission | Foundation | Implemented as the submitted state of the request-access route. Figma route `/…/request-access/submitted` and `GET /api/v1/access-requests/[id]` were **not** built: a requester-readable request would reveal whether the venture exists (ADR-0013). See open disagreements. Figma: New P0. |
+| 53 | Access Request Submitted | System / Team | P0 | `/v/[ventureId]/request-access` (submitted state) | 54:27489 | `memberships` | `requestAccessAction` result; no requester read API in P0 (spec §11) | Requester | Same as Request Access | E2E + permission | Foundation | Implemented as the submitted state of the request-access route. `GET /api/v1/access-requests/[id]` and `/…/submitted` are not part of P0: a requester-readable request would reveal whether the venture exists (ADR-0013). Figma: New P0. |
 
 ## 08 States
 
@@ -152,28 +154,40 @@ These approved Figma frames and spec items are foundations or specifications, no
 - **Design system:** Foundations v2 54:15162, Controls v2 54:15538, Product Patterns v2 54:15959, UI foundations 39:457. No `src/ui` implementation yet.
 - **Technical specification frames:** spec §9 (`/internal/specs/*`, nodes 19:4–19:2323).
 
-## Open disagreements
+## Resolved decisions
 
-The product spec value is in force in each case. Each item needs either a spec update or a Figma update; none was resolved silently.
+These were open between the spec, ADRs and Figma; they are now decided (spec §5, §8, §11; CLAUDE.md):
 
-1. **Accept invitation route:** Figma `/auth/invitations/[token]`; the spec (now) and implementation use `/invite/[token]` (ADR-0013). The Figma matrix needs updating.
-2. **Request access routes:** Figma `/v/[ventureId]/settings/request-access` and `/…/submitted`; the spec (now) and implementation use `/v/[ventureId]/request-access`, with "submitted" as an in-page state. The Figma matrix needs updating.
-3. **Requester-readable access requests:** Figma `GET /api/v1/access-requests/[id]` (permission Requester) conflicts with ADR-0013's non-disclosure decision. This needs a product decision.
-4. **Onboarding routes:** Figma `/onboarding/{business,data-connections,review}` versus spec §5/§8 `/onboarding/[ventureId]/*` (implemented).
-5. **Figma-only P0 routes not yet in the spec:** `/auth/mfa`, `/auth/session-expired`, `/auth/reset-password/success`, `/onboarding/creating-workspace`, `/onboarding/complete`. The spec needs to adopt or replace them before their steps.
-6. **Session refresh:** Figma `POST /api/v1/auth/refresh` conflicts with ADR-0009 (database sessions, no refresh tokens).
-7. **Verify email permission:** Figma Authenticated versus spec Public with valid token (implemented per spec).
-8. **System routes and phases:** Profile `/settings/profile` vs `/settings/profile-security`; Notifications `/settings/notifications` (P1) vs `/settings/notifications-activity` (P0); Help `/settings/help` (P1) vs `/support` (P0).
-9. **State routes:** Figma `/403`, `/404`, `/500` vs spec `/errors/*`. Figma 403 permission Authenticated vs spec Public.
-10. **Build routes:** Figma `research`, `blueprint`, `launch`, `funding`, `marketing-plan`, `sales-plan`, `operations-plan` vs spec `market-research`, `reverse-blueprint`, `launch-control`, `funding-waterfall`, `marketing`, `sales`, `operations-team`.
-11. **Operate and Portfolio routes:** Figma `/operate/scheduling`, `/operate/invoicing`, `/portfolio/capital` vs spec `/operate/schedule`, `/operate/billing`, `/portfolio/capital-allocation`.
-12. **Minimum permissions (Figma vs spec):**
-    - £1M Growth Command: Manager+ vs Viewer+.
-    - Idea Lab, Market Research, Launch Control, Risk Register, Assets: Manager+ vs Operator+.
-    - Funding Waterfall: Admin+ vs Manager+.
-    - Compliance, Systems: Admin+ vs Manager+.
-    - Technology: Admin+ vs Operator+.
-    - Forecast vs Actual: Manager+ vs Viewer+.
-    - Copilot: Manager+ vs Viewer+.
-    - Portfolio rows: "Portfolio grant / Portfolio admin" vs "Portfolio Viewer+ / Manager+".
-13. **API surface:** the Figma API column names REST endpoints (`/api/v1/memberships`, `/api/v1/invitations/accept`, `/api/v1/access-requests`, `/api/v1/onboarding/*`) that P0 steps 4–5 implemented as server actions over the same module services (ADR-0006). REST and OpenAPI for these groups are outstanding (spec §14).
+- **Step 6** = MFA, recovery, session/device management.
+- **Canonical routes:** `/invite/[token]`, `/v/[ventureId]/request-access`, `/onboarding/[ventureId]/business`, `/onboarding/[ventureId]/data-connections`, `/onboarding/[ventureId]/review`, `/auth/mfa`, `/auth/session-expired`, `/auth/reset-password/success`.
+- **Onboarding "creating workspace" and "complete"** are UX states only, not routes or security state.
+- **Canonical roles:** Owner, Admin, Manager, Operator, Viewer.
+- **Sessions** stay database-backed. No refresh-token API.
+- **No `GET /api/v1/access-requests/[id]`** in P0.
+- **Phases and permissions:** Notifications and Activity is P0; Help and Support is P0; £1M Growth Command is Viewer+; Copilot is Viewer+.
+
+## Known design-sync items
+
+Figma labels that differ from the canonical values above. Update Figma to match; none blocks implementation.
+
+1. **Accept invitation route:** Figma `/auth/invitations/[token]` → canonical `/invite/[token]`.
+2. **Request access routes:** Figma `/v/[ventureId]/settings/request-access` and `/…/submitted` → canonical `/v/[ventureId]/request-access` (submitted is a state).
+3. **Requester read API:** Figma `GET /api/v1/access-requests/[id]` (Requester) → not in P0.
+4. **Onboarding routes:** Figma `/onboarding/{business,data-connections,review}` → canonical `/onboarding/[ventureId]/*`.
+5. **Onboarding UX states:** Figma `/onboarding/creating-workspace` and `/onboarding/complete` routes → UX states, no routes.
+6. **Session refresh:** Figma `POST /api/v1/auth/refresh` → none (database sessions).
+7. **Verify email permission:** Figma Authenticated → Public with valid token.
+8. **System routes and phases:** Figma `/settings/profile`, `/settings/notifications` (P1), `/settings/help` (P1) → `/settings/profile-security`, `/settings/notifications-activity` (P0), `/support` (P0).
+9. **State routes:** Figma `/403`, `/404`, `/500` (403 Authenticated) → `/errors/403`, `/errors/404`, `/errors/500` (Public).
+10. **Build routes:** Figma `research`, `blueprint`, `launch`, `funding`, `marketing-plan`, `sales-plan`, `operations-plan` → `market-research`, `reverse-blueprint`, `launch-control`, `funding-waterfall`, `marketing`, `sales`, `operations-team`.
+11. **Operate and Portfolio routes:** Figma `/operate/scheduling`, `/operate/invoicing`, `/portfolio/capital` → `/operate/schedule`, `/operate/billing`, `/portfolio/capital-allocation`.
+12. **Minimum permissions (Figma → spec):**
+    - £1M Growth Command: Manager+ → Viewer+.
+    - Idea Lab, Market Research, Launch Control, Risk Register, Assets: Manager+ → Operator+.
+    - Funding Waterfall: Admin+ → Manager+.
+    - Compliance, Systems: Admin+ → Manager+.
+    - Technology: Admin+ → Operator+.
+    - Forecast vs Actual: Manager+ → Viewer+.
+    - Copilot: Manager+ → Viewer+.
+    - Portfolio: "Portfolio grant / Portfolio admin" → Portfolio Viewer+ / Portfolio Manager+.
+13. **API labels:** Figma names REST endpoints (`/api/v1/memberships`, `/api/v1/invitations/accept`, `/api/v1/access-requests`, `/api/v1/onboarding/*`, `/api/v1/auth/login`) where P0 uses server actions and Better Auth paths over the same module services (ADR-0006, ADR-0009). Spec §14 REST/OpenAPI coverage for these groups remains outstanding implementation work, not a Figma item.

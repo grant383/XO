@@ -61,6 +61,7 @@ DirectorXO
 - Auth routes use `/auth/*`.
 - Initial venture setup uses `/onboarding/*`: `/onboarding` starts a new draft venture or resumes an owned draft at its persisted step; each onboarding step is venture-scoped at `/onboarding/[ventureId]/*`.
 - The venture ID is part of every onboarding step route because venture context is security-sensitive. The route ID is only a reference: the server resolves and authorises it (active membership, Owner role, draft status) on every request and action, with PostgreSQL RLS confirming access independently. It is never taken from browser state.
+- "Creating workspace" (Figma 54:27638) and "Onboarding complete" (Figma 54:27717) are UX states of the onboarding flow, not security state. They carry no authority: draft/active status and onboarding progress remain server-authoritative (`ventures.status`, `venture_onboarding`). Each onboarding step is still authorised at `/onboarding/[ventureId]/*` on every request.
 - Venture-scoped product routes use `/v/[ventureId]/*`.
 - Team invitation acceptance uses `/invite/[token]`. The token is the only identifier in the link. Invitation details are shown only to the signed-in, email-verified account the invitation was addressed to, and acceptance is an explicit POST (ADR-0013).
 - The permission-denied request-access flow uses `/v/[ventureId]/request-access`. Its page and outcome are identical whether or not the venture exists; "request submitted" is a state of this route, not a separate route (ADR-0013).
@@ -144,6 +145,9 @@ Matrix notation:
 | 33:3315 | Set new password | `/auth/reset-password` | Auth | Public with valid token | P0 |
 | 33:3202 | Create account | `/auth/register` | Auth | Public | P0 |
 | 33:3266 | Verify email | `/auth/verify-email` | Auth | Public with valid token | P0 |
+| 54:27145 | MFA challenge, setup and recovery | `/auth/mfa` | Auth | Authenticated (first factor verified; second factor pending or being enrolled) | P0 |
+| 54:27222 | Session expired | `/auth/session-expired` | Auth | Public | P0 |
+| 54:27280 | Password reset success | `/auth/reset-password/success` | Auth | Public | P0 |
 | 33:3378 | Business setup onboarding | `/onboarding/[ventureId]/business` | Onboarding | Owner | P0 |
 | 33:3447 | Connect business data onboarding | `/onboarding/[ventureId]/data-connections` | Onboarding | Owner | P0 |
 | 39:164 | Review and confirm onboarding | `/onboarding/[ventureId]/review` | Onboarding | Owner | P0 |
@@ -237,6 +241,10 @@ The AI Copilot screen name does not authorize ML forecasting in Release 1. In P2
 - Monthly periods are canonical; weekly projections are allowed where supported.
 - Store source currency and normalized reporting currency with dated FX rates.
 - Confirm the supported Next.js version during P0 and record upgrades via ADR.
+- Sessions are database-backed, opaque and revocable (ADR-0009). There are no refresh tokens and no refresh-token API. An expired or revoked session leads to `/auth/session-expired` and re-authentication.
+- Access requests are not readable by the requester in P0: there is no `GET /api/v1/access-requests/[id]`, because a requester-visible status would disclose whether a venture exists (ADR-0013).
+- Notifications and Activity, and Help and Support, are P0 (§8). £1M Growth Command and AI Copilot are Viewer+ (§8).
+- Where a label in the Figma Master Implementation Matrix (node 54:29298) differs from this specification, this specification governs. The difference is tracked as a design-sync item in `DIRECTORXO_IMPLEMENTATION_MATRIX.md`, not as an implementation blocker.
 
 ## 12. Missing-Screen Backlog
 
