@@ -119,7 +119,9 @@ describe("/v/[ventureId]/settings/team", () => {
     expect(text(page)).toContain("Invite a member");
 
     signInAs(people.viewer);
-    expect(text(await render())).toContain("You do not have permission to manage this team");
+    const forbidden = text(await render());
+    expect(forbidden).toContain("You don’t have access to team and permissions.");
+    expect(forbidden).not.toContain("Invite a member");
 
     const outsider = await actor(admin, "outsider");
     signInAs(outsider);

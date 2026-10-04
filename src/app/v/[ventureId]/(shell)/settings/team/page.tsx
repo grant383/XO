@@ -3,12 +3,14 @@ import { notFound, redirect } from "next/navigation";
 import { getTeam, type TeamView } from "@/modules/memberships";
 import {
   can,
+  resolveSelectedVenture,
   ROLE_LABELS,
   VentureNotFoundError,
   VenturePermissionError,
   VentureStateError,
 } from "@/modules/ventures";
-import { Avatar, ButtonLink, EmptyState, Icon, StatusBadge } from "@/ui";
+import { Avatar, ButtonLink, Icon, StatusBadge } from "@/ui";
+import { ForbiddenState } from "../../../../../_chrome/error-states";
 import { PageContent, PageHeader } from "../../../../../_shell/page-header";
 import { requireActor } from "../../../../../actor";
 import { NoVentureAccess } from "../../../no-access";
@@ -34,7 +36,7 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeZ
 type LoadResult =
   | { kind: "ok"; team: TeamView }
   | { kind: "no-access" }
-  | { kind: "forbidden"; ventureName?: string };
+  | { kind: "forbidden"; roleLabel?: string };
 
 /**
  * The route id is only a reference: the memberships module resolves membership, role and
@@ -47,7 +49,11 @@ async function load(ventureId: string): Promise<LoadResult> {
   } catch (error) {
     // Unknown and inaccessible ventures look the same (no enumeration).
     if (error instanceof VentureNotFoundError) return { kind: "no-access" };
-    if (error instanceof VenturePermissionError) return { kind: "forbidden" };
+    if (error instanceof VenturePermissionError) {
+      // Shown back to the member themselves: their own role in this venture.
+      const access = await resolveSelectedVenture(actor, ventureId).catch(() => null);
+      return { kind: "forbidden", roleLabel: access ? ROLE_LABELS[access.role] : undefined };
+    }
     if (error instanceof VentureStateError) redirect("/");
     throw error;
   }
@@ -86,15 +92,13 @@ export default async function TeamPage({ params }: Props) {
           title="Team & permissions"
         />
         <PageContent>
-          <EmptyState
-            icon="key-round"
-            title="You do not have permission to manage this team"
-            description="Team and permissions are available to the venture Owner and Admins."
-            action={
-              <ButtonLink href={`/v/${ventureId}`} variant="secondary">
-                Go to venture home
-              </ButtonLink>
-            }
+          <ForbiddenState
+            as="h2"
+            title="You don’t have access to team and permissions."
+            description="Team and permissions are available to the venture Owner and Admins. Your access to the rest of the venture is unchanged."
+            required="Owner or Admin"
+            current={result.roleLabel}
+            home={{ href: `/v/${ventureId}`, label: "Go to venture home" }}
           />
         </PageContent>
       </>

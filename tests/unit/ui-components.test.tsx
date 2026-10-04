@@ -6,6 +6,8 @@ import {
   Button,
   Checkbox,
   EmptyState,
+  ErrorState,
+  AccessComparison,
   Icon,
   initialsOf,
   LoadingState,
@@ -175,5 +177,24 @@ describe("EmptyState and LoadingState", () => {
     const out = html(<LoadingState title="Loading" status="Loading…" />);
     expect(out).toContain('role="status"');
     expect(out).toContain('aria-live="polite"');
+  });
+});
+
+describe("ErrorState", () => {
+  it("states the error in text: code, heading and the access gap", () => {
+    const out = html(
+      <ErrorState
+        tone="danger"
+        icon="shield-x"
+        code="Error 403 · Permission required"
+        title="No access"
+        description="Ask an Owner."
+        detail={<AccessComparison required="Owner or Admin" current="Viewer" />}
+      />,
+    );
+    expect(out).toContain("Error 403 · Permission required");
+    expect(out).toMatch(/<h1[^>]*>No access<\/h1>/);
+    expect(out).toContain("Required access");
+    expect(out).toContain("Viewer");
   });
 });

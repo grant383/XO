@@ -69,6 +69,7 @@ describe("design tokens (Figma Foundations v2)", () => {
     "--status-warning",
     "--status-danger",
     "--status-danger-soft",
+    "--status-success-soft",
     "--status-info-text",
   ];
 

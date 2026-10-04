@@ -50,6 +50,7 @@
   --status-warning: #f59e0a;
   --status-danger: #f03d4a;
   --status-danger-soft: #fca5ad;
+  --status-success-soft: #7ee2bd;
   --status-info: var(--accent-blue);
   /* Info text on tinted surfaces: accent-blue is 3.6:1 there, below AA for body text. */
   --status-info-text: var(--cobalt-400);
@@ -65,6 +66,9 @@
   --tint-info-border-strong: rgb(43 99 237 / 0.4);
   --tint-info-tile: rgb(37 99 235 / 0.09);
   --tint-success-border: rgb(16 185 129 / 0.33);
+  --tint-danger-tile: rgb(239 68 68 / 0.09);
+  --tint-danger-tile-border: rgb(239 68 68 / 0.33);
+  --tint-warning-border: rgb(245 158 11 / 0.33);
 
   --border-subtle: #21242e;
   --border-default: #272b33;

@@ -45,6 +45,13 @@ textarea {
   outline-offset: 2px;
 }
 
+/* Requested path under the 404 state (Figma 31:3604). */
+.error-path {
+  font: 400 11px / normal var(--font-mono);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

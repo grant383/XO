@@ -4,6 +4,7 @@ export { Avatar, initialsOf } from "./components/avatar";
 export { StatusBadge, Eyebrow, type BadgeTone } from "./components/badge";
 export { Brand } from "./components/brand";
 export { ErrorSummary } from "./components/error-summary";
+export { AccessComparison, Assurance, ErrorState, type ErrorTone } from "./components/error-state";
 export { Button, ButtonLink, type ButtonVariant } from "./components/button";
 export { TextField, SelectField, Checkbox } from "./components/field";
 export { Icon, ICONS, type IconName } from "./components/icon";

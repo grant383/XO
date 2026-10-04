@@ -1,16 +1,12 @@
-import { ButtonLink } from "@/ui";
-import { SetupCard, SetupHeading } from "../parts";
+import { ForbiddenState } from "../../_chrome/error-states";
 
-/** Shown to venture members who are not the Owner. */
+/** Shown to venture members who are not the Owner (Figma 403, 33:4456). */
 export function ForbiddenNotice() {
   return (
-    <SetupCard>
-      <SetupHeading title="You do not have permission to set up this venture">
-        Only the venture Owner can complete onboarding.
-      </SetupHeading>
-      <ButtonLink href="/" variant="secondary">
-        Go to home
-      </ButtonLink>
-    </SetupCard>
+    <ForbiddenState
+      title="You don’t have permission to set up this venture."
+      description="Only the venture Owner can complete onboarding. Your access to the venture is unchanged."
+      required="Owner"
+    />
   );
 }
