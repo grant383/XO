@@ -11,7 +11,10 @@ export const metadata: Metadata = { title: "Sign in" };
 type Props = { searchParams: Promise<{ next?: string | string[] }> };
 
 /** Figma 31:3441 (sign in) and 31:3549 (failed sign-in state, rendered inline). */
-export default async function LoginPage({ searchParams }: Props) {
+export default async function LoginPage({
+  searchParams,
+  failed = false,
+}: Props & { failed?: boolean }) {
   // A validated return path (e.g. a pending invitation) survives sign-in.
   const next = safeNextPath((await searchParams).next);
   return (
@@ -19,7 +22,12 @@ export default async function LoginPage({ searchParams }: Props) {
       <AuthHeading title="Welcome back">Sign in to continue to DirectorXO.</AuthHeading>
       <AuthForm
         action={loginAction}
-        submitLabel="Sign in"
+        initialState={
+          failed
+            ? { status: "error", message: "Check your email and password and try again." }
+            : undefined
+        }
+        submitLabel={failed ? "Try again" : "Sign in"}
         pendingLabel="Signing in…"
         errorTitle="We couldn’t sign you in"
         hidden={next ? { next } : undefined}

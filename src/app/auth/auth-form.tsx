@@ -18,6 +18,7 @@ export type FieldSpec = {
 };
 
 type Props = {
+  initialState?: FormState;
   action: (prev: FormState, data: FormData) => Promise<FormState>;
   fields: FieldSpec[];
   submitLabel: string;
@@ -47,6 +48,7 @@ export function AuthForm(props: Props) {
  */
 function AuthFormBody({
   action,
+  initialState = idle,
   fields,
   submitLabel,
   pendingLabel = "Please wait…",
@@ -57,7 +59,7 @@ function AuthFormBody({
   success = { kind: "message" },
   onRestart,
 }: Props & { onRestart: () => void }) {
-  const [state, formAction, pending] = useActionState(action, idle);
+  const [state, formAction, pending] = useActionState(action, initialState);
   const summaryRef = useRef<HTMLDivElement>(null);
 
   // Move focus to the error summary after a failed submit (WCAG 3.3.1).

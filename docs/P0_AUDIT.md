@@ -24,3 +24,9 @@ The two maps disagree: the Figma map calls login error COMPLETE while the capabi
 ## Closure rule
 
 Do not rebuild completed slices or mark P0 closed from a rendering shell. Add focused, separately committed missing slices with tests and update both maps. P1 Command Centre remains gated on P0 exit criteria, including deployment/rollback evidence. Production monitoring and real provider configuration cannot be certified from local tests.
+
+## Verified fixes
+
+- Canonical login-error route: existing form reused; real retry and validated deep link pass desktop/mobile Playwright and axe.
+- Baseline verification: 190 unit tests and 250 database integration/RLS tests passed before the new slices.
+- Local environment inspection: Stripe, SendGrid and Companies House keys are unset. Railway CLI reports no linked project. Real subscription setup, staging deployment/rollback and production monitoring are not certified.

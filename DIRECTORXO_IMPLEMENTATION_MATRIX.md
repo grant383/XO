@@ -24,7 +24,7 @@ Design-sync items are corrections owed to Figma. They are **not implementation b
 | **Not started** | No implementation beyond shared foundations. |
 | **Deferred** | Deliberately moved out of its listed phase by a recorded decision. |
 
-Nineteen capabilities are **Implemented**: they have the approved Figma visual, desktop and mobile layouts, and Playwright E2E with axe accessibility checks (ADR-0014, ADR-0015, ADR-0016). The remaining P0 rows are Notifications & Activity (48), Billing & Subscription (49), Help & Support (50) and the non-UI parts of rows 2, 12, 14, 56 and 59.
+Twenty capabilities are **Implemented**: they have the approved Figma visual, desktop and mobile layouts, and Playwright E2E with axe accessibility checks (ADR-0014, ADR-0015, ADR-0016). The remaining P0 rows are Notifications & Activity (48), Billing & Subscription (49), Help & Support (50) and the non-UI parts of rows 12, 14, 56 and 59.
 
 ### Permission order (spec §7)
 
@@ -34,7 +34,7 @@ Public → Authenticated → Viewer+ → Operator+ → Manager+ → Admin+ → O
 
 | Domain | Rows | Implemented | Foundation | In progress | Not started | Deferred |
 |---|---|---|---|---|---|---|
-| 01 Auth & Onboarding | 15 | 12 | 0 | 3 | 0 | 0 |
+| 01 Auth & Onboarding | 15 | 13 | 0 | 2 | 0 | 0 |
 | 02 Command | 3 | 0 | 0 | 0 | 3 | 0 |
 | 03 Build | 15 | 0 | 0 | 0 | 15 | 0 |
 | 04 Operate | 8 | 0 | 0 | 0 | 8 | 0 |
@@ -42,14 +42,14 @@ Public → Authenticated → Viewer+ → Operator+ → Manager+ → Admin+ → O
 | 06 Portfolio | 3 | 0 | 0 | 0 | 3 | 0 |
 | 07 System | 8 | 4 | 0 | 0 | 4 | 0 |
 | 08 States | 7 | 3 | 0 | 2 | 2 | 0 |
-| **Total** | **60** | **19** | **0** | **5** | **36** | **0** |
+| **Total** | **60** | **20** | **0** | **4** | **36** | **0** |
 
 ## 01 Auth & Onboarding
 
 | # | Capability | Product area | Phase | Route | Figma node | Backend module | API / server action | Required permission | RLS / authorization boundary | Test requirement | Current implementation status | Notes / dependencies |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | Login | Auth | P0 | `/auth/login` | 31:3441 | `identity` | `loginAction` → `identity.login` → Better Auth `POST /api/v1/auth/sign-in/email` | Public | Better Auth as `dxo_auth`; per-IP and per-account rate limits; account lockout; Origin/CSRF checks forced on (ADR-0009) | E2E + auth | Implemented | Integration-tested. Figma visual and Playwright E2E + axe (desktop, mobile) in `tests/e2e/auth.spec.ts` (ADR-0014). Honours a validated `next` path (ADR-0013). SSO and "Remember me" are not built (design-sync 14). Figma API label `POST /api/v1/auth/login` differs from the implemented Better Auth path. Figma: Ready. |
-| 2 | Login error | Auth | P0 | `/auth/login/error` | 31:3549 | `identity` | as Login | Public | Identical response for unknown account and wrong password; lockout | E2E + lockout | In progress | The Figma failed-sign-in state renders inline on `/auth/login` with a focused error summary (E2E-tested); the `/auth/login/error` route does not exist. Lockout is implemented and tested. Remaining attempts are not shown (design-sync 18). Figma: Ready. |
+| 2 | Login error | Auth | P0 | `/auth/login/error` | 31:3549 | `identity` | as Login | Public | Identical response for unknown account and wrong password; lockout | E2E + lockout | Implemented | The Figma failed-sign-in state renders inline on `/auth/login` with a focused error summary (E2E-tested); the canonical `/auth/login/error` route now reuses the same form with a non-enumerating initial error. Desktop/mobile retry and axe coverage: `tests/e2e/login-error.spec.ts`. Lockout is implemented and tested. Remaining attempts are not shown (design-sync 18). Figma: Ready. |
 | 3 | Forgot password | Auth | P0 | `/auth/forgot-password` | 31:3503 | `identity` | `forgotPasswordAction` → `requestPasswordReset` → `POST /api/v1/auth/request-password-reset` | Public | Non-enumerating response; IP and account rate limits | E2E + rate limit | Implemented | Figma visual and Playwright E2E + axe (desktop, mobile) in `tests/e2e/auth.spec.ts` (ADR-0014). Figma API label `POST /api/v1/auth/password/forgot`. Figma: Ready. |
 | 4 | Set new password | Auth | P0 | `/auth/reset-password` | 33:3315 | `identity` | `resetPasswordAction` → `resetPassword` → `POST /api/v1/auth/reset-password` | Public with valid token | Hashed, single-use, 30-minute token; reset revokes all sessions | token + validation | Implemented | Token consumed only on explicit POST. Figma visual and Playwright E2E + axe (desktop, mobile) in `tests/e2e/auth.spec.ts` (ADR-0014). Confirm-password check in `resetPasswordAction`; requirements panel states the enforced policy (design-sync 15). Figma: Ready. |
 | 5 | Create account | Auth | P0 | `/auth/register` | 33:3202 | `identity` | `registerAction` → `register` → `POST /api/v1/auth/sign-up/email` | Public | Duplicate email returns a synthetic success (no enumeration); rate limits | E2E + validation | Implemented | Figma visual and Playwright E2E + axe (desktop, mobile) in `tests/e2e/auth.spec.ts` (ADR-0014). Success shows the Figma "Check your inbox" state (33:3266) with resend (`resendVerificationAction`). Carries a validated `next` (e.g. `/invite/[token]`) through the verification email. Figma API label `POST /api/v1/users`. Figma: Ready. |

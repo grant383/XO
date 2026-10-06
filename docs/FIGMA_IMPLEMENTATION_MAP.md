@@ -38,7 +38,7 @@ Do **not** treat exported/generated Figma code as the application architecture. 
 | Figma node | Screen | Canonical route | Module | Permission | Phase | Status |
 |---|---|---|---|---|---|---|
 | `31:3441` | DirectorXO login | `/auth/login` | Auth | Public | P0 | COMPLETE |
-| `31:3549` | Login error | `/auth/login/error` | Auth | Public | P0 | VERIFY — canonical error route missing |
+| `31:3549` | Login error | `/auth/login/error` | Auth | Public | P0 | COMPLETE |
 | `31:3503` | Forgot password | `/auth/forgot-password` | Auth | Public | P0 | COMPLETE |
 | `33:3315` | Set new password | `/auth/reset-password` | Auth | Valid token | P0 | COMPLETE |
 | `33:3202` | Create account | `/auth/register` | Auth | Public | P0 | COMPLETE |
@@ -257,3 +257,7 @@ When handing work to an agent, provide the **node ID from this map**, not only t
 ## I. Current P0 audit
 
 See [P0 audit](P0_AUDIT.md) for the 6 October 2026 code audit. Notifications, Billing and Support are confirmed missing, not completed slices. P0 remains open; deployment/rollback, recovery, API documentation and production telemetry evidence are outstanding. Command Centre remains gated.
+
+### Canonical login error route — verified 6 October 2026
+
+`/auth/login/error` now reuses the existing Figma sign-in form with its non-enumerating error state. Real retry retains a validated return path. Desktop/mobile Playwright and axe checks pass (`tests/e2e/login-error.spec.ts`); no completed auth slice was rebuilt.
