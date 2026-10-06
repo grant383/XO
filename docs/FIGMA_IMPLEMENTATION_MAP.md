@@ -186,7 +186,7 @@ The Figma/product-spec matrix still requires an explicit code/test check for:
 
 - Notifications and Activity — `33:3910`: complete locally (ADR-0018); account RLS, read state, Owner/Admin venture activity and desktop/mobile E2E verified.
 - Billing and Subscription — `33:4087`
-- Help and Support — `33:4290`
+- Help and Support — `33:4290`: complete locally (ADR-0017); persistent requests, account RLS and desktop/mobile E2E verified.
 - any remaining P0 observability / rollback / API-documentation exit criteria from the master definition of done
 - full local manual navigation through the completed P0 routes
 
@@ -200,7 +200,7 @@ Claude (or any implementation agent) must **re-read the current branch and produ
 
 ### Gate 1 — Close P0 honestly
 
-1. Check the three P0 screens currently marked **VERIFY**.
+1. Check the remaining P0 screens marked **VERIFY**.
 2. Check the P0 exit criteria against the master implementation matrix and `DIRECTORXO_PRODUCT_SPEC.md`.
 3. Implement only genuinely missing P0 requirements.
 4. Run the full verification gate and update this map.
@@ -265,3 +265,5 @@ See [P0 audit](P0_AUDIT.md) for the 6 October 2026 code audit. Notifications and
 ### Help & Support — verified 7 October 2026
 
 `/support` (33:4290) now uses the shared authenticated account shell, searchable help topics and persistent account-owned requests. Zod/database validation, atomic audit, retry-safe creation, cursor pagination, REST/OpenAPI, CSRF/origin checks, rate limiting and independent RLS are in place. Seven unit tests and ten focused database/catalog tests pass. Desktop/mobile Playwright with axe, canonical sign-in return paths, offline submission checks and exact SVG geometry pass. ADR-0017 records scope and recovery. No external email delivery or response SLA is claimed.
+
+Local error telemetry uses the Next.js server error hook and safe allowlisted Pino incident records; production alert delivery remains unverified. Profile & Security now reuses the existing shared Figma loading state.
