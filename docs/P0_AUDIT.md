@@ -30,3 +30,6 @@ Do not rebuild completed slices or mark P0 closed from a rendering shell. Add fo
 - Canonical login-error route: existing form reused; real retry and validated deep link pass desktop/mobile Playwright and axe.
 - Baseline verification: 190 unit tests and 250 database integration/RLS tests passed before the new slices.
 - Local environment inspection: Stripe, SendGrid and Companies House keys are unset. Railway CLI reports no linked project. Real subscription setup, staging deployment/rollback and production monitoring are not certified.
+
+- Help & Support: missing slice implemented (ADR-0017), seven unit tests, ten database/catalog checks and desktop/mobile Playwright + axe pass. Final screenshots and 19×19 search-icon geometry checked.
+- User confirmed local-only deployment on 7 October: no DirectorXO Railway resources exist; do not create/link resources or use BlueprintOS. No Stripe recurring price is approved. Keep commits local; no merge, push or deployment. P0 remains open and P1 is gated.

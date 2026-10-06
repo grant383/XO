@@ -86,7 +86,7 @@ Do **not** treat exported/generated Figma code as the application architecture. 
 | `33:3712` | Team and Permissions | `/v/[ventureId]/settings/team` | System | Admin+ | P0 | COMPLETE |
 | `33:3910` | Notifications and Activity | `/settings/notifications-activity` | System | Authenticated | P0 | VERIFY |
 | `33:4087` | Billing and Subscription | `/settings/billing` | System | Owner | P0 | VERIFY |
-| `33:4290` | Help and Support | `/support` | System | Authenticated | P0 | VERIFY |
+| `33:4290` | Help and Support | `/support` | System | Authenticated | P0 | COMPLETE |
 | `14:1443` | Settings Integrations | `/v/[ventureId]/settings/integrations` | System | Admin+ | P1 | NOT STARTED |
 | `31:3604` | 404 | `/errors/404` | State | Public | P0 | COMPLETE |
 | `33:4456` | 403 | `/errors/403` | State | Public | P0 | COMPLETE |
@@ -261,3 +261,7 @@ See [P0 audit](P0_AUDIT.md) for the 6 October 2026 code audit. Notifications, Bi
 ### Canonical login error route — verified 6 October 2026
 
 `/auth/login/error` now reuses the existing Figma sign-in form with its non-enumerating error state. Real retry retains a validated return path. Desktop/mobile Playwright and axe checks pass (`tests/e2e/login-error.spec.ts`); no completed auth slice was rebuilt.
+
+### Help & Support — verified 7 October 2026
+
+`/support` (33:4290) now uses the shared authenticated account shell, searchable help topics and persistent account-owned requests. Zod/database validation, atomic audit, retry-safe creation, cursor pagination, REST/OpenAPI, CSRF/origin checks, rate limiting and independent RLS are in place. Seven unit tests and ten focused database/catalog tests pass. Desktop/mobile Playwright with axe, canonical sign-in return paths, offline submission checks and exact SVG geometry pass. ADR-0017 records scope and recovery. No external email delivery or response SLA is claimed.

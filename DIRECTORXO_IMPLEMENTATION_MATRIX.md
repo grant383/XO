@@ -24,7 +24,7 @@ Design-sync items are corrections owed to Figma. They are **not implementation b
 | **Not started** | No implementation beyond shared foundations. |
 | **Deferred** | Deliberately moved out of its listed phase by a recorded decision. |
 
-Twenty capabilities are **Implemented**: they have the approved Figma visual, desktop and mobile layouts, and Playwright E2E with axe accessibility checks (ADR-0014, ADR-0015, ADR-0016). The remaining P0 rows are Notifications & Activity (48), Billing & Subscription (49), Help & Support (50) and the non-UI parts of rows 12, 14, 56 and 59.
+Twenty-one capabilities are **Implemented**: they have the approved Figma visual, desktop and mobile layouts, and Playwright E2E with axe accessibility checks (ADR-0014, ADR-0015, ADR-0016). The remaining P0 rows are Notifications & Activity (48), Billing & Subscription (49) and the non-UI parts of rows 12, 14, 56 and 59.
 
 ### Permission order (spec §7)
 
@@ -40,9 +40,9 @@ Public → Authenticated → Viewer+ → Operator+ → Manager+ → Admin+ → O
 | 04 Operate | 8 | 0 | 0 | 0 | 8 | 0 |
 | 05 Intelligence | 1 | 0 | 0 | 0 | 1 | 0 |
 | 06 Portfolio | 3 | 0 | 0 | 0 | 3 | 0 |
-| 07 System | 8 | 4 | 0 | 0 | 4 | 0 |
+| 07 System | 8 | 5 | 0 | 0 | 3 | 0 |
 | 08 States | 7 | 3 | 0 | 2 | 2 | 0 |
-| **Total** | **60** | **20** | **0** | **4** | **36** | **0** |
+| **Total** | **60** | **21** | **0** | **4** | **35** | **0** |
 
 ## 01 Auth & Onboarding
 
@@ -129,7 +129,7 @@ All Build rows are P2 and Not started. Spec routes are canonical; the Figma rout
 | 47 | Team & Permissions | System | P0 | `/v/[ventureId]/settings/team` | 33:3712 | `memberships`; RBAC in `ventures/rbac.ts` | `getTeam`; `inviteMemberAction`, `revokeInvitationAction`, `changeRoleAction`, `changeStatusAction`, `approveRequestAction`, `rejectRequestAction` | Admin+ (`team:*` capabilities) | Capability check on every request; actor role re-read in each mutation transaction; RLS on `venture_memberships`, `venture_invitations`, `venture_access_requests`; Owner-invariant trigger; audit | RLS + permission | Implemented | Step 5 (ADR-0013); 100 step-specific tests. Figma API `/api/v1/memberships` not implemented (server actions call the module). Minimal functional UI only. Figma: Ready. Figma visual and E2E in `tests/e2e/team.spec.ts` (ADR-0015). |
 | 48 | Notifications & Activity | System | P0 | `/settings/notifications-activity` | 33:3910 | `notifications` | `/api/v1/notifications` | Authenticated | `audit_log` RLS (account events: own; venture events: Owner/Admin) | CRUD + delivery | Not started | P0 audit and notification foundation; append-only `audit_log` exists. Figma route `/settings/notifications`; **Figma phase P1 vs spec P0**. Figma: Ready. |
 | 49 | Billing & Subscription | System | P0 | `/settings/billing` | 33:4087 | `billing` | `/api/v1/billing` | Owner | Billing accounts separate from venture ownership (ADR-0011) | webhook + idempotency | Not started | P0 billing foundation; Stripe. Figma: Ready. |
-| 50 | Help & Support | System | P0 | `/support` | 33:4290 | `support` | `/api/v1/support` | Authenticated | — | CRUD + validation | Not started | Figma route `/settings/help`; **Figma phase P1 vs spec P0**. Figma: Ready. |
+| 50 | Help & Support | System | P0 | `/support` | 33:4290 | `support` | `/api/v1/support` | Authenticated | — | CRUD + validation | Implemented | Account-owned support requests with retry-safe creation, atomic audit, FORCE RLS, search, details, cursor pagination, offline/pending/error states and exact Figma SVGs (ADR-0017). REST/OpenAPI and desktop/mobile E2E + axe pass. No external delivery or SLA is claimed. Figma route `/settings/help`; **Figma phase P1 vs spec P0**. Figma: Ready. |
 | 51 | Integrations | System | P1 | `/v/[ventureId]/settings/integrations` | 14:1443 | `integrations` | `/api/v1/integrations` | Admin+ | Venture RLS; encrypted credentials; signed, deduplicated webhooks | webhook + idempotency | Not started | The Companies House adapter (P0 onboarding) exists behind a stable interface. Figma: Ready. |
 | 52 | Request Access | System / Team | P0 | `/v/[ventureId]/request-access` | 54:27340 | `memberships` | `requestAccessAction` → `requestAccess` → `app.request_venture_access()` | Authenticated | Definer function; identical outcome whether or not the venture exists; requesters cannot read requests | RLS + permission | Implemented | ADR-0013 route (canonical). Figma route `/v/[ventureId]/settings/request-access` and API `POST /api/v1/access-requests` superseded (server action only). Figma: New P0. Figma visual and E2E in `tests/e2e/access.spec.ts` (ADR-0015). |
 | 53 | Access Request Submitted | System / Team | P0 | `/v/[ventureId]/request-access` (submitted state) | 54:27489 | `memberships` | `requestAccessAction` result; no requester read API in P0 (spec §11) | Requester | Same as Request Access | E2E + permission | Implemented | Implemented as the submitted state of the request-access route. `GET /api/v1/access-requests/[id]` and `/…/submitted` are not part of P0: a requester-readable request would reveal whether the venture exists (ADR-0013). Figma: New P0. E2E in `tests/e2e/access.spec.ts` (ADR-0015). |

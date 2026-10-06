@@ -21,7 +21,9 @@
     "db:bootstrap": "tsx --env-file-if-exists=.env.local db/scripts/bootstrap.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --env-file-if-exists=.env.local db/scripts/migrate.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "api:generate": "node --import tsx scripts/openapi.ts",
+    "api:check": "node --import tsx scripts/openapi.ts --check"
   },
   "dependencies": {
     "better-auth": "1.7.7",

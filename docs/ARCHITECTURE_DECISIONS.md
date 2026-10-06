@@ -54,3 +54,4 @@ Status: Accepted
 | [0014](adr/0014-ui-foundations-design-tokens.md) | UI foundations: design tokens, components and E2E | Accepted |
 | [0015](adr/0015-app-shell-error-states-journey-e2e.md) | Application shell, error states and journey E2E | Accepted |
 | [0016](adr/0016-mfa-recovery-session-management.md) | MFA, account recovery and session/device management | Accepted |
+| [0017](adr/0017-account-support.md) | Account support requests | Accepted |

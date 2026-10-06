@@ -53,6 +53,9 @@ export function AccountMenu({
         <Link href="/settings/profile-security" className={styles.popoverAction}>
           Profile &amp; Security
         </Link>
+        <Link href="/support" className={styles.popoverAction}>
+          Help &amp; Support
+        </Link>
         <form action={logoutAction}>
           <button type="submit" className={styles.popoverAction}>
             Sign out
