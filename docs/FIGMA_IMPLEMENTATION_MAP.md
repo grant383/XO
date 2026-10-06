@@ -84,7 +84,7 @@ Do **not** treat exported/generated Figma code as the application architecture. 
 | `10:4165` | Capital Allocation | `/portfolio/capital-allocation` | Portfolio | Portfolio Manager+ | P3 | NOT STARTED |
 | `33:3534` | Profile and Security | `/settings/profile-security` | System | Authenticated | P0 | COMPLETE |
 | `33:3712` | Team and Permissions | `/v/[ventureId]/settings/team` | System | Admin+ | P0 | COMPLETE |
-| `33:3910` | Notifications and Activity | `/settings/notifications-activity` | System | Authenticated | P0 | VERIFY |
+| `33:3910` | Notifications and Activity | `/settings/notifications-activity` | System | Authenticated | P0 | COMPLETE |
 | `33:4087` | Billing and Subscription | `/settings/billing` | System | Owner | P0 | VERIFY |
 | `33:4290` | Help and Support | `/support` | System | Authenticated | P0 | COMPLETE |
 | `14:1443` | Settings Integrations | `/v/[ventureId]/settings/integrations` | System | Admin+ | P1 | NOT STARTED |
@@ -184,7 +184,7 @@ The app has also been manually opened locally and the authenticated GS Appliance
 
 The Figma/product-spec matrix still requires an explicit code/test check for:
 
-- Notifications and Activity — `33:3910`
+- Notifications and Activity — `33:3910`: complete locally (ADR-0018); account RLS, read state, Owner/Admin venture activity and desktop/mobile E2E verified.
 - Billing and Subscription — `33:4087`
 - Help and Support — `33:4290`
 - any remaining P0 observability / rollback / API-documentation exit criteria from the master definition of done
@@ -256,7 +256,7 @@ When handing work to an agent, provide the **node ID from this map**, not only t
 
 ## I. Current P0 audit
 
-See [P0 audit](P0_AUDIT.md) for the 6 October 2026 code audit. Notifications, Billing and Support are confirmed missing, not completed slices. P0 remains open; deployment/rollback, recovery, API documentation and production telemetry evidence are outstanding. Command Centre remains gated.
+See [P0 audit](P0_AUDIT.md) for the 6 October 2026 code audit. Notifications and Support were confirmed missing and are now implemented locally (ADR-0017/0018). Billing remains missing. P0 remains open; deployment/rollback, recovery, API documentation and production telemetry evidence are outstanding. Command Centre remains gated.
 
 ### Canonical login error route — verified 6 October 2026
 

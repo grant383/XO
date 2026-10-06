@@ -4,3 +4,4 @@ export * from "./audit";
 export * from "./onboarding";
 export * from "./memberships";
 export * from "./support";
+export * from "./notifications";

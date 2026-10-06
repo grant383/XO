@@ -21,6 +21,7 @@ export async function AccountShell({ children, next }: { children: ReactNode; ne
           label: "Account",
           items: [
             { href: "/settings/profile-security", label: "Profile & Security" },
+            { href: "/settings/notifications-activity", label: "Notifications & Activity" },
             { href: "/support", label: "Help & Support" },
           ],
         },

@@ -33,3 +33,5 @@ Do not rebuild completed slices or mark P0 closed from a rendering shell. Add fo
 
 - Help & Support: missing slice implemented (ADR-0017), seven unit tests, ten database/catalog checks and desktop/mobile Playwright + axe pass. Final screenshots and 19×19 search-icon geometry checked.
 - User confirmed local-only deployment on 7 October: no DirectorXO Railway resources exist; do not create/link resources or use BlueprintOS. No Stripe recurring price is approved. Keep commits local; no merge, push or deployment. P0 remains open and P1 is gated.
+
+- Notifications & Activity: missing slice implemented (ADR-0018), two unit tests, ten database/catalog checks and desktop/mobile Playwright + axe pass. Final screenshots inspected. Read completion is awaited before reload in the persistence test.

@@ -53,6 +53,9 @@ export function AccountMenu({
         <Link href="/settings/profile-security" className={styles.popoverAction}>
           Profile &amp; Security
         </Link>
+        <Link href="/settings/notifications-activity" className={styles.popoverAction}>
+          Notifications &amp; Activity
+        </Link>
         <Link href="/support" className={styles.popoverAction}>
           Help &amp; Support
         </Link>

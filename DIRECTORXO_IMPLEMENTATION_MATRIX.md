@@ -24,7 +24,7 @@ Design-sync items are corrections owed to Figma. They are **not implementation b
 | **Not started** | No implementation beyond shared foundations. |
 | **Deferred** | Deliberately moved out of its listed phase by a recorded decision. |
 
-Twenty-one capabilities are **Implemented**: they have the approved Figma visual, desktop and mobile layouts, and Playwright E2E with axe accessibility checks (ADR-0014, ADR-0015, ADR-0016). The remaining P0 rows are Notifications & Activity (48), Billing & Subscription (49) and the non-UI parts of rows 12, 14, 56 and 59.
+Twenty-two capabilities are **Implemented**: they have the approved Figma visual, desktop and mobile layouts, and Playwright E2E with axe accessibility checks (ADR-0014, ADR-0015, ADR-0016). The remaining P0 rows are Billing & Subscription (49) and the non-UI parts of rows 12, 14, 56 and 59.
 
 ### Permission order (spec §7)
 
@@ -40,9 +40,9 @@ Public → Authenticated → Viewer+ → Operator+ → Manager+ → Admin+ → O
 | 04 Operate | 8 | 0 | 0 | 0 | 8 | 0 |
 | 05 Intelligence | 1 | 0 | 0 | 0 | 1 | 0 |
 | 06 Portfolio | 3 | 0 | 0 | 0 | 3 | 0 |
-| 07 System | 8 | 5 | 0 | 0 | 3 | 0 |
+| 07 System | 8 | 6 | 0 | 0 | 2 | 0 |
 | 08 States | 7 | 3 | 0 | 2 | 2 | 0 |
-| **Total** | **60** | **21** | **0** | **4** | **35** | **0** |
+| **Total** | **60** | **22** | **0** | **4** | **34** | **0** |
 
 ## 01 Auth & Onboarding
 
@@ -127,7 +127,7 @@ All Build rows are P2 and Not started. Spec routes are canonical; the Figma rout
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 46 | Profile & Security | System | P0 | `/settings/profile-security` | 33:3534 | `identity` | `updateNameAction`, `changePasswordAction`, `startMfaAction`, `confirmMfaAction`, `disableMfaAction`, `regenerateCodesAction`, `revokeSessionAction`, `revokeOtherSessionsAction` → identity flows (`getProfile`, `getMfaStatus`, `listSessions`, `getPasswordChangedAt`, …) | Authenticated | `users` RLS (self and co-members); sessions reachable only by `dxo_auth` | E2E + auth | Implemented | ADR-0016. Account-level page in the account settings shell (no venture context): personal details (name editable, email read-only), password change, MFA set-up with QR code and manual key, backup-code regeneration, MFA off (password + 15-minute freshness), device list with per-device and all-other sign-out, sign out. Linked from the account menu and the venture shell System section. E2E + axe `tests/e2e/profile.spec.ts`. Job title, phone, passkeys and the settings sub-navigation are not built (design-sync 20–22). Figma route `/settings/profile`. Figma: Ready. |
 | 47 | Team & Permissions | System | P0 | `/v/[ventureId]/settings/team` | 33:3712 | `memberships`; RBAC in `ventures/rbac.ts` | `getTeam`; `inviteMemberAction`, `revokeInvitationAction`, `changeRoleAction`, `changeStatusAction`, `approveRequestAction`, `rejectRequestAction` | Admin+ (`team:*` capabilities) | Capability check on every request; actor role re-read in each mutation transaction; RLS on `venture_memberships`, `venture_invitations`, `venture_access_requests`; Owner-invariant trigger; audit | RLS + permission | Implemented | Step 5 (ADR-0013); 100 step-specific tests. Figma API `/api/v1/memberships` not implemented (server actions call the module). Minimal functional UI only. Figma: Ready. Figma visual and E2E in `tests/e2e/team.spec.ts` (ADR-0015). |
-| 48 | Notifications & Activity | System | P0 | `/settings/notifications-activity` | 33:3910 | `notifications` | `/api/v1/notifications` | Authenticated | `audit_log` RLS (account events: own; venture events: Owner/Admin) | CRUD + delivery | Not started | P0 audit and notification foundation; append-only `audit_log` exists. Figma route `/settings/notifications`; **Figma phase P1 vs spec P0**. Figma: Ready. |
+| 48 | Notifications & Activity | System | P0 | `/settings/notifications-activity` | 33:3910 | `notifications` | `/api/v1/notifications` | Authenticated | `audit_log` RLS (account events: own; venture events: Owner/Admin) | CRUD + delivery | Implemented | Persistent account inbox projected from new audit events without metadata, cutoff-safe read state, filters/pagination, REST/OpenAPI, FORCE RLS and independently authorised Owner/Admin venture activity (ADR-0018). Two unit and ten database/catalog checks, desktop/mobile E2E and axe pass. Email digest is not enabled; existing transactional delivery remains separate. Figma route `/settings/notifications`; **Figma phase P1 vs spec P0**. Figma: Ready. |
 | 49 | Billing & Subscription | System | P0 | `/settings/billing` | 33:4087 | `billing` | `/api/v1/billing` | Owner | Billing accounts separate from venture ownership (ADR-0011) | webhook + idempotency | Not started | P0 billing foundation; Stripe. Figma: Ready. |
 | 50 | Help & Support | System | P0 | `/support` | 33:4290 | `support` | `/api/v1/support` | Authenticated | — | CRUD + validation | Implemented | Account-owned support requests with retry-safe creation, atomic audit, FORCE RLS, search, details, cursor pagination, offline/pending/error states and exact Figma SVGs (ADR-0017). REST/OpenAPI and desktop/mobile E2E + axe pass. No external delivery or SLA is claimed. Figma route `/settings/help`; **Figma phase P1 vs spec P0**. Figma: Ready. |
 | 51 | Integrations | System | P1 | `/v/[ventureId]/settings/integrations` | 14:1443 | `integrations` | `/api/v1/integrations` | Admin+ | Venture RLS; encrypted credentials; signed, deduplicated webhooks | webhook + idempotency | Not started | The Companies House adapter (P0 onboarding) exists behind a stable interface. Figma: Ready. |

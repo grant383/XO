@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { z } from "zod";
 import { format } from "prettier";
+import { inboxQuery, readInput } from "../src/modules/notifications/policy";
 import { supportInput, supportCursor } from "../src/modules/support/policy";
 
 const requestSchema = z.object({
@@ -25,7 +26,7 @@ const document = {
     title: "DirectorXO account APIs",
     version: "1.0.0",
     description:
-      "Support API contract. Existing identity and venture server-action coverage remains tracked in docs/P0_AUDIT.md.",
+      "Support and Notifications API contracts. Existing identity and venture server-action coverage remains tracked in docs/P0_AUDIT.md.",
   },
   servers: [{ url: "/" }],
   security: [{ sessionCookie: [] }],
@@ -84,6 +85,66 @@ const document = {
       },
     },
     schemas: { Error: z.toJSONSchema(errorSchema) },
+  },
+};
+const notification = z.object({
+  id: z.uuid(),
+  action: z.string(),
+  createdAt: z.iso.datetime(),
+  readAt: z.iso.datetime().nullable(),
+});
+const ventureEvent = z.object({
+  id: z.uuid(),
+  action: z.string(),
+  outcome: z.enum(["success", "failure", "denied"]),
+  occurredAt: z.iso.datetime(),
+});
+const paths = document.paths as Record<string, unknown>;
+paths["/api/v1/notifications"] = {
+  get: {
+    summary: "Read account notifications or authorised venture audit activity",
+    description:
+      "Account inbox: authenticated self only, newest timestamp then UUID descending, 30 per page, no audit metadata. With ventureId: active Owner/Admin required independently by the server and audit RLS; inaccessible and unknown ventures return the same 403. Venture activity returns the latest 30 records. New account audit events are projected from migration 0011 onward; historical audit logs remain unchanged.",
+    parameters: [
+      { name: "unread", in: "query", schema: { type: "string", enum: ["0", "1"] } },
+      { name: "ventureId", in: "query", schema: { type: "string", format: "uuid" } },
+      { name: "at", in: "query", schema: { type: "string", format: "date-time" } },
+      { name: "id", in: "query", schema: { type: "string", format: "uuid" } },
+    ],
+    responses: {
+      "200": {
+        description: "Own inbox or permitted venture activity",
+        ...json({
+          oneOf: [
+            z.toJSONSchema(
+              z.object({
+                items: z.array(notification),
+                total: z.number().int(),
+                unread: z.number().int(),
+                thisWeek: z.number().int(),
+                asOf: z.iso.datetime(),
+                nextCursor: inboxQuery.shape.cursor.unwrap().nullable(),
+              }),
+            ),
+            z.toJSONSchema(z.object({ items: z.array(ventureEvent) })),
+          ],
+        }),
+      },
+      ...errors,
+    },
+  },
+  post: {
+    summary: "Mark own notifications read through a displayed cutoff",
+    description:
+      "Explicit POST, exact Origin and authenticated account required. An optional id marks one notification; omitted id marks all through the cutoff. Other accounts' IDs update zero records. Future cutoffs are rejected. Retries are harmless.",
+    requestBody: { required: true, ...json(z.toJSONSchema(readInput)) },
+    responses: {
+      "200": {
+        description: "Number of records updated",
+        ...json(z.toJSONSchema(z.object({ updated: z.number().int().nonnegative() }))),
+      },
+      ...errors,
+    },
   },
 };
 const output = await format(JSON.stringify(document), { parser: "json", printWidth: 100 });
