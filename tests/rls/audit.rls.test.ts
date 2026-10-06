@@ -157,6 +157,11 @@ describe("audit_log immutability", () => {
       "append-only",
     );
     await expectPgError(admin`delete from audit_log`, RLS_VIOLATION, "append-only");
-    await expectPgError(admin`truncate audit_log`, RLS_VIOLATION, "append-only");
+    const before = await admin`select count(*)::int as count from audit_log`;
+    // The inbox projection now references audit rows. Prove both the FK guard and
+    // append-only trigger; CASCADE reaches the trigger without weakening integrity.
+    await expectPgError(admin`truncate audit_log`, "0A000", "foreign key");
+    await expectPgError(admin`truncate audit_log cascade`, RLS_VIOLATION, "append-only");
+    expect(await admin`select count(*)::int as count from audit_log`).toEqual(before);
   });
 });
