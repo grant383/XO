@@ -38,7 +38,7 @@ Do **not** treat exported/generated Figma code as the application architecture. 
 | Figma node | Screen | Canonical route | Module | Permission | Phase | Status |
 |---|---|---|---|---|---|---|
 | `31:3441` | DirectorXO login | `/auth/login` | Auth | Public | P0 | COMPLETE |
-| `31:3549` | Login error | `/auth/login/error` | Auth | Public | P0 | COMPLETE |
+| `31:3549` | Login error | `/auth/login/error` | Auth | Public | P0 | VERIFY — canonical error route missing |
 | `31:3503` | Forgot password | `/auth/forgot-password` | Auth | Public | P0 | COMPLETE |
 | `33:3315` | Set new password | `/auth/reset-password` | Auth | Valid token | P0 | COMPLETE |
 | `33:3202` | Create account | `/auth/register` | Auth | Public | P0 | COMPLETE |
@@ -253,3 +253,7 @@ Canonical design file:
 `https://www.figma.com/design/rqWc0iFUFSTdudXuO4Gm47/Director-xo?node-id=0-1`
 
 When handing work to an agent, provide the **node ID from this map**, not only the root file URL. This prevents implementation from drifting to the wrong frame.
+
+## I. Current P0 audit
+
+See [P0 audit](P0_AUDIT.md) for the 6 October 2026 code audit. Notifications, Billing and Support are confirmed missing, not completed slices. P0 remains open; deployment/rollback, recovery, API documentation and production telemetry evidence are outstanding. Command Centre remains gated.
