@@ -37,6 +37,13 @@ function navigationFor(access: VentureAccess): ShellNavSection[] {
       ],
     });
   }
+  if (can(access.role, "operations:view")) {
+    sections[0]?.items.push({
+      href: `${base}/operate/operations`,
+      label: "Operations",
+      exact: true,
+    });
+  }
   // Profile & Security is account-level (/settings/*), open to every signed-in user.
   const system = [{ href: "/settings/profile-security", label: "Profile & Security" }];
   if (can(access.role, "team:view")) {
@@ -70,7 +77,12 @@ export default async function VentureShellLayout({ children, params }: Props) {
   const ventures = await listSwitchableVentures(actor);
   return (
     <AppShell
-      venture={{ id: access.id, name: access.name, roleLabel: ROLE_LABELS[access.role] }}
+      venture={{
+        id: access.id,
+        name: access.name,
+        roleLabel: ROLE_LABELS[access.role],
+        operationsAllowed: can(access.role, "operations:view"),
+      }}
       ventures={ventures.map((v) => ({ id: v.id, name: v.name, roleLabel: ROLE_LABELS[v.role] }))}
       user={{ name: actor.name, email: actor.email }}
       nav={navigationFor(access)}

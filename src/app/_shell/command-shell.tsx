@@ -48,6 +48,8 @@ export function CommandShell({
   const pathname = usePathname();
   const growth = pathname.endsWith("/command/growth-1m");
   const finance = pathname.endsWith("/operate/finance");
+  const operations = pathname.endsWith("/operate/operations");
+  const canOpenOperations = venture.operationsAllowed === true;
   const navigation = (
     <>
       <div className={styles.brand}>
@@ -60,22 +62,29 @@ export function CommandShell({
             <ul>
               {section.items.map((item) => (
                 <li key={item}>
-                  {item === "Command" || item === "Growth" || item === "Finance" ? (
+                  {item === "Command" ||
+                  item === "Growth" ||
+                  item === "Finance" ||
+                  (section.label === "Operate" && item === "Operations" && canOpenOperations) ? (
                     <Link
                       href={
                         item === "Command"
                           ? `/v/${venture.id}/command`
-                          : item === "Finance"
-                            ? `/v/${venture.id}/operate/finance`
-                            : `/v/${venture.id}/command/growth-1m`
+                          : item === "Operations"
+                            ? `/v/${venture.id}/operate/operations`
+                            : item === "Finance"
+                              ? `/v/${venture.id}/operate/finance`
+                              : `/v/${venture.id}/command/growth-1m`
                       }
                       aria-current={
                         (
-                          item === "Finance"
-                            ? finance
-                            : item === "Growth"
-                              ? growth
-                              : !growth && !finance
+                          item === "Operations"
+                            ? operations
+                            : item === "Finance"
+                              ? finance
+                              : item === "Growth"
+                                ? growth
+                                : !growth && !finance && !operations
                         )
                           ? "page"
                           : undefined
@@ -85,7 +94,14 @@ export function CommandShell({
                       {item}
                     </Link>
                   ) : (
-                    <span aria-disabled="true" title="Module not yet available">
+                    <span
+                      aria-disabled="true"
+                      title={
+                        section.label === "Operate" && item === "Operations"
+                          ? "Operator access required"
+                          : "Module not yet available"
+                      }
+                    >
                       {item}
                     </span>
                   )}
@@ -139,7 +155,15 @@ export function CommandShell({
             <span>/</span>
             <span>Operate</span>
             <span>/</span>
-            <span>{finance ? "Finance" : growth ? "£1M Growth Command" : "Command"}</span>
+            <span>
+              {operations
+                ? "Operations"
+                : finance
+                  ? "Finance"
+                  : growth
+                    ? "£1M Growth Command"
+                    : "Command"}
+            </span>
           </p>
           <div className={styles.meta}>
             <span className={styles.date}>
@@ -148,7 +172,7 @@ export function CommandShell({
                   Period: August 2026{" "}
                   <img src="/ui/finance/chevron.svg" width="10" height="10" alt="" />
                 </span>
-              ) : growth ? (
+              ) : growth || operations ? (
                 "Fixed Figma fixture"
               ) : (
                 "Thursday 4 Sep 2026"

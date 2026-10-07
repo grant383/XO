@@ -42,6 +42,8 @@ export const CAPABILITIES = [
   "command:view",
   /** Create, complete and reopen Command Centre tasks (day-to-day records: Operator+). */
   "command:manage_tasks",
+  /** Operate Operations reference screen (spec §8: Operator+). */
+  "operations:view",
 ] as const;
 export type Capability = (typeof CAPABILITIES)[number];
 
@@ -67,6 +69,7 @@ const GRANTS: Record<Capability, readonly VentureRole[]> = {
   "command:view": VIEWER_PLUS,
   // Matches the command_tasks INSERT/UPDATE policies (migration 0014).
   "command:manage_tasks": OPERATOR_PLUS,
+  "operations:view": OPERATOR_PLUS,
 };
 
 export function can(role: VentureRole | null | undefined, capability: Capability): boolean {
