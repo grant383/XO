@@ -1,13 +1,23 @@
+import { logger } from "@/platform/observability/logger";
+
 /**
- * Deferred work started by authentication endpoints (email delivery). Running it after
- * the response keeps response times independent of whether an account exists, which
- * prevents timing-based account enumeration. The web process is long-lived (Railway),
- * so tasks complete after the response; BullMQ replaces this in P0 step 7.
+ * Deferred work started by authentication endpoints (queueing email for the BullMQ worker,
+ * ADR-0023). Running it after the response keeps response times independent of whether an
+ * account exists, which prevents timing-based account enumeration. Delivery itself, with
+ * retries and dead-lettering, happens in the worker process, not here.
  */
 const pending = new Set<Promise<unknown>>();
 
 export function runInBackground(task: Promise<unknown>): void {
-  const tracked: Promise<unknown> = task.finally(() => pending.delete(tracked));
+  // A rejected task is logged, never left unhandled: an unhandled rejection stops Node.
+  const tracked: Promise<unknown> = task
+    .catch((error: unknown) => {
+      logger.error(
+        { err: { name: error instanceof Error ? error.name : "unknown" } },
+        "background task failed",
+      );
+    })
+    .finally(() => pending.delete(tracked));
   pending.add(tracked);
 }
 

@@ -39,6 +39,7 @@ docker compose up -d                # postgres, redis, s3 emulator, mailpit (loc
 pnpm db:bootstrap                   # create least-privilege roles (idempotent)
 pnpm db:migrate
 pnpm dev
+pnpm worker                         # email delivery (BullMQ, ADR-0023); separate terminal
 ```
 
 | Command | Purpose |

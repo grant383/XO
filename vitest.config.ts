@@ -26,6 +26,7 @@ export default defineConfig({
           include: ["tests/integration/**/*.test.ts", "tests/rls/**/*.test.ts"],
           environment: "node",
           globalSetup: ["tests/setup/global-db.ts"],
+          setupFiles: ["tests/setup/email-outbox.ts"],
           fileParallelism: false,
           testTimeout: 20_000,
           hookTimeout: 60_000,

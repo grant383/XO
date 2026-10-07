@@ -40,6 +40,8 @@ export function testAuthEnv() {
     EMAIL_PROVIDER: "memory",
     EMAIL_FROM: "DirectorXO <no-reply@directorxo.test>",
     REDIS_URL: process.env.REDIS_URL ?? "redis://localhost:63799",
+    // Base64 of a fixed, public 32-byte test value; never a real key (ADR-0023).
+    ENCRYPTION_KEY: Buffer.from("directorxo-test-only-envelope-k!").toString("base64"),
     LOG_LEVEL: "warn",
   };
 }

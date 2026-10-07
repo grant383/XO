@@ -3,7 +3,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest
 import { closePools } from "@/platform/db";
 import type { MemoryTransport } from "@/platform/email";
 import { logger } from "@/platform/observability/logger";
-import { register, settleBackgroundTasks } from "@/modules/identity";
+import { register } from "@/modules/identity";
 import {
   acceptInvitation,
   createInvitation,
@@ -18,6 +18,7 @@ import {
   APP_URL,
   freshIp,
   installTestAuth,
+  settleEmail,
   STRONG_PASSWORD,
   tokenFromEmail,
   uniqueEmail,
@@ -40,7 +41,7 @@ beforeAll(() => {
 });
 afterEach(async () => {
   vi.restoreAllMocks();
-  await settleBackgroundTasks();
+  await settleEmail();
 });
 afterAll(async () => {
   uninstallTestAuth();
@@ -345,7 +346,7 @@ describe("accepting invitations", () => {
         `/invite/${token}`,
       ),
     ).toEqual({ ok: true, data: undefined });
-    await settleBackgroundTasks();
+    await settleEmail();
 
     const verification = mailbox.outbox
       .filter((m) => m.to === email && m.category === "auth.verify-email")
@@ -376,7 +377,7 @@ describe("accepting invitations", () => {
       headers,
       "https://evil.example/",
     );
-    await settleBackgroundTasks();
+    await settleEmail();
     const verification = mailbox.outbox
       .filter((m) => m.to === email && m.category === "auth.verify-email")
       .at(-1)!;

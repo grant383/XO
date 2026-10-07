@@ -43,3 +43,15 @@ Do not rebuild completed slices or mark P0 closed from a rendering shell. Add fo
 
 - Final local restore drill passed with column grants and trigger definitions added: 19 public tables, migration history, row content/counts, table/column grants, ownership, FORCE RLS/policies and security-function definitions/grants verified in 242.87 seconds; temporary database removed. Still no production PITR/RPO/RTO certification.
 - Final database regression passes all 265 tests. Unit suite passes 210 tests, plus the new offline identity contract check. Production build and typecheck pass; lint has five SVG `<img>` warnings and no errors.
+
+## Email outbox and P0 infrastructure freeze — 7 October 2026
+
+- Identity email outbox completed as already started and kept minimal (ADR-0023): one BullMQ queue, six bounded attempts with exponential backoff, metadata-only dead-letter queue, one `pnpm worker` entry point, payloads sealed with AES-256-GCM. Team invitations still send inline (unchanged).
+- Verification: format check, typecheck and production build pass. Lint has the same five `<img>` warnings and no errors. Unit suite: 266 tests (22 files). Database integration/RLS suite: 271 tests (27 files), including six outbox tests against real Redis (encrypted at rest, idempotent enqueue, retry, exhaustion, permanent rejection, undecryptable payload). Playwright now starts the worker. Onboarding and team journeys (four desktop tests) pass with email delivered through the queue. The full desktop/mobile E2E matrix was not rerun.
+- **Infrastructure freeze (user decision, 7 October).** No further P0 infrastructure, worker features, telemetry, providers, queues or deployment abstractions. The following are **deferred deployment gates**, not current build work:
+  - Railway services: web and worker, staging deployment and rollback.
+  - Live Stripe configuration and an approved recurring price.
+  - Production PITR, with RPO/RTO certified by a timed restore.
+  - Production monitoring and alerting, including dead-letter and queue-depth alerts.
+  - Execution of the GitHub Actions CI workflow. It is defined, but no commits are pushed.
+- **Conflict recorded.** The Closure rule above and spec §19 gate P1 on deployment/rollback evidence. The user has directed work to move to P1 Command Centre with these gates deferred. They must pass before any production release.

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { GET, POST } from "@/app/api/v1/auth/[...all]/route";
-import { setEmailTransportForTests, MemoryTransport } from "@/platform/email";
+import { emailOutboxCounts, setEmailTransportForTests, MemoryTransport } from "@/platform/email";
 import { MemoryRateLimitStore, type RateLimitStore } from "@/platform/security";
 import {
   createIdentityAuth,
@@ -30,6 +30,21 @@ export function installTestAuth(options: { secureCookies?: boolean; store?: Rate
 export function uninstallTestAuth() {
   setAuthForTests(undefined);
   setEmailTransportForTests(undefined);
+}
+
+/**
+ * Waits until deferred auth work has run and the email outbox has delivered (or
+ * dead-lettered) everything queued, so tests can read the mailbox deterministically.
+ */
+export async function settleEmail(timeoutMs = 15_000): Promise<void> {
+  await settleBackgroundTasks();
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const c = await emailOutboxCounts();
+    if (!c.waiting && !c.active && !c.delayed && !c.prioritized) return;
+    if (Date.now() > deadline) throw new Error(`email outbox not idle: ${JSON.stringify(c)}`);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
 }
 
 let ipCounter = 1;
@@ -108,7 +123,7 @@ export async function api(path: string, options: CallOptions = {}): Promise<ApiR
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   });
   const response = method === "GET" ? await GET(request) : await POST(request);
-  await settleBackgroundTasks();
+  await settleEmail();
 
   const text = await response.text();
   let body: Record<string, unknown> | null = null;

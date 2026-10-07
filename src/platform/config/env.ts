@@ -96,3 +96,22 @@ export const companiesHouseEnv = defineEnv(
     COMPANIES_HOUSE_API_URL: z.url({ protocol: /^https?$/ }).optional(),
   }),
 );
+
+/** A base64-encoded 256-bit key (`openssl rand -base64 32`). */
+const aes256Key = z
+  .string()
+  .refine((v) => /^[A-Za-z0-9+/]+={0,2}$/.test(v) && Buffer.from(v, "base64").length === 32, {
+    message: "must be 32 bytes, base64-encoded",
+  });
+
+/**
+ * Application-level encryption for data at rest outside PostgreSQL (e.g. queued email
+ * payloads, ADR-0023). `ENCRYPTION_KEY_PREVIOUS` is set only while rotating keys, so data
+ * sealed with the old key can still be opened (ADR-0023, key rotation).
+ */
+export const encryptionEnv = defineEnv(
+  z.object({
+    ENCRYPTION_KEY: aes256Key,
+    ENCRYPTION_KEY_PREVIOUS: aes256Key.optional(),
+  }),
+);

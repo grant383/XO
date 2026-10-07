@@ -28,11 +28,15 @@ export default defineConfig({
     },
     { name: "mobile", use: { ...devices["Pixel 7"] } },
   ],
-  webServer: {
-    command: `pnpm exec next dev -p ${PORT}`,
-    url: `${baseURL}/api/health/live`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-    env: { APP_URL: baseURL, NEXT_DIST_DIR: ".next-e2e" },
-  },
+  webServer: [
+    {
+      command: `pnpm exec next dev -p ${PORT}`,
+      url: `${baseURL}/api/health/live`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+      env: { APP_URL: baseURL, NEXT_DIST_DIR: ".next-e2e" },
+    },
+    // Identity email is delivered by the worker from the BullMQ outbox (ADR-0023).
+    { command: "pnpm worker", wait: { stdout: /worker started/ }, timeout: 60_000 },
+  ],
 });

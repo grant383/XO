@@ -7,3 +7,4 @@ export {
   type RateLimitStore,
 } from "./rate-limit";
 export { clientIp } from "./client-ip";
+export { EnvelopeError, open, seal } from "./envelope";

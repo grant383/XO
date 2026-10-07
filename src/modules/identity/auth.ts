@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware, getSessionFromCtx, isAPIError } from "better-auth/api";
 import { verifyJWT } from "better-auth/crypto";
@@ -10,7 +10,7 @@ import {
   identityStoreAdapter,
   revokeUserVerificationValues,
 } from "@/platform/db";
-import { sendEmail } from "@/platform/email";
+import { enqueueEmail } from "@/platform/email";
 import { logger } from "@/platform/observability/logger";
 import {
   subjectKey,
@@ -471,7 +471,12 @@ export function createIdentityAuth(config: IdentityConfig) {
           metadata: failed ? { reason: code ?? "unknown" } : {},
         });
         if (!failed) {
-          runInBackground(sendEmail(passwordChangedEmail(user, `${appUrl}/auth/forgot-password`)));
+          runInBackground(
+            enqueueEmail(
+              passwordChangedEmail(user, `${appUrl}/auth/forgot-password`),
+              randomUUID(),
+            ),
+          );
         }
         break;
       }
@@ -505,7 +510,10 @@ export function createIdentityAuth(config: IdentityConfig) {
         });
         if (method === "recovery_code") {
           runInBackground(
-            sendEmail(mfaNoticeEmail(user, "recovery-code-used", `${appUrl}/auth/forgot-password`)),
+            enqueueEmail(
+              mfaNoticeEmail(user, "recovery-code-used", `${appUrl}/auth/forgot-password`),
+              randomUUID(),
+            ),
           );
         }
         break;
@@ -545,8 +553,9 @@ export function createIdentityAuth(config: IdentityConfig) {
             subjectUserId: user.id,
           });
           runInBackground(
-            sendEmail(
+            enqueueEmail(
               mfaNoticeEmail(user, "recovery-codes-regenerated", `${appUrl}/auth/forgot-password`),
+              randomUUID(),
             ),
           );
         }
@@ -608,12 +617,14 @@ export function createIdentityAuth(config: IdentityConfig) {
           actorType: "anonymous",
           subjectUserId: user.id,
         });
-        await sendEmail(
+        // Keyed by the single-use token: a repeated callback for the same reset is ignored.
+        await enqueueEmail(
           passwordResetEmail(
             user,
             resetPasswordUrl(appUrl, token),
             TOKEN_POLICY.passwordResetTtlSec / 60,
           ),
+          token,
         );
       },
       onPasswordReset: async ({ user }, request) => {
@@ -634,8 +645,9 @@ export function createIdentityAuth(config: IdentityConfig) {
           actorType: "anonymous",
           subjectUserId: user.id,
         });
-        await sendEmail(
+        await enqueueEmail(
           existingAccountEmail(user, `${appUrl}/auth/login`, `${appUrl}/auth/forgot-password`),
+          randomUUID(),
         );
       },
     },
@@ -651,12 +663,13 @@ export function createIdentityAuth(config: IdentityConfig) {
         const callback = safeNextPath(new URL(url).searchParams.get("callbackURL"));
         const next = callback === "/" ? null : callback; // Better Auth's default
 
-        await sendEmail(
+        await enqueueEmail(
           verificationEmail(
             user,
             verifyEmailUrl(appUrl, token, next),
             TOKEN_POLICY.emailVerificationTtlSec / 3600,
           ),
+          token,
         );
       },
       afterEmailVerification: async (user, request) => {
@@ -730,7 +743,10 @@ export function createIdentityAuth(config: IdentityConfig) {
                 metadata: { method: "totp", otherSessionsRevoked: open.length - 1 },
               });
               runInBackground(
-                sendEmail(mfaNoticeEmail(user, "enabled", `${appUrl}/auth/forgot-password`)),
+                enqueueEmail(
+                  mfaNoticeEmail(user, "enabled", `${appUrl}/auth/forgot-password`),
+                  randomUUID(),
+                ),
               );
             } else if (path === "/two-factor/disable" && !enabled) {
               await recordAuthEvent(meta, {
@@ -741,7 +757,10 @@ export function createIdentityAuth(config: IdentityConfig) {
                 subjectUserId: user.id,
               });
               runInBackground(
-                sendEmail(mfaNoticeEmail(user, "disabled", `${appUrl}/auth/forgot-password`)),
+                enqueueEmail(
+                  mfaNoticeEmail(user, "disabled", `${appUrl}/auth/forgot-password`),
+                  randomUUID(),
+                ),
               );
             }
           },

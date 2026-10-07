@@ -11,6 +11,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "worker": "SERVICE_NAME=${SERVICE_NAME:-worker} tsx --env-file-if-exists=.env.local worker/main.ts",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
@@ -27,6 +28,7 @@
   },
   "dependencies": {
     "better-auth": "1.7.7",
+    "bullmq": "6.3.11",
     "drizzle-orm": "0.45.3",
     "geist": "1.7.2",
     "ioredis": "6.0.0",
