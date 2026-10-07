@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
 import { expectNoA11yViolations } from "./a11y";
-import { createVerifiedUser, isolatedIp, onboardVenture, signIn } from "./helpers";
+import { createVerifiedUser, isolatedIp, onboardVenture, openNavigation, signIn } from "./helpers";
 
 test.use({ extraHTTPHeaders: isolatedIp() });
 
@@ -50,6 +50,8 @@ test("non-member requests access and the owner approves it", async ({ page, brow
   await expect(page.getByText("No pending access requests.")).toBeVisible();
 
   await outsider.goto(`/v/${ventureId}`);
-  await expect(outsider.getByText("Your role: Operator.")).toBeVisible();
+  await expect(
+    (await openNavigation(outsider)).getByRole("button", { name: /Current venture/ }),
+  ).toContainText("Operator");
   await outsiderContext.close();
 });

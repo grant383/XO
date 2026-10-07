@@ -334,6 +334,10 @@
   font: var(--type-small);
 }
 
+.contextSection {
+  flex: none;
+}
+
 .contextPage {
   flex: none;
   color: var(--text-primary);

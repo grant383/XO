@@ -20,17 +20,17 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 type Props = { children: ReactNode; params: Promise<{ ventureId: string }> };
 
 /**
- * Navigation shows only destinations that exist and that the role can open. Command,
- * Build, Operate, Intelligence and Portfolio join (in that order, spec §4) as their
- * routes ship. Hiding an item is presentation only: every page authorises on its own.
+ * Navigation shows only destinations that exist and that the role can open; the Figma
+ * 8:651 sections (Portfolio, Build, Operate) gain items as their routes ship. Hiding an
+ * item is presentation only: every page authorises on its own.
  */
 function navigationFor(access: VentureAccess): ShellNavSection[] {
   const base = `/v/${access.id}`;
   const sections: ShellNavSection[] = [];
   if (can(access.role, "command:view")) {
     sections.push({
-      label: "Command",
-      items: [{ href: `${base}/command`, label: "Command Centre", exact: true }],
+      label: "Operate",
+      items: [{ href: `${base}/command`, label: "Command", exact: true }],
     });
   }
   // Profile & Security is account-level (/settings/*), open to every signed-in user.

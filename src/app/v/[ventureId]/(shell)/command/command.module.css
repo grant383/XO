@@ -3,43 +3,17 @@
  * quadrants stack in reading order (numbers, changes, why, what to do).
  */
 
-.headerMeta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-16);
-  font: var(--type-small);
-  color: var(--text-muted);
-}
-
-.freshness {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-6);
-  font: var(--type-small);
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.dotLive,
-.dotOffline {
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--status-success-strong);
-}
-
-.dotOffline {
-  background: var(--status-warning);
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  min-height: 764px;
+  height: calc(100dvh - 112px);
   gap: var(--space-24);
 }
 
 .quadrant {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-12);
@@ -47,37 +21,66 @@
 }
 
 .eyebrow {
-  font: var(--type-eyebrow);
+  font: 700 11px / 13px var(--font-mono);
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-}
-
-.note {
-  font: var(--type-small);
-  color: var(--text-muted);
 }
 
 .card {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  min-height: 0;
-  padding: var(--space-16) var(--space-20);
+  margin: 0;
   background: var(--surface-default);
-  border: 1px solid var(--border-subtle);
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
   border-radius: var(--radius-8);
+  list-style: none;
 }
 
-.cardEmpty {
-  background: transparent;
-  border: 0;
+.dot {
+  flex: 0 0 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--text-subtle);
+}
+
+/* Status tones shared by dots and insight borders. */
+.success {
+  --tone: var(--status-success-strong);
+}
+
+.warning {
+  --tone: var(--status-warning);
+}
+
+.danger {
+  --tone: var(--status-danger);
+}
+
+.info {
+  --tone: var(--action-link);
+}
+
+.neutral {
+  --tone: var(--text-subtle);
+}
+
+.dot.success,
+.dot.warning,
+.dot.danger,
+.dot.info,
+.dot.neutral {
+  background: var(--tone);
 }
 
 /* Today's numbers */
 .tiles {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
   gap: var(--space-12);
   margin: 0;
 }
@@ -89,28 +92,35 @@
   min-width: 0;
   padding: var(--space-16);
   background: var(--surface-default);
-  border: 1px solid var(--border-subtle);
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
   border-radius: var(--radius-8);
 }
 
-.tile dd {
-  margin: 0;
-}
-
 .tileLabel {
-  font: 500 11px / 16px var(--font-sans);
+  font: 500 11px / 13px var(--font-sans);
   color: var(--text-subtle);
   text-transform: uppercase;
 }
 
-.tileValue {
-  font: 600 20px / 28px var(--font-sans);
-  color: var(--text-primary);
+.tileRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-8);
+  margin: 0;
 }
 
-.tileMeta {
-  font: 500 11px / 16px var(--font-mono);
-  color: var(--text-subtle);
+.tileValue {
+  font: 600 20px / 24px var(--font-sans);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.tileChange {
+  font: 500 11px / 14px var(--font-mono);
+  white-space: nowrap;
 }
 
 .up {
@@ -127,12 +137,8 @@
 
 /* What changed */
 .timeline {
-  display: flex;
-  flex-direction: column;
   gap: var(--space-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  padding: var(--space-20);
 }
 
 .timelineRow {
@@ -144,205 +150,90 @@
 }
 
 .timelineTime {
-  flex: 0 0 72px;
-  font: 400 11px / 16px var(--font-mono);
+  flex: 0 0 60px;
+  font: 400 11px / 14px var(--font-mono);
   color: var(--text-muted);
-}
-
-.dot {
-  flex: 0 0 6px;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--text-subtle);
-}
-
-.task_added {
-  background: var(--action-link);
-}
-
-.task_completed {
-  background: var(--status-success-strong);
-}
-
-.task_reopened {
-  background: var(--status-warning);
 }
 
 .timelineText {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  font: 400 13px / 18px var(--font-sans);
+  font: 400 13px / 16px var(--font-sans);
   color: var(--neutral-mist);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 /* Why */
-.signals {
+.insights {
   display: flex;
   flex-direction: column;
   gap: var(--space-12);
 }
 
-.signal {
+.insight {
   display: flex;
   flex-direction: column;
   gap: var(--space-12);
   padding: var(--space-16);
   background: var(--surface-default);
-  border-left: 3px solid var(--accent-blue);
+  box-shadow: inset 3px 0 var(--tone, var(--accent-blue));
   border-radius: 0 var(--radius-8) var(--radius-8) 0;
 }
 
-.signal.danger {
-  border-left-color: var(--status-danger);
-}
-
-.signal.warning {
-  border-left-color: var(--status-warning);
-}
-
-.signalCopy {
+.insightCopy {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
 }
 
-.signalTitle {
-  font: 600 14px / 20px var(--font-sans);
+.insightTitle {
+  font: 600 14px / 17px var(--font-sans);
   color: var(--text-primary);
 }
 
-.signalText {
+.insightText {
   font: 400 13px / 1.4 var(--font-sans);
   color: var(--neutral-mist);
 }
 
-.signalText strong {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.signalMeta {
-  font: 400 11px / 16px var(--font-mono);
+.insightMeta {
+  font: 400 11px / 13px var(--font-mono);
   color: var(--text-muted);
-  overflow-wrap: anywhere;
-}
-
-.evidence {
-  font: 400 12px / 18px var(--font-sans);
-  color: var(--text-secondary);
-}
-
-.evidence summary {
-  width: fit-content;
-  color: var(--action-link);
-  cursor: pointer;
-}
-
-.evidence dl {
-  display: grid;
-  gap: var(--space-4);
-  margin: var(--space-8) 0 0;
-}
-
-.evidence dl div {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-  gap: var(--space-12);
-}
-
-.evidence dt {
-  color: var(--text-muted);
-}
-
-.evidence dd {
-  margin: 0;
-  font-family: var(--font-mono);
-  overflow-wrap: anywhere;
 }
 
 /* What to do */
 .tasks {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-16);
 }
 
 .taskRow {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-16);
   min-height: 44px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.toggleForm {
-  display: contents;
-}
-
-/* 24px target (WCAG 2.2 target size) around the 16px Figma box. */
 .checkbox {
-  display: inline-grid;
-  flex: 0 0 24px;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  margin: 0 -4px;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  border-radius: var(--radius-4);
-  cursor: pointer;
-}
-
-.checkbox:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.checkbox:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 1px;
-}
-
-.checkboxBox,
-.checkboxStatic {
-  display: inline-grid;
-  place-items: center;
+  flex: 0 0 16px;
   width: 16px;
   height: 16px;
   border: 1.5px solid #64697a;
   border-radius: var(--radius-4);
 }
 
-.checkboxStatic {
-  flex: 0 0 16px;
-}
-
-.checkbox[aria-checked="true"] .checkboxBox {
-  background: var(--action-primary);
-  border-color: var(--action-primary);
-}
-
 .taskTitle {
   flex: 1 1 0;
   min-width: 0;
   overflow: hidden;
-  font: 400 13px / 18px var(--font-sans);
+  font: 400 13px / 16px var(--font-sans);
   color: var(--text-primary);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.taskDone .taskTitle {
-  color: var(--text-muted);
-  text-decoration: line-through;
 }
 
 .priority {
@@ -355,7 +246,7 @@
 
 .high {
   background: rgb(239 68 68 / 0.08);
-  color: var(--status-danger-soft);
+  color: var(--status-danger);
 }
 
 .medium {
@@ -369,89 +260,49 @@
 }
 
 .due {
-  flex: 0 0 auto;
-  min-width: 84px;
-  font: 400 11px / 16px var(--font-sans);
+  flex: 0 0 75px;
+  font: 400 11px / 14px var(--font-sans);
   color: var(--text-subtle);
   text-align: right;
   white-space: nowrap;
 }
 
-.overdue {
-  color: var(--status-danger-soft);
-}
-
-/* The toggle form uses display: contents, so its error wraps onto its own row line. */
-.rowError {
-  flex: 1 0 100%;
-  padding-bottom: var(--space-8);
-  font: var(--type-small);
-  color: var(--status-danger-soft);
-}
-
-.subheading {
-  margin-top: var(--space-16);
-  font: var(--type-eyebrow);
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.addForm {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-12);
-  margin-top: var(--space-16);
-  padding-top: var(--space-16);
-  border-top: 1px solid var(--border-subtle);
-}
-
-.addTitle {
-  font: var(--type-emphasis);
-  color: var(--text-primary);
-}
-
-.addFields {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: end;
-  gap: var(--space-12);
-}
-
-.addTitleField {
-  grid-column: 1 / -1;
-}
-
 @media (max-width: 1023px) {
   .grid {
+    height: auto;
+    min-height: 0;
+    grid-template-rows: none;
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-/* Narrow phones: the title gets the full line; priority and due date sit beneath it. */
+/* Narrow phones: task title gets the full line; priority and due sit beneath it. */
 @media (max-width: 479px) {
-  .addFields {
+  .tiles {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .timelineText {
+    white-space: normal;
   }
 
   .taskRow {
     display: grid;
-    grid-template-columns: 24px auto minmax(0, 1fr);
+    grid-template-columns: 16px auto minmax(0, 1fr);
     grid-template-areas:
       "check title title"
-      ". priority due"
-      ". error error";
+      ". priority due";
     gap: var(--space-4) var(--space-12);
     padding: var(--space-8) 0;
   }
 
-  .checkbox,
-  .checkboxStatic {
+  .checkbox {
     grid-area: check;
-    margin: 0;
   }
 
   .taskTitle {
     grid-area: title;
+    white-space: normal;
   }
 
   .priority {
@@ -460,12 +311,119 @@
 
   .due {
     grid-area: due;
-    min-width: 0;
     align-self: center;
     text-align: left;
   }
+}
 
-  .rowError {
-    grid-area: error;
+.content {
+  padding: 32px;
+}
+@media (max-width: 767px) {
+  .content {
+    padding: 24px 16px;
+  }
+}
+
+.toggleForm {
+  display: flex;
+  flex: none;
+  position: relative;
+}
+button.checkbox {
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.checkboxBox {
+  display: flex;
+}
+.checkboxBox svg {
+  width: 12px;
+  height: 12px;
+}
+.checkbox[aria-checked="true"] {
+  background: var(--action-primary);
+  border-color: var(--action-primary);
+}
+.checkbox:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.rowError {
+  position: absolute;
+  bottom: 24px;
+  width: 240px;
+  padding: 8px;
+  background: var(--surface-default);
+  color: var(--status-danger-soft);
+  z-index: 2;
+}
+.manageTasks {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  max-width: calc(100% - 32px);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.manageTasks summary {
+  cursor: pointer;
+}
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface-default);
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  border-radius: 8px;
+  margin-top: 8px;
+}
+.addTitle {
+  font-size: 14px;
+}
+.addFields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.note {
+  font-size: 12px;
+}
+.addTitleField {
+  min-width: 0;
+}
+
+.manageTasks[open] {
+  position: relative;
+  inset: auto;
+  max-width: none;
+}
+
+.taskRow {
+  flex-shrink: 0;
+}
+.taskRow[data-status="done"] .taskTitle {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+.taskSource {
+  font-weight: 400;
+}
+
+@media (max-width: 767px) {
+  .manageTasks {
+    position: static;
+    max-width: none;
+  }
+}
+@media (max-width: 479px) {
+  .timelineRow {
+    padding: 6px 0;
   }
 }

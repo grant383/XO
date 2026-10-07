@@ -27,7 +27,7 @@ test("shell adapts across breakpoints and keeps account controls separate", asyn
     await page.setViewportSize({ width: 900, height: 900 });
     const box = await sidebar.boundingBox();
     expect(box?.width).toBe(76);
-    await expect(sidebar.getByRole("link", { name: "Command Centre" })).toHaveAttribute(
+    await expect(sidebar.getByRole("link", { name: "Command", exact: true })).toHaveAttribute(
       "aria-current",
       "page",
     );

@@ -130,17 +130,3 @@ export function AddTaskForm({ action, requestId }: { action: Action; requestId: 
     </form>
   );
 }
-
-/**
- * Figma top-bar "Live" indicator, stated honestly: the page is a snapshot read at
- * `asOf`, and offline it says the figures may be out of date (spec §20 freshness).
- */
-export function Freshness({ asOf }: { asOf: string }) {
-  const online = useOnline();
-  return (
-    <p className={styles.freshness} role="status">
-      <span className={online ? styles.dotLive : styles.dotOffline} aria-hidden="true" />
-      {online ? `Updated ${asOf}` : `Offline · showing data from ${asOf}`}
-    </p>
-  );
-}

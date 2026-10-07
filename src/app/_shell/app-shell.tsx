@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, type ReactNode } from "react";
 import { Brand, Icon } from "@/ui";
+import { CommandShell } from "./command-shell";
 import { AccountMenu } from "./account-menu";
 import styles from "./app-shell.module.css";
 import { CurrentPage, NavLink } from "./nav-link";
@@ -56,6 +57,14 @@ export function AppShell({ venture, ventures, user, nav, children }: Props) {
     if (sheetRef.current?.open) sheetRef.current.close();
   }, [pathname]);
 
+  if (venture && pathname === `/v/${venture.id}/command`) {
+    return (
+      <CommandShell venture={venture} user={user}>
+        {children}
+      </CommandShell>
+    );
+  }
+
   return (
     <div className={styles.shell}>
       <a href="#main" className={styles.skipLink}>
@@ -104,7 +113,7 @@ export function AppShell({ venture, ventures, user, nav, children }: Props) {
             <span className={styles.contextDivider} aria-hidden="true">
               /
             </span>
-            <CurrentPage sections={nav} />
+            <CurrentPage sections={nav} withSection={venture !== null} />
           </p>
           <div className={styles.accountWide}>
             <AccountMenu user={user} context={venture?.roleLabel ?? ACCOUNT_CONTEXT} />

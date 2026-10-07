@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon } from "@/ui";
 import styles from "./app-shell.module.css";
-import type { ShellNavItem } from "./types";
+import type { ShellNavItem, ShellNavSection } from "./types";
 
 export function isActive(pathname: string, item: ShellNavItem) {
   return item.exact
@@ -29,9 +29,34 @@ export function NavLink({ item }: { item: ShellNavItem }) {
   );
 }
 
-/** The current page label for the top-bar context ("Venture / Page"). */
-export function CurrentPage({ sections }: { sections: { items: ShellNavItem[] }[] }) {
+/**
+ * The current page for the top-bar context: "Venture / Section / Page" (Figma 8:651), or
+ * "Account / Page" when `withSection` is off.
+ */
+export function CurrentPage({
+  sections,
+  withSection,
+}: {
+  sections: ShellNavSection[];
+  withSection: boolean;
+}) {
   const pathname = usePathname();
-  const item = sections.flatMap((s) => s.items).find((i) => isActive(pathname, i));
-  return item ? <span className={styles.contextPage}>{item.label}</span> : null;
+  for (const section of sections) {
+    const item = section.items.find((i) => isActive(pathname, i));
+    if (!item) continue;
+    return (
+      <>
+        {withSection ? (
+          <>
+            <span className={styles.contextSection}>{section.label}</span>
+            <span className={styles.contextDivider} aria-hidden="true">
+              /
+            </span>
+          </>
+        ) : null}
+        <span className={styles.contextPage}>{item.label}</span>
+      </>
+    );
+  }
+  return null;
 }

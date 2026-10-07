@@ -64,7 +64,7 @@ test("founder onboards a venture and enters the shell", async ({ page }) => {
   await page.getByRole("link", { name: "Enter workspace" }).click();
   await page.waitForURL(`**/v/${ventureId}/command`);
   await expect(page.getByRole("heading", { level: 1, name: "Command Centre" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "No open tasks" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "What to do" })).toBeVisible();
   await expectNoA11yViolations(page);
 
   await page.goto(`/onboarding/${ventureId}/review`);
