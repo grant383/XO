@@ -121,6 +121,13 @@ test("viewers read Command Centre; outsiders get nothing", async ({ page, browse
   await expect(viewerPage.getByRole("list", { name: "Open tasks" })).toBeVisible();
   await expectNoA11yViolations(viewerPage);
 
+  // Growth Command uses the same Viewer+ boundary and shared shell.
+  await viewerPage.goto(`/v/${ventureId}/command/growth-1m`);
+  await expect(viewerPage.getByRole("heading", { name: "£1M Growth Command" })).toBeVisible();
+  await viewerPage.getByText("Venture tasks · existing backend", { exact: true }).click();
+  await expect(viewerPage.getByText("Viewer access · tasks are read-only.")).toBeVisible();
+  await expect(viewerPage.getByRole("button", { name: "Add task", exact: true })).toHaveCount(0);
+
   // The REST snapshot applies the same authority.
   const api = await viewerPage.request.get(`/api/v1/command?ventureId=${ventureId}`);
   expect(api.status()).toBe(200);
@@ -147,6 +154,12 @@ test("viewers read Command Centre; outsiders get nothing", async ({ page, browse
     ...(await body(unknown)),
     correlationId: "",
   });
+
+  await outsider.goto(`/v/${ventureId}/command/growth-1m`);
+  await expect(
+    outsider.getByRole("heading", { name: "You don’t have access to this venture." }),
+  ).toBeVisible();
+  await expect(outsider.getByText("Meridian Lettings")).toHaveCount(0);
 
   await viewerContext.close();
   await outsiderContext.close();

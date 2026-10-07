@@ -57,7 +57,10 @@ export function AppShell({ venture, ventures, user, nav, children }: Props) {
     if (sheetRef.current?.open) sheetRef.current.close();
   }, [pathname]);
 
-  if (venture && pathname === `/v/${venture.id}/command`) {
+  if (
+    venture &&
+    (pathname === `/v/${venture.id}/command` || pathname.startsWith(`/v/${venture.id}/command/`))
+  ) {
     return (
       <CommandShell venture={venture} user={user}>
         {children}

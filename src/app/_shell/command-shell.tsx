@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useRef, type ReactNode } from "react";
 import { Brand, Icon } from "@/ui";
 import { AccountMenu } from "./account-menu";
@@ -44,6 +45,7 @@ export function CommandShell({
   children: ReactNode;
 }) {
   const menu = useRef<HTMLDialogElement>(null);
+  const growth = usePathname().endsWith("/command/growth-1m");
   const navigation = (
     <>
       <div className={styles.brand}>
@@ -56,10 +58,14 @@ export function CommandShell({
             <ul>
               {section.items.map((item) => (
                 <li key={item}>
-                  {item === "Command" ? (
+                  {item === "Command" || item === "Growth" ? (
                     <Link
-                      href={`/v/${venture.id}/command`}
-                      aria-current="page"
+                      href={
+                        item === "Command"
+                          ? `/v/${venture.id}/command`
+                          : `/v/${venture.id}/command/growth-1m`
+                      }
+                      aria-current={(item === "Growth") === growth ? "page" : undefined}
                       onClick={() => menu.current?.close()}
                     >
                       {item}
@@ -119,10 +125,12 @@ export function CommandShell({
             <span>/</span>
             <span>Operate</span>
             <span>/</span>
-            <span>Command</span>
+            <span>{growth ? "£1M Growth Command" : "Command"}</span>
           </p>
           <div className={styles.meta}>
-            <span className={styles.date}>Thursday 4 Sep 2026</span>
+            <span className={styles.date}>
+              {growth ? "Fixed Figma fixture" : "Thursday 4 Sep 2026"}
+            </span>
             <span className={styles.sample}>
               <img src="/ui/command/success.svg" width="6" height="6" alt="" />
               Sample data

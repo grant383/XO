@@ -48,6 +48,7 @@ async function run(
     return { status: "error", message: "The change could not be saved. Please try again.", values };
   }
   revalidatePath(commandPath(ventureId));
+  revalidatePath(`${commandPath(ventureId)}/growth-1m`);
   if (!result.ok) {
     return { status: "error", message: result.message, fieldErrors: result.fieldErrors, values };
   }

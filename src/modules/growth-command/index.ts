@@ -1,0 +1,1 @@
+export { growthGap } from "./model";

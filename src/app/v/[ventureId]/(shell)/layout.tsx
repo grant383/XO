@@ -30,7 +30,10 @@ function navigationFor(access: VentureAccess): ShellNavSection[] {
   if (can(access.role, "command:view")) {
     sections.push({
       label: "Operate",
-      items: [{ href: `${base}/command`, label: "Command", exact: true }],
+      items: [
+        { href: `${base}/command`, label: "Command", exact: true },
+        { href: `${base}/command/growth-1m`, label: "£1M Growth Command", exact: true },
+      ],
     });
   }
   // Profile & Security is account-level (/settings/*), open to every signed-in user.
