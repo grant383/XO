@@ -35,3 +35,11 @@ Do not rebuild completed slices or mark P0 closed from a rendering shell. Add fo
 - User confirmed local-only deployment on 7 October: no DirectorXO Railway resources exist; do not create/link resources or use BlueprintOS. No Stripe recurring price is approved. Keep commits local; no merge, push or deployment. P0 remains open and P1 is gated.
 
 - Notifications & Activity: missing slice implemented (ADR-0018), two unit tests, ten database/catalog checks and desktop/mobile Playwright + axe pass. Final screenshots inspected. Read completion is awaited before reload in the persistence test.
+
+- Error/loading gaps: Next.js unhandled server errors now emit privacy-safe incident metadata without exception content, request URLs, headers or identifiers (three unit checks). Profile & Security reuses the existing shared Figma loading component. Production alerts/release monitoring are not certified.
+
+- Local logical restore drill passed: 19 public tables, migration history, row counts/content digests, ownership/table grants, FORCE RLS/policies and security-function definitions/grants verified in 226.39 seconds. The fresh temporary database was removed. This does not certify production PITR, RPO or RTO; see `docs/runbooks/P0_RELEASE_RECOVERY.md`.
+- Full database regression: 262/263 initially passed; the sole failure was the audit TRUNCATE test encountering the new inbox FK before the append-only trigger. The test now proves both FK and CASCADE-trigger rejection and unchanged audit count; all 24 related audit/notification/billing/catalog checks pass.
+
+- Final local restore drill passed with column grants and trigger definitions added: 19 public tables, migration history, row content/counts, table/column grants, ownership, FORCE RLS/policies and security-function definitions/grants verified in 242.87 seconds; temporary database removed. Still no production PITR/RPO/RTO certification.
+- Final database regression passes all 265 tests. Unit suite passes 210 tests, plus the new offline identity contract check. Production build and typecheck pass; lint has five SVG `<img>` warnings and no errors.
