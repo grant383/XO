@@ -2,7 +2,6 @@ import { readdirSync } from "node:fs";
 import path from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import RootLoading from "@/app/loading";
 import OnboardingLoading from "@/app/onboarding/loading";
 import InvitationLoading from "@/app/invite/[token]/loading";
 import RequestAccessLoading from "@/app/v/[ventureId]/request-access/loading";
@@ -12,21 +11,26 @@ const APP = path.resolve(import.meta.dirname, "../../src/app");
 /**
  * Every page and the loading boundary (Figma 54:27792) that covers it. A new page must be
  * added here, so loading coverage is decided explicitly rather than by accident.
+ *
+ * `null`: deliberately no streaming boundary. The entry route and auth pages either redirect
+ * at once or render without data work; a fallback would flush first and turn their server
+ * redirects (session, MFA challenge, sign-in) into client-side redirects. Error pages are
+ * static.
  */
-const EXPECTED: Record<string, string> = {
-  "page.tsx": "loading.tsx",
-  "auth/forgot-password/page.tsx": "loading.tsx",
-  "auth/login/error/page.tsx": "loading.tsx",
-  "auth/login/page.tsx": "loading.tsx",
-  "auth/mfa/page.tsx": "loading.tsx",
-  "auth/register/page.tsx": "loading.tsx",
-  "auth/reset-password/page.tsx": "loading.tsx",
-  "auth/reset-password/success/page.tsx": "loading.tsx",
-  "auth/session-expired/page.tsx": "loading.tsx",
-  "auth/verify-email/page.tsx": "loading.tsx",
-  "errors/403/page.tsx": "loading.tsx",
-  "errors/404/page.tsx": "loading.tsx",
-  "errors/500/page.tsx": "loading.tsx",
+const EXPECTED: Record<string, string | null> = {
+  "page.tsx": null,
+  "auth/forgot-password/page.tsx": null,
+  "auth/login/error/page.tsx": null,
+  "auth/login/page.tsx": null,
+  "auth/mfa/page.tsx": null,
+  "auth/register/page.tsx": null,
+  "auth/reset-password/page.tsx": null,
+  "auth/reset-password/success/page.tsx": null,
+  "auth/session-expired/page.tsx": null,
+  "auth/verify-email/page.tsx": null,
+  "errors/403/page.tsx": null,
+  "errors/404/page.tsx": null,
+  "errors/500/page.tsx": null,
   "invite/[token]/page.tsx": "invite/[token]/loading.tsx",
   "onboarding/page.tsx": "onboarding/loading.tsx",
   "onboarding/[ventureId]/page.tsx": "onboarding/loading.tsx",
@@ -50,12 +54,12 @@ function files(dir: string, name: string): string[] {
 }
 
 /** The nearest `loading.tsx` in the page's folder or an ancestor (Next.js nesting). */
-function nearestLoading(page: string, loadings: Set<string>): string | undefined {
+function nearestLoading(page: string, loadings: Set<string>): string | null {
   let dir = path.posix.dirname(page);
   for (;;) {
     const candidate = dir === "." ? "loading.tsx" : `${dir}/loading.tsx`;
     if (loadings.has(candidate)) return candidate;
-    if (dir === ".") return undefined;
+    if (dir === ".") return null;
     dir = path.posix.dirname(dir);
   }
 }
@@ -73,7 +77,6 @@ describe("application loading coverage (Figma 54:27792)", () => {
   });
 
   it.each([
-    ["root", RootLoading],
     ["onboarding", OnboardingLoading],
     ["invitation", InvitationLoading],
     ["request access", RequestAccessLoading],
