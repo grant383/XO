@@ -265,3 +265,14 @@
   color: white;
   font-size: 13px;
 }
+
+.growthRate {
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid #10b98133;
+  border-radius: 4px;
+  background: #10b9811f;
+  color: #10b981;
+  font-size: 12px;
+  font-weight: 600;
+}

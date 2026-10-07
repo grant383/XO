@@ -1,0 +1,19 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="548" height="141" viewBox="0 0 548 141" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="chart-area">
+<line id="grid-line-0" x1="4" y1="0.5" x2="544" y2="0.5" stroke="#1C1E2A"/>
+<line id="grid-line-1" x1="4" y1="47.5" x2="544" y2="47.5" stroke="#1C1E2A"/>
+<line id="grid-line-2" x1="4" y1="93.5" x2="544" y2="93.5" stroke="#1C1E2A"/>
+<line id="grid-line-3" x1="4" y1="140.5" x2="544" y2="140.5" stroke="#1C1E2A"/>
+<line id="segment-0" x1="3.87138" y1="112.008" x2="111.867" y2="98.0013" stroke="#3B82F6" stroke-width="2"/>
+<line id="segment-1" x1="111.792" y1="98.0219" x2="219.771" y2="75.0308" stroke="#3B82F6" stroke-width="2"/>
+<line id="segment-2" x1="220.083" y1="75.0034" x2="328.109" y2="83.9987" stroke="#3B82F6" stroke-width="2"/>
+<line id="segment-3" x1="327.676" y1="84.054" x2="435.712" y2="47.0437" stroke="#3B82F6" stroke-width="2"/>
+<line id="segment-4" x1="435.749" y1="47.032" x2="543.78" y2="19.033" stroke="#3B82F6" stroke-width="2"/>
+<circle id="Ellipse" cx="4" cy="113" r="3.25" fill="#3B82F6" stroke="#13151B" stroke-width="1.5"/>
+<circle id="Ellipse_2" cx="112" cy="99" r="3.25" fill="#3B82F6" stroke="#13151B" stroke-width="1.5"/>
+<circle id="Ellipse_3" cx="220" cy="76" r="3.25" fill="#3B82F6" stroke="#13151B" stroke-width="1.5"/>
+<circle id="Ellipse_4" cx="328" cy="85" r="3.25" fill="#3B82F6" stroke="#13151B" stroke-width="1.5"/>
+<circle id="Ellipse_5" cx="436" cy="48" r="3.25" fill="#3B82F6" stroke="#13151B" stroke-width="1.5"/>
+<circle id="Ellipse_6" cx="544" cy="20" r="3.25" fill="#3B82F6" stroke="#13151B" stroke-width="1.5"/>
+</g>
+</svg>

@@ -44,6 +44,8 @@ export const CAPABILITIES = [
   "command:manage_tasks",
   /** Operate Operations reference screen (spec §8: Operator+). */
   "operations:view",
+  /** Operate Growth reference screen (spec §8: Operator+). */
+  "growth:view",
 ] as const;
 export type Capability = (typeof CAPABILITIES)[number];
 
@@ -70,6 +72,7 @@ const GRANTS: Record<Capability, readonly VentureRole[]> = {
   // Matches the command_tasks INSERT/UPDATE policies (migration 0014).
   "command:manage_tasks": OPERATOR_PLUS,
   "operations:view": OPERATOR_PLUS,
+  "growth:view": OPERATOR_PLUS,
 };
 
 export function can(role: VentureRole | null | undefined, capability: Capability): boolean {

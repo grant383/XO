@@ -44,6 +44,9 @@ function navigationFor(access: VentureAccess): ShellNavSection[] {
       exact: true,
     });
   }
+  if (can(access.role, "growth:view")) {
+    sections[0]?.items.push({ href: `${base}/operate/growth`, label: "Growth", exact: true });
+  }
   // Profile & Security is account-level (/settings/*), open to every signed-in user.
   const system = [{ href: "/settings/profile-security", label: "Profile & Security" }];
   if (can(access.role, "team:view")) {
@@ -82,6 +85,7 @@ export default async function VentureShellLayout({ children, params }: Props) {
         name: access.name,
         roleLabel: ROLE_LABELS[access.role],
         operationsAllowed: can(access.role, "operations:view"),
+        growthAllowed: can(access.role, "growth:view"),
       }}
       ventures={ventures.map((v) => ({ id: v.id, name: v.name, roleLabel: ROLE_LABELS[v.role] }))}
       user={{ name: actor.name, email: actor.email }}

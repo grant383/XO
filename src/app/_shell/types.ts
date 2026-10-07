@@ -4,6 +4,7 @@ export type ShellVenture = {
   name: string;
   roleLabel: string;
   operationsAllowed?: boolean;
+  growthAllowed?: boolean;
 };
 export type ShellUser = { name: string; email: string };
 export type ShellNavItem = { href: string; label: string; exact?: boolean };

@@ -31,7 +31,10 @@ const sections = [
       "Launch",
     ],
   },
-  { label: "Operate", items: ["Command", "Finance", "Operations", "Growth", "Technology"] },
+  {
+    label: "Operate",
+    items: ["Command", "£1M Growth Command", "Finance", "Operations", "Growth", "Technology"],
+  },
 ];
 
 /** Node 8:651 has its own dense navigation; unshipped destinations remain truthful. */
@@ -47,6 +50,7 @@ export function CommandShell({
   const menu = useRef<HTMLDialogElement>(null);
   const pathname = usePathname();
   const growth = pathname.endsWith("/command/growth-1m");
+  const operateGrowth = pathname.endsWith("/operate/growth");
   const finance = pathname.endsWith("/operate/finance");
   const operations = pathname.endsWith("/operate/operations");
   const canOpenOperations = venture.operationsAllowed === true;
@@ -63,28 +67,33 @@ export function CommandShell({
               {section.items.map((item) => (
                 <li key={item}>
                   {item === "Command" ||
-                  item === "Growth" ||
+                  item === "£1M Growth Command" ||
+                  (item === "Growth" && venture.growthAllowed === true) ||
                   item === "Finance" ||
                   (section.label === "Operate" && item === "Operations" && canOpenOperations) ? (
                     <Link
                       href={
-                        item === "Command"
-                          ? `/v/${venture.id}/command`
-                          : item === "Operations"
-                            ? `/v/${venture.id}/operate/operations`
-                            : item === "Finance"
-                              ? `/v/${venture.id}/operate/finance`
-                              : `/v/${venture.id}/command/growth-1m`
+                        item === "£1M Growth Command"
+                          ? `/v/${venture.id}/command/growth-1m`
+                          : item === "Command"
+                            ? `/v/${venture.id}/command`
+                            : item === "Operations"
+                              ? `/v/${venture.id}/operate/operations`
+                              : item === "Finance"
+                                ? `/v/${venture.id}/operate/finance`
+                                : `/v/${venture.id}/operate/growth`
                       }
                       aria-current={
                         (
-                          item === "Operations"
-                            ? operations
-                            : item === "Finance"
-                              ? finance
-                              : item === "Growth"
-                                ? growth
-                                : !growth && !finance && !operations
+                          item === "£1M Growth Command"
+                            ? growth
+                            : item === "Operations"
+                              ? operations
+                              : item === "Finance"
+                                ? finance
+                                : item === "Growth"
+                                  ? operateGrowth
+                                  : !growth && !finance && !operations && !operateGrowth
                         )
                           ? "page"
                           : undefined
@@ -97,7 +106,7 @@ export function CommandShell({
                     <span
                       aria-disabled="true"
                       title={
-                        section.label === "Operate" && item === "Operations"
+                        section.label === "Operate" && (item === "Operations" || item === "Growth")
                           ? "Operator access required"
                           : "Module not yet available"
                       }
@@ -156,13 +165,15 @@ export function CommandShell({
             <span>Operate</span>
             <span>/</span>
             <span>
-              {operations
-                ? "Operations"
-                : finance
-                  ? "Finance"
-                  : growth
-                    ? "£1M Growth Command"
-                    : "Command"}
+              {operateGrowth
+                ? "Growth"
+                : operations
+                  ? "Operations"
+                  : finance
+                    ? "Finance"
+                    : growth
+                      ? "£1M Growth Command"
+                      : "Command"}
             </span>
           </p>
           <div className={styles.meta}>
@@ -172,6 +183,8 @@ export function CommandShell({
                   Period: August 2026{" "}
                   <img src="/ui/finance/chevron.svg" width="10" height="10" alt="" />
                 </span>
+              ) : operateGrowth ? (
+                <span className={styles.growthRate}>Sample growth rate: +12% MoM</span>
               ) : growth || operations ? (
                 "Fixed Figma fixture"
               ) : (
