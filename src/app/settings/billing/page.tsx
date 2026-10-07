@@ -2,8 +2,10 @@ import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
 import { z } from "zod";
 import {
+  billingIntervalLabel,
   formatBillingAmount,
   BillingPermissionError,
+  presentSubscription,
   getBillingOverview,
   listBillingAccounts,
 } from "@/modules/billing";
@@ -15,6 +17,19 @@ import { BillingButton } from "./billing-button";
 import styles from "./billing.module.css";
 export const metadata: Metadata = { title: "Billing and subscription" };
 export const dynamic = "force-dynamic";
+
+const periodFormat = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeZone: "UTC" });
+const syncedFormat = new Intl.DateTimeFormat("en-GB", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "UTC",
+});
+
+/**
+ * Billing & Subscription (Figma 33:4087). Plan state comes from the provider-confirmed
+ * mirror; payment methods, invoices, plan changes and cancellation are handled in the
+ * Stripe-hosted billing portal in P0 (ADR-0020).
+ */
 export default async function BillingPage({
   searchParams,
 }: {
@@ -45,8 +60,8 @@ export default async function BillingPage({
     throw error;
   }
   const { account, subscription, entitlements, configured } = overview;
-  const subscribed =
-    subscription && !["canceled", "incomplete_expired"].includes(subscription.status);
+  const presentation = subscription ? presentSubscription(subscription.status) : null;
+  const subscribed = presentation?.subscribed ?? false;
   return (
     <>
       <PageHeader
@@ -96,14 +111,8 @@ export default async function BillingPage({
             <section className={styles.card}>
               <div className={styles.heading}>
                 <span className={styles.label}>Current plan</span>
-                {subscription ? (
-                  <StatusBadge
-                    tone={
-                      ["active", "trialing"].includes(subscription.status) ? "success" : "warning"
-                    }
-                  >
-                    {subscription.status}
-                  </StatusBadge>
+                {presentation ? (
+                  <StatusBadge tone={presentation.tone}>{presentation.label}</StatusBadge>
                 ) : null}
               </div>
               <h2>{subscription ? "DirectorXO subscription" : "No subscription"}</h2>
@@ -113,21 +122,26 @@ export default async function BillingPage({
                     {formatBillingAmount(subscription.amountMinor, subscription.currency)}
                     <span>
                       {" "}
-                      / {subscription.intervalCount} {subscription.interval}
+                      {billingIntervalLabel(subscription.interval, subscription.intervalCount)}
                     </span>
                   </p>
                   <p>Provider-confirmed subscription for {account.name}.</p>
+                  {presentation?.notice ? (
+                    <p role="status" className={styles.notice}>
+                      {presentation.notice}
+                    </p>
+                  ) : null}
                   <dl>
                     <dt>
-                      {subscription.cancelAtPeriodEnd
-                        ? "Ends at period close"
-                        : "Current period ends"}
+                      {!subscribed
+                        ? "Ended"
+                        : subscription.cancelAtPeriodEnd
+                          ? "Ends at period close"
+                          : "Current period ends"}
                     </dt>
-                    <dd>
-                      {subscription.periodEnd.toLocaleDateString("en-GB", { timeZone: "UTC" })} UTC
-                    </dd>
+                    <dd>{periodFormat.format(subscription.periodEnd)}</dd>
                     <dt>Last synced</dt>
-                    <dd>{subscription.syncedAt.toISOString()}</dd>
+                    <dd>{syncedFormat.format(subscription.syncedAt)} UTC</dd>
                   </dl>
                 </>
               ) : (

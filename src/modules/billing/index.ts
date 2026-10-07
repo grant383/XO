@@ -29,6 +29,7 @@ export class BillingConflictError extends Error {
   }
 }
 import { billingCommand } from "./policy";
+import { ENTITLING_STATUSES, type SubscriptionStatus } from "./presentation";
 export { billingCommand } from "./policy";
 const providerConfig = z.object({
   STRIPE_SECRET_KEY: z.string().regex(/^sk_(test|live)_/),
@@ -122,7 +123,10 @@ export async function getBillingOverview(actor: Actor, accountId: string) {
       .orderBy(ventures.name, ventures.id);
     return {
       account,
-      subscription: subscription ?? null,
+      // The status check constraint (migration 0012) limits values to SubscriptionStatus.
+      subscription: subscription
+        ? { ...subscription, status: subscription.status as SubscriptionStatus }
+        : null,
       entitlements,
       configured: billingConfigured(),
     };
@@ -264,7 +268,10 @@ export async function processBillingWebhook(
         .onConflictDoUpdate({ target: subscriptions.billingAccountId, set: values });
       await tx
         .update(ventureEntitlements)
-        .set({ enabled: ["active", "trialing"].includes(snapshot.status), updatedAt: new Date() })
+        .set({
+          enabled: ENTITLING_STATUSES.includes(snapshot.status as SubscriptionStatus),
+          updatedAt: new Date(),
+        })
         .where(eq(ventureEntitlements.billingAccountId, accountId));
       // Retire only a provider-confirmed closed checkout. A later cancellation can
       // then start a new subscription, while a newly opened checkout stays reusable.
@@ -312,3 +319,10 @@ export {
 export type { BillingProvider, SubscriptionSnapshot } from "./provider";
 
 export { billingMinorDigits, formatBillingAmount } from "./money";
+export {
+  billingIntervalLabel,
+  ENTITLING_STATUSES,
+  presentSubscription,
+  type SubscriptionPresentation,
+  type SubscriptionStatus,
+} from "./presentation";

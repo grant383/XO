@@ -124,6 +124,11 @@ describe("Stripe amounts at the ISO minor-unit boundary", () => {
 });
 
 import { formatBillingAmount } from "@/modules/billing/money";
+import {
+  billingIntervalLabel,
+  ENTITLING_STATUSES,
+  presentSubscription,
+} from "@/modules/billing/presentation";
 it("renders ISO minor amounts without rounding away HUF or MGA fractional precision", () => {
   expect(formatBillingAmount(1045, "HUF")).toContain("10.45");
   expect(formatBillingAmount(50000, "MGA")).toContain("500.00");
@@ -165,4 +170,30 @@ it("normalizes a provider subscription snapshot before returning its data contra
   const result = await provider.retrieveSubscription("sub_fixture");
   expect(result.amountMinor).toBe(5);
   expect(result.currency).toBe("ISK");
+});
+
+describe("subscription presentation", () => {
+  it.each([
+    ["active", "Active", "success", true, false],
+    ["trialing", "Trial", "success", true, false],
+    ["past_due", "Past due", "warning", true, true],
+    ["unpaid", "Unpaid", "danger", true, true],
+    ["incomplete", "Incomplete", "warning", true, true],
+    ["paused", "Paused", "neutral", true, true],
+    ["canceled", "Canceled", "neutral", false, true],
+    ["incomplete_expired", "Expired", "neutral", false, true],
+  ] as const)("%s → %s", (status, label, tone, subscribed, hasNotice) => {
+    const p = presentSubscription(status);
+    expect(p).toMatchObject({ label, tone, subscribed });
+    expect(Boolean(p.notice)).toBe(hasNotice);
+  });
+
+  it("enables entitlements only for active and trialing subscriptions (ADR-0019)", () => {
+    expect([...ENTITLING_STATUSES].sort()).toEqual(["active", "trialing"]);
+  });
+
+  it("labels billing intervals", () => {
+    expect(billingIntervalLabel("month", 1)).toBe("/ month");
+    expect(billingIntervalLabel("month", 3)).toBe("/ 3 months");
+  });
 });
