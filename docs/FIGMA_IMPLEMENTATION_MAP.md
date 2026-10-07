@@ -70,7 +70,7 @@ Do **not** treat exported/generated Figma code as the application architecture. 
 | `10:2067` | Assets and Equipment | `/v/[ventureId]/build/assets` | Build | Operator+ | P2 | NOT STARTED |
 | `10:2366` | Systems and Technology | `/v/[ventureId]/build/systems` | Build | Manager+ | P2 | NOT STARTED |
 | `10:2842` | People and HR | `/v/[ventureId]/build/people` | Build | Manager+ | P2 | NOT STARTED |
-| `10:3179` | Operate Finance | `/v/[ventureId]/operate/finance` | Operate | Viewer+ | P1 | NOT STARTED |
+| `10:3179` | Operate Finance | `/v/[ventureId]/operate/finance` | Operate | Viewer+ | P1 | **COMPLETE (local fixture; review pending)** — [verification](verification/finance.md) |
 | `10:3462` | Operate Operations | `/v/[ventureId]/operate/operations` | Operate | Operator+ | P1 | NOT STARTED |
 | `10:3734` | Operate Growth | `/v/[ventureId]/operate/growth` | Operate | Operator+ | P1 | NOT STARTED |
 | `10:4344` | Operate Technology | `/v/[ventureId]/operate/technology` | Operate | Operator+ | P1 | NOT STARTED |

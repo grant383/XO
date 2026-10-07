@@ -45,7 +45,9 @@ export function CommandShell({
   children: ReactNode;
 }) {
   const menu = useRef<HTMLDialogElement>(null);
-  const growth = usePathname().endsWith("/command/growth-1m");
+  const pathname = usePathname();
+  const growth = pathname.endsWith("/command/growth-1m");
+  const finance = pathname.endsWith("/operate/finance");
   const navigation = (
     <>
       <div className={styles.brand}>
@@ -58,14 +60,26 @@ export function CommandShell({
             <ul>
               {section.items.map((item) => (
                 <li key={item}>
-                  {item === "Command" || item === "Growth" ? (
+                  {item === "Command" || item === "Growth" || item === "Finance" ? (
                     <Link
                       href={
                         item === "Command"
                           ? `/v/${venture.id}/command`
-                          : `/v/${venture.id}/command/growth-1m`
+                          : item === "Finance"
+                            ? `/v/${venture.id}/operate/finance`
+                            : `/v/${venture.id}/command/growth-1m`
                       }
-                      aria-current={(item === "Growth") === growth ? "page" : undefined}
+                      aria-current={
+                        (
+                          item === "Finance"
+                            ? finance
+                            : item === "Growth"
+                              ? growth
+                              : !growth && !finance
+                        )
+                          ? "page"
+                          : undefined
+                      }
                       onClick={() => menu.current?.close()}
                     >
                       {item}
@@ -125,11 +139,20 @@ export function CommandShell({
             <span>/</span>
             <span>Operate</span>
             <span>/</span>
-            <span>{growth ? "£1M Growth Command" : "Command"}</span>
+            <span>{finance ? "Finance" : growth ? "£1M Growth Command" : "Command"}</span>
           </p>
           <div className={styles.meta}>
             <span className={styles.date}>
-              {growth ? "Fixed Figma fixture" : "Thursday 4 Sep 2026"}
+              {finance ? (
+                <span className={styles.period}>
+                  Period: August 2026{" "}
+                  <img src="/ui/finance/chevron.svg" width="10" height="10" alt="" />
+                </span>
+              ) : growth ? (
+                "Fixed Figma fixture"
+              ) : (
+                "Thursday 4 Sep 2026"
+              )}
             </span>
             <span className={styles.sample}>
               <img src="/ui/command/success.svg" width="6" height="6" alt="" />

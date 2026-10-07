@@ -59,7 +59,9 @@ export function AppShell({ venture, ventures, user, nav, children }: Props) {
 
   if (
     venture &&
-    (pathname === `/v/${venture.id}/command` || pathname.startsWith(`/v/${venture.id}/command/`))
+    (pathname === `/v/${venture.id}/command` ||
+      pathname.startsWith(`/v/${venture.id}/command/`) ||
+      pathname === `/v/${venture.id}/operate/finance`)
   ) {
     return (
       <CommandShell venture={venture} user={user}>

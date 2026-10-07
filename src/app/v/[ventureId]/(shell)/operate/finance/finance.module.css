@@ -1,0 +1,375 @@
+.screen {
+  font-family: var(--font-geist-sans), sans-serif;
+  color: var(--text-primary);
+  --finance-muted: #9eabbf;
+}
+.hero {
+  padding: 24px 32px;
+  box-shadow: inset 0 -1px #21242e;
+}
+.hero h1 {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 26px;
+  margin: 0;
+}
+.hero h1 span {
+  line-height: 14px;
+  font-size: 12px;
+  color: var(--finance-muted);
+  font-weight: 400;
+}
+.hero p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--finance-muted);
+}
+.body {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+.metric {
+  padding: 16px;
+  background: #13151b;
+  box-shadow: inset 0 0 0 1px #21242e;
+  border-radius: 8px;
+}
+.metric dt {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+  color: var(--finance-muted);
+}
+.metric dd {
+  margin: 8px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.metric strong {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 31px;
+}
+.healthy {
+  color: #10b981;
+  background: #10b9811c;
+  box-shadow: inset 0 0 0 1px #10b981;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  line-height: 14px;
+}
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 24px;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+.panel {
+  padding: 20px;
+  background: #13151b;
+  box-shadow: inset 0 0 0 1px #21242e;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.panel h2 {
+  margin: 0;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--finance-muted);
+}
+.panelHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.total {
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+.legend {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--finance-muted);
+  white-space: nowrap;
+}
+.legend span {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.legend i {
+  width: 10px;
+  height: 10px;
+  background: #10b981;
+  border-radius: 2px;
+}
+.legend span:last-child i {
+  background: #ef4444;
+}
+.chartScroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.chart {
+  position: relative;
+  width: 530px;
+  height: 160px;
+}
+.gridline {
+  position: absolute;
+  left: 0;
+}
+.month {
+  position: absolute;
+  top: 10px;
+  height: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--finance-muted);
+  font-size: 11px;
+  line-height: 14px;
+}
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 110px;
+}
+.bars span {
+  width: 16px;
+  background: #10b981;
+  border-radius: 2px 2px 0 0;
+}
+.bars span:last-child {
+  background: #ef4444;
+}
+.balanceLine {
+  position: absolute;
+  transform-origin: left bottom;
+}
+.point {
+  position: absolute;
+}
+.tableScroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.panel table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+  line-height: 17px;
+}
+.panel tr {
+  box-shadow: inset 0 -1px #21242e;
+}
+.panel th,
+.panel td {
+  padding: 10px 0;
+  text-align: right;
+  font-weight: 400;
+}
+.panel th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+.panel thead th {
+  padding: 8px 0;
+  font-size: 11px;
+  line-height: 14px;
+  text-transform: uppercase;
+  color: var(--finance-muted);
+  font-weight: 600;
+}
+.payables {
+  min-width: 530px;
+}
+.payables th:nth-child(2) {
+  width: 120px;
+}
+.payables th:nth-child(3) {
+  width: 120px;
+}
+.payables th:nth-child(4) {
+  width: 100px;
+}
+.panel td:last-child {
+  font-size: 11px;
+  line-height: 14px;
+}
+.money {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.muted {
+  color: var(--finance-muted);
+}
+.success {
+  color: #10b981;
+  font-size: 11px;
+}
+.warning {
+  color: #f59e0b;
+}
+.receivablesHead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.receivablesHead > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.receivablesHead h3 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 23px;
+  margin: 0;
+  white-space: nowrap;
+}
+.overdue {
+  background: #f59e0b1f;
+  color: #f59e0b;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 14px;
+  white-space: nowrap;
+}
+.receivables {
+  min-width: 358px;
+}
+.receivables th:nth-child(2) {
+  width: 80px;
+}
+.receivables th:nth-child(3) {
+  width: 60px;
+}
+.receivables th:nth-child(4) {
+  width: 90px;
+}
+.panel .receivables td,
+.panel .receivables tbody th {
+  padding: 8px 0;
+}
+.receivables small {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  color: var(--finance-muted);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 400;
+}
+.ratios {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ratios > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  box-shadow: inset 0 -1px #21242e;
+  font-size: 13px;
+  line-height: 17px;
+}
+.ratios dt {
+  color: var(--finance-muted);
+}
+.ratios dd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.samples {
+  font-size: 12px;
+  color: var(--finance-muted);
+  line-height: 1.6;
+}
+.samples summary {
+  cursor: pointer;
+}
+.samples h2 {
+  font-size: 14px;
+  color: white;
+  margin-top: 16px;
+}
+.samples li {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1190px) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .column {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 767px) {
+  .hero {
+    padding: 24px 16px;
+  }
+  .body {
+    padding: 24px 16px;
+  }
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .metric {
+    padding: 12px;
+  }
+  .metric dd {
+    flex-wrap: wrap;
+  }
+  .metric strong {
+    font-size: 22px;
+  }
+  .panel {
+    padding: 16px;
+  }
+  .panelHead {
+    flex-wrap: wrap;
+  }
+  .receivablesHead > div {
+    flex-wrap: wrap;
+  }
+}

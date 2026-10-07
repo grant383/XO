@@ -33,6 +33,7 @@ function navigationFor(access: VentureAccess): ShellNavSection[] {
       items: [
         { href: `${base}/command`, label: "Command", exact: true },
         { href: `${base}/command/growth-1m`, label: "£1M Growth Command", exact: true },
+        { href: `${base}/operate/finance`, label: "Finance", exact: true },
       ],
     });
   }

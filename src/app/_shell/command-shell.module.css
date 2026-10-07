@@ -253,3 +253,15 @@
     font-size: 11px;
   }
 }
+
+.period {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid #21242e;
+  border-radius: 4px;
+  background: #13151b;
+  color: white;
+  font-size: 13px;
+}
