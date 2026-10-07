@@ -78,7 +78,38 @@ P0 Foundation (original checklist; scope reference only, not execution order):
 10. error states;
 11. CI/CD, environments, secrets, observability, backup/recovery foundations.
 
-Do not start P1 until the P0 exit criteria in `DIRECTORXO_PRODUCT_SPEC.md` pass.
+P0 / P1 DEVELOPMENT GATE
+
+P0 local engineering requirements must be complete and passing before P1 product development begins.
+
+DirectorXO is currently intentionally local-only. The following production/deployment gates may remain deferred while local P1 development proceeds:
+
+- Railway staging deployment and rollback proof
+- live Stripe configuration and webhook delivery
+- production backup / PITR / RPO / RTO validation
+- production monitoring and alerting
+- GitHub CI execution that requires pushing the local branch
+
+These deferred gates MUST be completed before any production release.
+
+Do not treat the deferred deployment gates as permission to reopen or expand P0 infrastructure work.
+
+Infrastructure freeze:
+- no new backend platforms, queues, provider abstractions, deployment systems, observability stacks, or architectural foundations unless required by a P1 product slice or to fix a demonstrated defect;
+- prefer existing platform capabilities;
+- product delivery now takes priority.
+
+P1 may begin locally once:
+- the working tree is clean;
+- formatting, typecheck, lint, unit/integration/RLS tests and production build pass;
+- the critical auth/onboarding/team journeys affected by the latest P0 changes pass;
+- remaining production-only gates are explicitly recorded in `docs/P0_AUDIT.md`.
+
+The next canonical P1 product slice is Command Centre:
+- Figma `8:651`
+- Route `/v/[ventureId]/command`
+
+Do not push, merge or deploy DirectorXO without explicit instruction.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
