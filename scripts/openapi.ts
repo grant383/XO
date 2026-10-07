@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { z } from "zod";
 import { format } from "prettier";
+import { billingCommand } from "../src/modules/billing/policy";
 import { inboxQuery, readInput } from "../src/modules/notifications/policy";
 import { supportInput, supportCursor } from "../src/modules/support/policy";
 
@@ -26,7 +27,7 @@ const document = {
     title: "DirectorXO account APIs",
     version: "1.0.0",
     description:
-      "Support and Notifications API contracts. Existing identity and venture server-action coverage remains tracked in docs/P0_AUDIT.md.",
+      "Support, Notifications and Billing API contracts. Existing identity and venture server-action coverage remains tracked in docs/P0_AUDIT.md.",
   },
   servers: [{ url: "/" }],
   security: [{ sessionCookie: [] }],
@@ -144,6 +145,85 @@ paths["/api/v1/notifications"] = {
         ...json(z.toJSONSchema(z.object({ updated: z.number().int().nonnegative() }))),
       },
       ...errors,
+    },
+  },
+};
+const billingSubscription = z.object({
+  status: z.string(),
+  priceId: z.string(),
+  amountMinor: z.number().int().nonnegative(),
+  currency: z.string().regex(/^[A-Z]{3}$/),
+  interval: z.string(),
+  intervalCount: z.number().int().positive(),
+  periodEnd: z.iso.datetime(),
+  cancelAtPeriodEnd: z.boolean(),
+  syncedAt: z.iso.datetime(),
+});
+paths["/api/v1/billing"] = {
+  get: {
+    summary: "Read owned billing accounts or a subscription overview",
+    description:
+      "Active billing-account owner membership is required, independently of venture roles. Omitting accountId returns owned accounts; supplying it returns the selected overview and only independently visible venture entitlements. Subscription state is a provider-confirmed local mirror, never activated by a checkout return URL.",
+    parameters: [{ name: "accountId", in: "query", schema: { type: "string", format: "uuid" } }],
+    responses: {
+      "200": {
+        description: "Owned accounts or selected billing overview",
+        ...json({
+          oneOf: [
+            z.toJSONSchema(
+              z.object({ accounts: z.array(z.object({ id: z.uuid(), name: z.string() })) }),
+            ),
+            z.toJSONSchema(
+              z.object({
+                account: z.object({ id: z.uuid(), name: z.string(), hasCustomer: z.boolean() }),
+                subscription: billingSubscription.nullable(),
+                configured: z.boolean(),
+                entitlements: z.array(
+                  z.object({ ventureId: z.uuid(), name: z.string(), enabled: z.boolean() }),
+                ),
+              }),
+            ),
+          ],
+        }),
+      },
+      ...errors,
+    },
+  },
+  post: {
+    summary: "Open subscription checkout or secure billing management",
+    description:
+      "Exact Origin and active billing owner required. requestId is a command idempotency UUID. The server chooses the configured price and stored customer; client-supplied provider identifiers are rejected. Existing open checkout is reused. Returns a validated Stripe-hosted URL for explicit navigation. Returns 503 while provider configuration is unavailable.",
+    requestBody: { required: true, ...json(z.toJSONSchema(billingCommand)) },
+    responses: {
+      "200": {
+        description: "Secure Stripe session",
+        ...json(z.toJSONSchema(z.object({ url: z.url() }))),
+      },
+      ...errors,
+      "503": error,
+    },
+  },
+};
+paths["/api/v1/webhooks/stripe"] = {
+  post: {
+    summary: "Receive a signed Stripe subscription snapshot event",
+    security: [],
+    description:
+      "Untouched body, maximum 128 KiB, valid stripe-signature and five-minute timestamp tolerance required. Supported subscription and checkout events route by stored customer, fetch fresh provider state and atomically commit subscription, entitlements, audit and unique receipt. Retries are safe. Provider/storage failures return 503 for retry. No cookie or Origin required.",
+    parameters: [
+      { name: "stripe-signature", in: "header", required: true, schema: { type: "string" } },
+    ],
+    requestBody: { required: true, ...json({ type: "object", additionalProperties: true }) },
+    responses: {
+      "200": {
+        description: "Accepted, duplicate or ignored event",
+        ...json(
+          z.toJSONSchema(z.object({ status: z.enum(["processed", "duplicate", "ignored"]) })),
+        ),
+      },
+      "400": error,
+      "413": error,
+      "503": error,
     },
   },
 };

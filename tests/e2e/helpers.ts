@@ -104,7 +104,11 @@ export async function onboardVenture(page: Page, name: string): Promise<string> 
   await page.getByRole("button", { name: "Review & confirm" }).click();
   await page.waitForURL(/\/review$/);
   await page.getByRole("button", { name: "Create my workspace" }).click();
-  await expect(page.getByRole("heading", { name: "Your workspace is ready" })).toBeVisible();
+  // Activation is a real async server action; cold dev compilation can exceed
+  // the short default locator timeout on small hosts. Still require completion.
+  await expect(page.getByRole("heading", { name: "Your workspace is ready" })).toBeVisible({
+    timeout: 60000,
+  });
   await page.getByRole("link", { name: "Enter workspace" }).click();
   await page.waitForURL(/\/v\/[0-9a-f-]+$/);
   return new URL(page.url()).pathname.split("/")[2]!;

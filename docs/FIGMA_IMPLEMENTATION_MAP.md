@@ -185,7 +185,7 @@ The app has also been manually opened locally and the authenticated GS Appliance
 The Figma/product-spec matrix still requires an explicit code/test check for:
 
 - Notifications and Activity — `33:3910`: complete locally (ADR-0018); account RLS, read state, Owner/Admin venture activity and desktop/mobile E2E verified.
-- Billing and Subscription — `33:4087`
+- Billing and Subscription — `33:4087`: local foundation implemented (ADR-0019), with separate billing ownership, RLS, real subscription contracts and signed webhooks. Real Stripe configuration/provider verification and full screen verification remain open.
 - Help and Support — `33:4290`: complete locally (ADR-0017); persistent requests, account RLS and desktop/mobile E2E verified.
 - any remaining P0 observability / rollback / API-documentation exit criteria from the master definition of done
 - full local manual navigation through the completed P0 routes
@@ -256,7 +256,7 @@ When handing work to an agent, provide the **node ID from this map**, not only t
 
 ## I. Current P0 audit
 
-See [P0 audit](P0_AUDIT.md) for the 6 October 2026 code audit. Notifications and Support were confirmed missing and are now implemented locally (ADR-0017/0018). Billing remains missing. P0 remains open; deployment/rollback, recovery, API documentation and production telemetry evidence are outstanding. Command Centre remains gated.
+See [P0 audit](P0_AUDIT.md) for the 6 October 2026 code audit. Notifications and Support were confirmed missing and are now implemented locally (ADR-0017/0018). Billing has a tested local foundation (ADR-0019) and remains VERIFY; provider and full presentation gates are open. P0 remains open; deployment/rollback, recovery, API documentation and production telemetry evidence are outstanding. Command Centre remains gated.
 
 ### Canonical login error route — verified 6 October 2026
 

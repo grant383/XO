@@ -55,7 +55,7 @@ services:
   stripe-cli:
     image: stripe/stripe-cli:latest
     profiles: ["stripe"]
-    command: ["listen", "--forward-to", "http://host.docker.internal:3000/api/webhooks/stripe"]
+    command: ["listen", "--forward-to", "http://host.docker.internal:3000/api/v1/webhooks/stripe"]
     environment:
       STRIPE_API_KEY: ${STRIPE_SECRET_KEY:-}
     extra_hosts:

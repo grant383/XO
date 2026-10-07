@@ -56,3 +56,4 @@ Status: Accepted
 | [0016](adr/0016-mfa-recovery-session-management.md) | MFA, account recovery and session/device management | Accepted |
 | [0017](adr/0017-account-support.md) | Account support requests | Accepted |
 | [0018](adr/0018-account-notifications.md) | Account notifications and venture activity | Accepted |
+| [0019](adr/0019-subscription-foundation.md) | Local subscription billing foundation | Accepted; provider verification open |

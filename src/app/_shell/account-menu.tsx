@@ -56,6 +56,9 @@ export function AccountMenu({
         <Link href="/settings/notifications-activity" className={styles.popoverAction}>
           Notifications &amp; Activity
         </Link>
+        <Link href="/settings/billing" className={styles.popoverAction}>
+          Billing &amp; Subscription
+        </Link>
         <Link href="/support" className={styles.popoverAction}>
           Help &amp; Support
         </Link>

@@ -5,3 +5,5 @@ export * from "./onboarding";
 export * from "./memberships";
 export * from "./support";
 export * from "./notifications";
+
+export * from "./billing";

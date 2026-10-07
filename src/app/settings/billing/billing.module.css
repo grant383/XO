@@ -1,0 +1,106 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+.columns {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: var(--space-16);
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+  padding: var(--space-20);
+  background: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+}
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-16);
+}
+.stack h2 {
+  color: var(--neutral-white);
+  font: 600 16px / normal var(--font-sans);
+}
+.stack p {
+  color: var(--text-subtle);
+  font: 400 12px / 1.45 var(--font-sans);
+}
+.label {
+  color: var(--text-muted);
+  font: 500 11px / normal var(--font-mono);
+  text-transform: uppercase;
+}
+.stack .price {
+  font: 600 24px / normal var(--font-sans);
+  color: var(--neutral-white);
+}
+.price span {
+  font: 400 12px / normal var(--font-sans);
+  color: var(--text-subtle);
+}
+.card dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-12);
+  padding-top: var(--space-16);
+  border-top: 1px solid var(--border-subtle);
+  font-size: 12px;
+}
+.card dd {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.card dt {
+  color: var(--text-muted);
+}
+.ventures {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+.ventures li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+.inset {
+  padding: var(--space-16);
+  background: var(--surface-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.notice {
+  padding: var(--space-16);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-8);
+}
+.selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-16);
+}
+@media (max-width: 900px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+  .card dl {
+    grid-template-columns: 1fr;
+  }
+  .card dd {
+    text-align: left;
+  }
+}

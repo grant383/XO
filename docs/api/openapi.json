@@ -3,7 +3,7 @@
   "info": {
     "title": "DirectorXO account APIs",
     "version": "1.0.0",
-    "description": "Support and Notifications API contracts. Existing identity and venture server-action coverage remains tracked in docs/P0_AUDIT.md."
+    "description": "Support, Notifications and Billing API contracts. Existing identity and venture server-action coverage remains tracked in docs/P0_AUDIT.md."
   },
   "servers": [{ "url": "/" }],
   "security": [{ "sessionCookie": [] }],
@@ -521,6 +521,332 @@
             }
           },
           "500": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/billing": {
+      "get": {
+        "summary": "Read owned billing accounts or a subscription overview",
+        "description": "Active billing-account owner membership is required, independently of venture roles. Omitting accountId returns owned accounts; supplying it returns the selected overview and only independently visible venture entitlements. Subscription state is a provider-confirmed local mirror, never activated by a checkout return URL.",
+        "parameters": [
+          { "name": "accountId", "in": "query", "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owned accounts or selected billing overview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "accounts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              "name": { "type": "string" }
+                            },
+                            "required": ["id", "name"],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": ["accounts"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "account": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            },
+                            "name": { "type": "string" },
+                            "hasCustomer": { "type": "boolean" }
+                          },
+                          "required": ["id", "name", "hasCustomer"],
+                          "additionalProperties": false
+                        },
+                        "subscription": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "status": { "type": "string" },
+                                "priceId": { "type": "string" },
+                                "amountMinor": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 9007199254740991
+                                },
+                                "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+                                "interval": { "type": "string" },
+                                "intervalCount": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991
+                                },
+                                "periodEnd": {
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                },
+                                "cancelAtPeriodEnd": { "type": "boolean" },
+                                "syncedAt": {
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                }
+                              },
+                              "required": [
+                                "status",
+                                "priceId",
+                                "amountMinor",
+                                "currency",
+                                "interval",
+                                "intervalCount",
+                                "periodEnd",
+                                "cancelAtPeriodEnd",
+                                "syncedAt"
+                              ],
+                              "additionalProperties": false
+                            },
+                            { "type": "null" }
+                          ]
+                        },
+                        "configured": { "type": "boolean" },
+                        "entitlements": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "ventureId": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              "name": { "type": "string" },
+                              "enabled": { "type": "boolean" }
+                            },
+                            "required": ["ventureId", "name", "enabled"],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": ["account", "subscription", "configured", "entitlements"],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "401": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "403": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "409": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "413": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "429": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "500": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Open subscription checkout or secure billing management",
+        "description": "Exact Origin and active billing owner required. requestId is a command idempotency UUID. The server chooses the configured price and stored customer; client-supplied provider identifiers are rejected. Existing open checkout is reused. Returns a validated Stripe-hosted URL for explicit navigation. Returns 503 while provider configuration is unavailable.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "accountId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "requestId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "action": { "type": "string", "enum": ["checkout", "portal"] }
+                },
+                "required": ["accountId", "requestId", "action"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Secure Stripe session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": { "url": { "type": "string", "format": "uri" } },
+                  "required": ["url"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "401": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "403": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "409": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "413": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "429": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "500": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "503": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/webhooks/stripe": {
+      "post": {
+        "summary": "Receive a signed Stripe subscription snapshot event",
+        "security": [],
+        "description": "Untouched body, maximum 128 KiB, valid stripe-signature and five-minute timestamp tolerance required. Supported subscription and checkout events route by stored customer, fetch fresh provider state and atomically commit subscription, entitlements, audit and unique receipt. Retries are safe. Provider/storage failures return 503 for retry. No cookie or Origin required.",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "type": "object", "additionalProperties": true } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted, duplicate or ignored event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "enum": ["processed", "duplicate", "ignored"] }
+                  },
+                  "required": ["status"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "413": {
+            "description": "Machine-readable error; x-correlation-id matches the body",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "503": {
             "description": "Machine-readable error; x-correlation-id matches the body",
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }

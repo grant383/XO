@@ -67,7 +67,7 @@ export async function accountApi(request: Request, handler: (actor: Actor) => Pr
   }
 }
 
-export async function readJson(request: Request) {
+export async function readBody(request: Request, maxBytes = 16_384) {
   const reader = request.body?.getReader();
   const decoder = new TextDecoder();
   let body = "";
@@ -78,7 +78,7 @@ export async function readJson(request: Request) {
         const { value, done } = await reader.read();
         if (done) break;
         bytes += value.byteLength;
-        if (bytes > 16_384) {
+        if (bytes > maxBytes) {
           await reader.cancel();
           throw new HttpError(413, "TOO_LARGE", "Request body is too large");
         }
@@ -89,6 +89,11 @@ export async function readJson(request: Request) {
       reader.releaseLock();
     }
   }
+  return body;
+}
+
+export async function readJson(request: Request) {
+  const body = await readBody(request);
   try {
     return JSON.parse(body) as unknown;
   } catch {
