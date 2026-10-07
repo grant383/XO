@@ -52,9 +52,9 @@ Do **not** treat exported/generated Figma code as the application architecture. 
 | `54:27078` | Accept team invitation | `/invite/[token]` | Memberships | Invited verified user | P0 | COMPLETE |
 | `54:27340` | Request access | `/v/[ventureId]/request-access` | Memberships | Authenticated | P0 | COMPLETE |
 | `54:27489` | Access request submitted | same route; submitted state | Memberships | Authenticated | P0 | COMPLETE |
-| `8:651` | **Command Centre** | `/v/[ventureId]/command` | Command | Viewer+ | **P1** | **NOT STARTED — NEXT CORE PRODUCT** |
+| `8:651` | **Command Centre** | `/v/[ventureId]/command` | Command | Viewer+ | **P1** | **COMPLETE (local) — ADR-0024; see §J** |
 | `29:1087` | £1M Growth Command | `/v/[ventureId]/command/growth-1m` | Command | Viewer+ | P1 | NOT STARTED |
-| `3:255` | DirectorXO dashboard | legacy redirect to Command | Legacy | Viewer+ | Deprecated | DEPRECATED |
+| `3:255` | DirectorXO dashboard | legacy redirect to Command | Legacy | Viewer+ | Deprecated | DEPRECATED — `/dashboard` redirects to Command (ADR-0024) |
 | `10:847` | Idea Lab | `/v/[ventureId]/build/ideas` | Build | Operator+ | P2 | NOT STARTED |
 | `10:1429` | Market Research | `/v/[ventureId]/build/market-research` | Build | Operator+ | P2 | NOT STARTED |
 | `10:4668` | Goal Architect | `/v/[ventureId]/build/goals` | Build | Manager+ | P2 | NOT STARTED |
@@ -267,3 +267,18 @@ See [P0 audit](P0_AUDIT.md) for the 6 October 2026 code audit. Notifications and
 `/support` (33:4290) now uses the shared authenticated account shell, searchable help topics and persistent account-owned requests. Zod/database validation, atomic audit, retry-safe creation, cursor pagination, REST/OpenAPI, CSRF/origin checks, rate limiting and independent RLS are in place. Seven unit tests and ten focused database/catalog tests pass. Desktop/mobile Playwright with axe, canonical sign-in return paths, offline submission checks and exact SVG geometry pass. ADR-0017 records scope and recovery. No external email delivery or response SLA is claimed.
 
 Local error telemetry uses the Next.js server error hook and safe allowlisted Pino incident records; production alert delivery remains unverified. Profile & Security now reuses the existing shared Figma loading state.
+
+## J. Command Centre — first P1 slice (7 October 2026)
+
+`/v/[ventureId]/command` (8:651) is a real venture-scoped module (`src/modules/command`, ADR-0024) on the approved app shell. The frame's embedded sidebar predates the shell and is not used.
+
+- **Today's numbers:** the six Figma tiles are typed metrics that name their source module. They show "—" and the source until Operate Finance/Operations/Growth supply records. No sample figures are shown.
+- **What changed:** derived from task history that every member may read (venture audit stays Owner/Admin-only).
+- **Why:** deterministic, versioned rules with severity, evidence, threshold and recommended action, replacing "AI Analysis" (spec §13.14). Evaluated on read; the recommendation decision workflow is P2.
+- **What to do:** persisted `command_tasks` with FORCE RLS (members read, Operator+ write, status-only updates, no deletes), retry-safe creation, audited completion/reopening and venture-timezone due labels.
+- **States:** shell loading/error, empty quadrants, Viewer read-only, non-member no-access with request access, offline read-only with freshness. Responsive: 2×2 from 1024px, stacked below.
+- **Routing:** `/v/[ventureId]` and the legacy `/dashboard` (3:255) redirect here; the shell nav gains a Command section.
+- **Verification:** unit golden rules and calendar, database integration, RLS isolation/role/privilege tests, and desktop/mobile Playwright with axe (`tests/e2e/command.spec.ts`).
+- **Design-sync:** matrix items 26–29 ("AI Analysis" label, "Live" indicator, sample metric figures and "Customer sat" source, 307 legacy redirect).
+
+Next P1 slice is not started. Stop for review before beginning another module.

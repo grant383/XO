@@ -7,3 +7,4 @@ export * from "./support";
 export * from "./notifications";
 
 export * from "./billing";
+export * from "./command";

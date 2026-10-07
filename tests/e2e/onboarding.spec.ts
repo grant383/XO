@@ -60,16 +60,15 @@ test("founder onboards a venture and enters the shell", async ({ page }) => {
   );
   await expectNoA11yViolations(page);
 
-  // Completed ventures leave onboarding: the review route now goes home.
+  // Completed ventures leave onboarding: the workspace opens on Command Centre.
   await page.getByRole("link", { name: "Enter workspace" }).click();
-  await page.waitForURL(`**/v/${ventureId}`);
-  await expect(page.getByRole("heading", { level: 1, name: "Northwind Trades" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Nothing here yet" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Manage team" })).toBeVisible();
+  await page.waitForURL(`**/v/${ventureId}/command`);
+  await expect(page.getByRole("heading", { level: 1, name: "Command Centre" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No open tasks" })).toBeVisible();
   await expectNoA11yViolations(page);
 
   await page.goto(`/onboarding/${ventureId}/review`);
-  await page.waitForURL(`**/v/${ventureId}`);
+  await page.waitForURL(`**/v/${ventureId}/command`);
 });
 
 test("onboarding rejects an empty business name with a focused error summary", async ({ page }) => {

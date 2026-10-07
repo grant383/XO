@@ -6,6 +6,8 @@ import { generateActionContract } from "./action-contract";
 import { billingCommand } from "../src/modules/billing/policy";
 import { inboxQuery, readInput } from "../src/modules/notifications/policy";
 import { supportInput, supportCursor } from "../src/modules/support/policy";
+import { TASK_PRIORITIES } from "../src/modules/command/policy";
+import { METRIC_KEYS } from "../src/modules/command/metrics";
 
 const requestSchema = z.object({
   id: z.uuid(),
@@ -29,7 +31,7 @@ const document = {
     title: "DirectorXO account APIs",
     version: "1.0.0",
     description:
-      "Configured identity HTTP endpoints, Support, Notifications, Billing and operational health contracts. Existing Next.js Server Action signatures are inventoried separately in server-actions.json with behavioral/permission notes in SERVER_ACTIONS.md.",
+      "Configured identity HTTP endpoints, Support, Notifications, Billing, Command and operational health contracts. Existing Next.js Server Action signatures are inventoried separately in server-actions.json with behavioral/permission notes in SERVER_ACTIONS.md.",
   },
   servers: [{ url: "/" }],
   security: [{ sessionCookie: [] }],
@@ -203,6 +205,93 @@ paths["/api/v1/billing"] = {
       },
       ...errors,
       "503": error,
+    },
+  },
+};
+const commandTask = z.object({
+  id: z.uuid(),
+  title: z.string(),
+  priority: z.enum(TASK_PRIORITIES),
+  dueOn: z.iso.date().nullable(),
+  status: z.enum(["open", "done"]),
+  createdAt: z.iso.datetime(),
+  statusChangedAt: z.iso.datetime().nullable(),
+});
+const commandMetric = z.object({
+  key: z.enum(METRIC_KEYS),
+  label: z.string(),
+  unit: z.enum(["money", "count", "score"]),
+  source: z.string(),
+  status: z.enum(["awaiting_source", "available"]),
+  value: z.number().optional().describe("Money in integer minor units; present when available"),
+  change: z.number().nullable().optional(),
+  currency: z
+    .string()
+    .regex(/^[A-Z]{3}$/)
+    .optional(),
+  asOf: z.iso.datetime().optional(),
+});
+paths["/api/v1/command"] = {
+  get: {
+    summary: "Read a venture's Command Centre snapshot",
+    description:
+      "Viewer+ of an active venture, resolved from the database on every request; venture RLS applies independently. Unknown, inaccessible and inactive ventures return the same 403. Metrics report awaiting_source until their Operate source records exist; no sample figures are returned. Signals are deterministic rule outputs with rule id/version, threshold and evidence, evaluated on read (not persisted). Task changes are Server Actions (server-actions.json).",
+    parameters: [
+      {
+        name: "ventureId",
+        in: "query",
+        required: true,
+        schema: { type: "string", format: "uuid" },
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Snapshot read at asOf",
+        ...json(
+          z.toJSONSchema(
+            z.object({
+              venture: z.object({
+                id: z.uuid(),
+                name: z.string(),
+                timezone: z.string(),
+                reportingCurrency: z.string().regex(/^[A-Z]{3}$/),
+              }),
+              viewer: z.object({
+                role: z.enum(["owner", "admin", "manager", "operator", "viewer"]),
+                canManageTasks: z.boolean(),
+              }),
+              asOf: z.iso.datetime(),
+              today: z.iso.date(),
+              metrics: z.array(commandMetric),
+              signals: z.array(
+                z.object({
+                  ruleId: z.string(),
+                  ruleVersion: z.number().int().positive(),
+                  severity: z.enum(["danger", "warning", "info"]),
+                  title: z.string(),
+                  detail: z.string(),
+                  action: z.string(),
+                  threshold: z.string(),
+                  evidence: z.array(z.object({ label: z.string(), value: z.string() })),
+                  evaluatedAt: z.iso.datetime(),
+                }),
+              ),
+              changes: z.array(
+                z.object({
+                  id: z.string(),
+                  kind: z.enum(["task_added", "task_completed", "task_reopened"]),
+                  at: z.iso.datetime(),
+                  title: z.string(),
+                  actorName: z.string().nullable(),
+                }),
+              ),
+              openTasks: z.array(commandTask),
+              completedTasks: z.array(commandTask),
+            }),
+          ),
+        ),
+      },
+      ...errors,
     },
   },
 };

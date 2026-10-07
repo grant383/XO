@@ -38,14 +38,19 @@ export const CAPABILITIES = [
   "settings:view",
   "settings:update",
   "audit:view",
+  /** Command Centre (spec §8: Viewer+). */
+  "command:view",
+  /** Create, complete and reopen Command Centre tasks (day-to-day records: Operator+). */
+  "command:manage_tasks",
 ] as const;
 export type Capability = (typeof CAPABILITIES)[number];
 
 const VIEWER_PLUS: readonly VentureRole[] = ["owner", "admin", "manager", "operator", "viewer"];
+const OPERATOR_PLUS: readonly VentureRole[] = ["owner", "admin", "manager", "operator"];
 const ADMIN_PLUS: readonly VentureRole[] = ["owner", "admin"];
 const OWNER: readonly VentureRole[] = ["owner"];
 
-/** Minimum roles per capability (spec §7 matrix notation: Viewer+, Admin+, Owner). */
+/** Minimum roles per capability (spec §7 matrix notation: Viewer+, Operator+, Admin+, Owner). */
 const GRANTS: Record<Capability, readonly VentureRole[]> = {
   "venture:view": VIEWER_PLUS,
   "venture:update": ADMIN_PLUS,
@@ -59,6 +64,9 @@ const GRANTS: Record<Capability, readonly VentureRole[]> = {
   "settings:update": ADMIN_PLUS,
   // Matches the audit_log SELECT policy (Owner/Admin).
   "audit:view": ADMIN_PLUS,
+  "command:view": VIEWER_PLUS,
+  // Matches the command_tasks INSERT/UPDATE policies (migration 0014).
+  "command:manage_tasks": OPERATOR_PLUS,
 };
 
 export function can(role: VentureRole | null | undefined, capability: Capability): boolean {

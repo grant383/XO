@@ -2,20 +2,21 @@ import type { Route } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getSession } from "@/modules/identity";
-import { signInPath } from "./actor";
 import { listSwitchableVentures } from "@/modules/ventures";
+import { signInPath } from "../actor";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Entry point. Signed-out visitors sign in; signed-in users land in their first active
- * venture (the shell's switcher moves between ventures), or in onboarding when they have
- * none. `/v/[ventureId]` re-authorises the venture on every request.
+ * Legacy DirectorXO dashboard (Figma 3:255, deprecated; spec §10): redirects to Command
+ * Centre for the user's first accessible active venture and owns no data. The redirect is
+ * temporary (307), not 301/308: its target depends on who is signed in, so a browser must
+ * not cache it across accounts.
  */
-export default async function HomePage() {
+export default async function LegacyDashboardPage() {
   const h = await headers();
   const session = await getSession(h);
-  if (!session) redirect(await signInPath(h));
+  if (!session) redirect(await signInPath(h, "/dashboard"));
   const [first] = await listSwitchableVentures({ userId: session.userId });
   redirect((first ? `/v/${first.id}/command` : "/onboarding") as Route);
 }

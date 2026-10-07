@@ -42,7 +42,10 @@ const EXPECTED: Record<string, string | null> = {
   "settings/profile-security/page.tsx": "settings/profile-security/loading.tsx",
   "support/page.tsx": "support/loading.tsx",
   "v/[ventureId]/request-access/page.tsx": "v/[ventureId]/request-access/loading.tsx",
-  "v/[ventureId]/(shell)/page.tsx": "v/[ventureId]/(shell)/loading.tsx",
+  // Redirect-only entry points (legacy dashboard, venture index → Command Centre).
+  "dashboard/page.tsx": null,
+  "v/[ventureId]/page.tsx": null,
+  "v/[ventureId]/(shell)/command/page.tsx": "v/[ventureId]/(shell)/loading.tsx",
   "v/[ventureId]/(shell)/settings/team/page.tsx": "v/[ventureId]/(shell)/loading.tsx",
 };
 

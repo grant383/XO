@@ -25,9 +25,19 @@ describe("role defaults (spec §7)", () => {
   it("resolves the P0 capability matrix from the role alone", () => {
     expect(capabilitiesOf("owner")).toEqual([...CAPABILITIES]);
     expect(capabilitiesOf("admin")).toEqual(CAPABILITIES.filter((c) => c !== "venture:onboard"));
-    for (const role of ["manager", "operator", "viewer"] as const) {
-      expect(capabilitiesOf(role)).toEqual(["venture:view"]);
+    for (const role of ["manager", "operator"] as const) {
+      expect(capabilitiesOf(role)).toEqual([
+        "venture:view",
+        "command:view",
+        "command:manage_tasks",
+      ]);
     }
+    expect(capabilitiesOf("viewer")).toEqual(["venture:view", "command:view"]);
+  });
+
+  it("opens Command Centre to Viewer+ and task changes to Operator+ (spec §7, §8)", () => {
+    expect(rolesWith("command:view")).toEqual(VENTURE_ROLES);
+    expect(rolesWith("command:manage_tasks")).toEqual(["owner", "admin", "manager", "operator"]);
   });
 
   it("gives Team and Permissions to Admin+ only (spec §8)", () => {

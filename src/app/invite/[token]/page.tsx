@@ -169,7 +169,7 @@ export default async function InvitationPage({ params }: Props) {
           <Heading icon="user-plus" title="You are already a member">
             You already belong to {preview.ventureName}.
           </Heading>
-          <ButtonLink href={`/v/${preview.ventureId}`} block>
+          <ButtonLink href={`/v/${preview.ventureId}/command`} block>
             Go to {preview.ventureName}
             <Icon name="arrow-right" />
           </ButtonLink>

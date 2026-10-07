@@ -92,6 +92,20 @@
       "when": 1791329399234,
       "tag": "0012_billing_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791387276440,
+      "tag": "0013_command_tasks",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791387285481,
+      "tag": "0014_command_tasks_rls",
+      "breakpoints": true
     }
   ]
 }

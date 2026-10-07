@@ -307,6 +307,32 @@
       "literalFormFields": ["description", "requestId", "subject"]
     },
     {
+      "name": "createTaskAction",
+      "source": "src/app/v/[ventureId]/(shell)/command/actions.ts",
+      "line": 57,
+      "modules": ["@/modules/command", "@/modules/ventures"],
+      "parameters": [
+        { "name": "ventureId", "type": "string" },
+        { "name": "_prev", "type": "TaskFormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<TaskFormState>",
+      "literalFormFields": ["dueOn", "priority", "requestId", "title"]
+    },
+    {
+      "name": "setTaskStatusAction",
+      "source": "src/app/v/[ventureId]/(shell)/command/actions.ts",
+      "line": 76,
+      "modules": ["@/modules/command", "@/modules/ventures"],
+      "parameters": [
+        { "name": "ventureId", "type": "string" },
+        { "name": "_prev", "type": "TaskFormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<TaskFormState>",
+      "literalFormFields": ["status", "taskId"]
+    },
+    {
       "name": "inviteMemberAction",
       "source": "src/app/v/[ventureId]/(shell)/settings/team/actions.ts",
       "line": 66,

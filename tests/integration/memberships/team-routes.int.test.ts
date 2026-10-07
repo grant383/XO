@@ -312,7 +312,9 @@ describe("/invite/[token]", () => {
     expect(text(await InvitationPage({ params: Promise.resolve({ token }) }))).toContain(
       "<AcceptInvitationForm>",
     );
-    expect(redirectTo(await digestOf(() => acceptInvitationAction(token)))).toBe(`/v/${ventureId}`);
+    expect(redirectTo(await digestOf(() => acceptInvitationAction(token)))).toBe(
+      `/v/${ventureId}/command`,
+    );
     expect((await membershipOf(admin, ventureId, invitee.userId))!.role).toBe("operator");
     expect(await acceptInvitationAction(token)).toEqual({
       status: "error",

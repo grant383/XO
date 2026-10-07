@@ -56,11 +56,9 @@ test("owner invites a member who accepts and is assigned a role", async ({ page,
   await expect(invitee.getByText("Manager", { exact: true })).toBeVisible();
   await expectNoA11yViolations(invitee);
   await invitee.getByRole("button", { name: "Accept invitation and continue" }).click();
-  await invitee.waitForURL(`**/v/${ventureId}`);
-  await expect(
-    invitee.getByRole("heading", { level: 1, name: "Harbour Lane Builders" }),
-  ).toBeVisible();
-  await expect(invitee.getByText("Your role in this venture: Manager.")).toBeVisible();
+  await invitee.waitForURL(`**/v/${ventureId}/command`);
+  await expect(invitee.getByRole("heading", { level: 1, name: "Command Centre" })).toBeVisible();
+  await expect(invitee.getByText("Your role: Manager.")).toBeVisible();
 
   // Managers have no Team navigation, and the route itself refuses them (server-side).
   const memberNav = await openNavigation(invitee);
@@ -84,7 +82,7 @@ test("owner invites a member who accepts and is assigned a role", async ({ page,
   await expect(page.getByRole("row").filter({ hasText: member.email })).toContainText("Viewer");
 
   await invitee.goto(`/v/${ventureId}`);
-  await expect(invitee.getByText("Your role in this venture: Viewer.")).toBeVisible();
+  await expect(invitee.getByText("Your role: Viewer.")).toBeVisible();
   await inviteeContext.close();
 });
 
@@ -107,7 +105,7 @@ test("venture switcher lists the user's active ventures and switches between the
   );
   await expectNoA11yViolations(page);
   await nav.getByRole("link", { name: /Alpha Works/ }).click();
-  await page.waitForURL(`**/v/${first}`);
-  await expect(page.getByRole("heading", { level: 1, name: "Alpha Works" })).toBeVisible();
+  await page.waitForURL(`**/v/${first}/command`);
+  await expect(page.getByRole("navigation", { name: "Breadcrumb" })).toContainText("Alpha Works");
   expect(second).not.toBe(first);
 });

@@ -50,6 +50,6 @@ test("non-member requests access and the owner approves it", async ({ page, brow
   await expect(page.getByText("No pending access requests.")).toBeVisible();
 
   await outsider.goto(`/v/${ventureId}`);
-  await expect(outsider.getByText("Your role in this venture: Operator.")).toBeVisible();
+  await expect(outsider.getByText("Your role: Operator.")).toBeVisible();
   await outsiderContext.close();
 });

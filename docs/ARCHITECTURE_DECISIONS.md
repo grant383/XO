@@ -61,3 +61,4 @@ Status: Accepted
 | [0021](adr/0021-p0-server-action-contracts.md) | Server-action contracts for P0 venture, onboarding and membership APIs | Accepted |
 | [0022](adr/0022-technical-specifications-in-docs.md) | Technical specifications live in version-controlled docs | Accepted |
 | [0023](adr/0023-email-outbox-worker.md) | Identity email outbox and worker (BullMQ) | Accepted |
+| [0024](adr/0024-command-centre.md) | Command Centre: tasks, deterministic signals, no placeholder metrics | Accepted |

@@ -57,7 +57,7 @@ export function VentureSwitcher({
           {ventures.map((v) => (
             <li key={v.id}>
               <Link
-                href={`/v/${v.id}` as Route}
+                href={`/v/${v.id}/command` as Route}
                 className={cx(
                   styles.popoverItem,
                   v.id === current?.id && styles.popoverItemCurrent,

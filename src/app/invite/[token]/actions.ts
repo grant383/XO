@@ -24,7 +24,7 @@ export async function acceptInvitationAction(token: string): Promise<AcceptState
   );
   const result = await acceptInvitation(actor, token);
   if (!result.ok) return { status: "error", message: result.message };
-  redirect(`/v/${result.ventureId}` as Route);
+  redirect(`/v/${result.ventureId}/command` as Route);
 }
 
 /** Signs out so the invitee can sign in with the invited address, then returns here. */

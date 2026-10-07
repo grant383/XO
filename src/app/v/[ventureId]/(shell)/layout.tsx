@@ -26,9 +26,13 @@ type Props = { children: ReactNode; params: Promise<{ ventureId: string }> };
  */
 function navigationFor(access: VentureAccess): ShellNavSection[] {
   const base = `/v/${access.id}`;
-  const sections: ShellNavSection[] = [
-    { label: "Venture", items: [{ href: base, label: "Home", exact: true }] },
-  ];
+  const sections: ShellNavSection[] = [];
+  if (can(access.role, "command:view")) {
+    sections.push({
+      label: "Command",
+      items: [{ href: `${base}/command`, label: "Command Centre", exact: true }],
+    });
+  }
   // Profile & Security is account-level (/settings/*), open to every signed-in user.
   const system = [{ href: "/settings/profile-security", label: "Profile & Security" }];
   if (can(access.role, "team:view")) {

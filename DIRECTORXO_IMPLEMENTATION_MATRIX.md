@@ -1,6 +1,6 @@
 # DirectorXO Implementation Matrix
 
-Route-to-delivery tracker for the 60 approved DirectorXO capabilities. Rows mirror the Figma **Master Implementation Matrix** (file `rqWc0iFUFSTdudXuO4Gm47`, node `54:29298`, "Spec v1.0 · Oct 2026 · 8 domains · 60 rows"). Status reflects the repository on branch `p0/foundation` after P0 step 6 (MFA, recovery, session/device management, ADR-0016), the application shell and journey E2E (ADR-0015) and the UI foundations (ADR-0014).
+Route-to-delivery tracker for the 60 approved DirectorXO capabilities. Rows mirror the Figma **Master Implementation Matrix** (file `rqWc0iFUFSTdudXuO4Gm47`, node `54:29298`, "Spec v1.0 · Oct 2026 · 8 domains · 60 rows"). Status reflects the repository on branch `p0/foundation` after P0 step 6 (MFA, recovery, session/device management, ADR-0016), the application shell and journey E2E (ADR-0015), the UI foundations (ADR-0014) and the first P1 slice, Command Centre (ADR-0024).
 
 ## How to read this matrix
 
@@ -24,7 +24,7 @@ Design-sync items are corrections owed to Figma. They are **not implementation b
 | **Not started** | No implementation beyond shared foundations. |
 | **Deferred** | Deliberately moved out of its listed phase by a recorded decision. |
 
-Twenty-two capabilities are **Implemented**: they have the approved Figma visual, desktop and mobile layouts, and Playwright E2E with axe accessibility checks (ADR-0014, ADR-0015, ADR-0016). The remaining P0 rows are Billing & Subscription (49) and the non-UI parts of rows 12, 14, 56 and 59.
+Twenty-four capabilities are **Implemented**: they have the approved Figma visual, desktop and mobile layouts, and Playwright E2E with axe accessibility checks (ADR-0014, ADR-0015, ADR-0016). The remaining P0 rows are Billing & Subscription (49) and the non-UI parts of rows 12, 14, 56 and 59.
 
 ### Permission order (spec §7)
 
@@ -35,14 +35,14 @@ Public → Authenticated → Viewer+ → Operator+ → Manager+ → Admin+ → O
 | Domain | Rows | Implemented | Foundation | In progress | Not started | Deferred |
 |---|---|---|---|---|---|---|
 | 01 Auth & Onboarding | 15 | 13 | 0 | 2 | 0 | 0 |
-| 02 Command | 3 | 0 | 0 | 0 | 3 | 0 |
+| 02 Command | 3 | 2 | 0 | 0 | 1 | 0 |
 | 03 Build | 15 | 0 | 0 | 0 | 15 | 0 |
 | 04 Operate | 8 | 0 | 0 | 0 | 8 | 0 |
 | 05 Intelligence | 1 | 0 | 0 | 0 | 1 | 0 |
 | 06 Portfolio | 3 | 0 | 0 | 0 | 3 | 0 |
 | 07 System | 8 | 6 | 1 | 0 | 1 | 0 |
 | 08 States | 7 | 3 | 0 | 2 | 2 | 0 |
-| **Total** | **60** | **22** | **1** | **4** | **33** | **0** |
+| **Total** | **60** | **24** | **1** | **4** | **31** | **0** |
 
 ## 01 Auth & Onboarding
 
@@ -68,9 +68,9 @@ Public → Authenticated → Viewer+ → Operator+ → Manager+ → Admin+ → O
 
 | # | Capability | Product area | Phase | Route | Figma node | Backend module | API / server action | Required permission | RLS / authorization boundary | Test requirement | Current implementation status | Notes / dependencies |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 16 | Command Centre | Command | P1 | `/v/[ventureId]/command` | 8:651 | `command` | `GET /api/v1/command` | Viewer+ | Venture RLS + `venture:view` | RLS + permission | Not started | Needs the app shell and venture switcher. Figma: Ready. |
+| 16 | Command Centre | Command | P1 | `/v/[ventureId]/command` | 8:651 | `command` | `GET /api/v1/command?ventureId=` → `getCommandCentre`; `createTaskAction` → `createTask`, `setTaskStatusAction` → `setTaskStatus` | Viewer+ (`command:view`); tasks Operator+ (`command:manage_tasks`) | `resolveSelectedVenture` with capability on every request/action; `command_tasks` FORCE RLS: members read the venture in context, Operator+ insert/update as themselves, status-only updates, no deletes (migration 0014); atomic `command.task.*` audit | RLS + permission | Implemented | ADR-0024. Four Figma quadrants on the approved shell (2×2 from 1024px, stacked below). Tasks are persisted, retry-safe and audited, with venture-timezone due labels. "Why" shows deterministic versioned rules with evidence and threshold (`command.tasks.overdue@1`, `command.tasks.high_priority_due_today@1`, `command.metrics.awaiting_sources@1`); not persisted (the recommendation workflow is P2). The six metrics report `awaiting_source` with their source module until Operate Finance/Operations/Growth ship (no sample figures). "What changed" is derived from task history (venture audit is Owner/Admin-only). Loading, error, empty, Viewer read-only, non-member and offline read-only states. Tests: `tests/unit/command.test.ts` (golden rules, calendar, formatting, validation), `tests/integration/command.int.test.ts`, `tests/rls/command.rls.test.ts`, `tests/e2e/command.spec.ts` (desktop + mobile, axe). `/v/[ventureId]` redirects here. Design-sync 26–29. Figma: Ready. |
 | 17 | £1M Growth Command | Command | P1 | `/v/[ventureId]/command/growth-1m` | 29:1087 | `growth-command` | `GET /api/v1/growth-command` | Viewer+ | Venture RLS | formula unit + integration | Not started | Figma permission Manager+ disagrees with spec Viewer+. Deterministic formulas per spec §13.11. Figma: Ready. |
-| 18 | Legacy dashboard | Command | P1 | `/dashboard` → `/v/[ventureId]/command` | 3:255 | routing | 301 redirect only | Viewer+ | Redirect resolves an accessible venture | redirect + deep link | Not started | Deprecated screen; redirect is a P1 exit criterion. Figma: Legacy/Deprecated. |
+| 18 | Legacy dashboard | Command | P1 | `/dashboard` → `/v/[ventureId]/command` | 3:255 | routing | Redirect only (307; see notes) | Viewer+ | Redirect resolves the first accessible active venture from the session; signed out → sign-in with `next=/dashboard`; no venture → onboarding | redirect + deep link | Implemented | ADR-0024. Owns no data. A temporary redirect, because the target depends on the signed-in account and a cached 301/308 would send another account to the wrong venture (design-sync 29). E2E in `tests/e2e/command.spec.ts`. Figma: Legacy/Deprecated. |
 
 ## 03 Build
 
@@ -185,6 +185,10 @@ Figma labels that differed from the canonical values above. None blocks implemen
 23. **Session expired and reset success copy** (54:27222, 54:27280): "30 minutes of inactivity" → the real policy (7 days idle, 30 days absolute); "draft content encrypted in this browser" removed (no such feature); "Contact security support" and "Report an unrecognised reset" not built until `/support` exists.
 24. **MFA challenge** (54:27145): masked account email and "Can’t access your authenticator?" not built; backup codes are the recovery path (ADR-0016).
 25. **Session location** (33:3534): "London, United Kingdom" → the IP address recorded at sign-in; no geo-IP lookup.
+26. **Command "Why" cards** (8:651): "AI Analysis · 2h ago" → "Rule `<id>` v`<n>` · Evaluated HH:MM", with a severity label and expandable evidence and threshold. Release 1 has no AI analysis (spec §3, §13.14).
+27. **Command "Live" indicator** (8:651): → "Updated HH:MM" freshness, or "Offline · showing data from HH:MM". The page is a server snapshot, not a live stream.
+28. **Command metric tiles** (8:651): sample figures (£38,420, 187, …) → "—" plus the named source until Operate modules supply records. "Customer sat" has no data source in spec §16 and needs a product decision.
+29. **Legacy dashboard redirect** (50:10242 D1 "permanent redirect"): implemented as 307 because the target is per account. Command Centre uses the approved app shell (54:24284–54:24286), not the frame's embedded pre-shell sidebar.
 
 **Open (needs design work, not label changes):**
 - **Request access / Access request submitted (54:27340, 54:27489):** the screens still depict an existing member requesting a higher permission, with justification, a named approver, a request reference and approval tracking. P0 (ADR-0013) is a signed-in non-member requesting venture access with no venture disclosure; the reviewer chooses the role. Role labels were canonicalised and the conflict is annotated on both frames.

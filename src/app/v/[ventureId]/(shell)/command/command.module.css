@@ -1,0 +1,471 @@
+/*
+ * Command Centre (Figma 8:651). Desktop is the Figma 2×2 quadrant grid; below 1024px the
+ * quadrants stack in reading order (numbers, changes, why, what to do).
+ */
+
+.headerMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-16);
+  font: var(--type-small);
+  color: var(--text-muted);
+}
+
+.freshness {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font: var(--type-small);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.dotLive,
+.dotOffline {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--status-success-strong);
+}
+
+.dotOffline {
+  background: var(--status-warning);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-24);
+}
+
+.quadrant {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.eyebrow {
+  font: var(--type-eyebrow);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.note {
+  font: var(--type-small);
+  color: var(--text-muted);
+}
+
+.card {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--space-16) var(--space-20);
+  background: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+}
+
+.cardEmpty {
+  background: transparent;
+  border: 0;
+}
+
+/* Today's numbers */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-12);
+  margin: 0;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+  padding: var(--space-16);
+  background: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+}
+
+.tile dd {
+  margin: 0;
+}
+
+.tileLabel {
+  font: 500 11px / 16px var(--font-sans);
+  color: var(--text-subtle);
+  text-transform: uppercase;
+}
+
+.tileValue {
+  font: 600 20px / 28px var(--font-sans);
+  color: var(--text-primary);
+}
+
+.tileMeta {
+  font: 500 11px / 16px var(--font-mono);
+  color: var(--text-subtle);
+}
+
+.up {
+  color: var(--status-success-strong);
+}
+
+.down {
+  color: var(--status-warning);
+}
+
+.flat {
+  color: var(--text-subtle);
+}
+
+/* What changed */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timelineRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-height: 36px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.timelineTime {
+  flex: 0 0 72px;
+  font: 400 11px / 16px var(--font-mono);
+  color: var(--text-muted);
+}
+
+.dot {
+  flex: 0 0 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--text-subtle);
+}
+
+.task_added {
+  background: var(--action-link);
+}
+
+.task_completed {
+  background: var(--status-success-strong);
+}
+
+.task_reopened {
+  background: var(--status-warning);
+}
+
+.timelineText {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font: 400 13px / 18px var(--font-sans);
+  color: var(--neutral-mist);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Why */
+.signals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.signal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  background: var(--surface-default);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 0 var(--radius-8) var(--radius-8) 0;
+}
+
+.signal.danger {
+  border-left-color: var(--status-danger);
+}
+
+.signal.warning {
+  border-left-color: var(--status-warning);
+}
+
+.signalCopy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.signalTitle {
+  font: 600 14px / 20px var(--font-sans);
+  color: var(--text-primary);
+}
+
+.signalText {
+  font: 400 13px / 1.4 var(--font-sans);
+  color: var(--neutral-mist);
+}
+
+.signalText strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.signalMeta {
+  font: 400 11px / 16px var(--font-mono);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.evidence {
+  font: 400 12px / 18px var(--font-sans);
+  color: var(--text-secondary);
+}
+
+.evidence summary {
+  width: fit-content;
+  color: var(--action-link);
+  cursor: pointer;
+}
+
+.evidence dl {
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-8) 0 0;
+}
+
+.evidence dl div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: var(--space-12);
+}
+
+.evidence dt {
+  color: var(--text-muted);
+}
+
+.evidence dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+/* What to do */
+.tasks {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.taskRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-16);
+  min-height: 44px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.toggleForm {
+  display: contents;
+}
+
+/* 24px target (WCAG 2.2 target size) around the 16px Figma box. */
+.checkbox {
+  display: inline-grid;
+  flex: 0 0 24px;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 -4px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-4);
+  cursor: pointer;
+}
+
+.checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.checkbox:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.checkboxBox,
+.checkboxStatic {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #64697a;
+  border-radius: var(--radius-4);
+}
+
+.checkboxStatic {
+  flex: 0 0 16px;
+}
+
+.checkbox[aria-checked="true"] .checkboxBox {
+  background: var(--action-primary);
+  border-color: var(--action-primary);
+}
+
+.taskTitle {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  font: 400 13px / 18px var(--font-sans);
+  color: var(--text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.taskDone .taskTitle {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.priority {
+  flex: 0 0 auto;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-4);
+  font: 500 11px / 14px var(--font-sans);
+  white-space: nowrap;
+}
+
+.high {
+  background: rgb(239 68 68 / 0.08);
+  color: var(--status-danger-soft);
+}
+
+.medium {
+  background: rgb(245 158 11 / 0.08);
+  color: var(--status-warning);
+}
+
+.low {
+  background: var(--border-subtle);
+  color: var(--text-muted);
+}
+
+.due {
+  flex: 0 0 auto;
+  min-width: 84px;
+  font: 400 11px / 16px var(--font-sans);
+  color: var(--text-subtle);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.overdue {
+  color: var(--status-danger-soft);
+}
+
+/* The toggle form uses display: contents, so its error wraps onto its own row line. */
+.rowError {
+  flex: 1 0 100%;
+  padding-bottom: var(--space-8);
+  font: var(--type-small);
+  color: var(--status-danger-soft);
+}
+
+.subheading {
+  margin-top: var(--space-16);
+  font: var(--type-eyebrow);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin-top: var(--space-16);
+  padding-top: var(--space-16);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.addTitle {
+  font: var(--type-emphasis);
+  color: var(--text-primary);
+}
+
+.addFields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: end;
+  gap: var(--space-12);
+}
+
+.addTitleField {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Narrow phones: the title gets the full line; priority and due date sit beneath it. */
+@media (max-width: 479px) {
+  .addFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .taskRow {
+    display: grid;
+    grid-template-columns: 24px auto minmax(0, 1fr);
+    grid-template-areas:
+      "check title title"
+      ". priority due"
+      ". error error";
+    gap: var(--space-4) var(--space-12);
+    padding: var(--space-8) 0;
+  }
+
+  .checkbox,
+  .checkboxStatic {
+    grid-area: check;
+    margin: 0;
+  }
+
+  .taskTitle {
+    grid-area: title;
+  }
+
+  .priority {
+    grid-area: priority;
+  }
+
+  .due {
+    grid-area: due;
+    min-width: 0;
+    align-self: center;
+    text-align: left;
+  }
+
+  .rowError {
+    grid-area: error;
+  }
+}

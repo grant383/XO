@@ -187,7 +187,7 @@ export default async function ReviewStepPage({ params }: Props) {
         </Link>
       </div>
       <div className={`${styles.actions} ${styles.actionsEnd}`}>
-        <ButtonLink href={`/v/${ventureId}`}>
+        <ButtonLink href={`/v/${ventureId}/command`}>
           Enter workspace
           <Icon name="arrow-right" />
         </ButtonLink>

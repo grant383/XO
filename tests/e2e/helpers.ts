@@ -110,7 +110,7 @@ export async function onboardVenture(page: Page, name: string): Promise<string> 
     timeout: 60000,
   });
   await page.getByRole("link", { name: "Enter workspace" }).click();
-  await page.waitForURL(/\/v\/[0-9a-f-]+$/);
+  await page.waitForURL(/\/v\/[0-9a-f-]+\/command$/);
   return new URL(page.url()).pathname.split("/")[2]!;
 }
 
