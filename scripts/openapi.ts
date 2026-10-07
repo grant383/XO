@@ -1,6 +1,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { z } from "zod";
 import { format } from "prettier";
+import { generateAuthContract } from "./auth-openapi";
+import { generateActionContract } from "./action-contract";
 import { billingCommand } from "../src/modules/billing/policy";
 import { inboxQuery, readInput } from "../src/modules/notifications/policy";
 import { supportInput, supportCursor } from "../src/modules/support/policy";
@@ -27,7 +29,7 @@ const document = {
     title: "DirectorXO account APIs",
     version: "1.0.0",
     description:
-      "Support, Notifications and Billing API contracts. Existing identity and venture server-action coverage remains tracked in docs/P0_AUDIT.md.",
+      "Configured identity HTTP endpoints, Support, Notifications, Billing and operational health contracts. Existing Next.js Server Action signatures are inventoried separately in server-actions.json with behavioral/permission notes in SERVER_ACTIONS.md.",
   },
   servers: [{ url: "/" }],
   security: [{ sessionCookie: [] }],
@@ -227,6 +229,56 @@ paths["/api/v1/webhooks/stripe"] = {
     },
   },
 };
+const auth = await generateAuthContract();
+Object.assign(paths, auth.paths);
+Object.assign(document.components.schemas, auth.schemas);
+Object.assign(document.components.securitySchemes, {
+  mfaPendingCookie: {
+    type: "apiKey",
+    in: "cookie",
+    name: "dxo.two_factor",
+    description: "Signed pending MFA challenge; production uses the __Secure- prefix.",
+  },
+});
+paths["/api/health/live"] = {
+  get: {
+    summary: "Process liveness",
+    security: [],
+    responses: {
+      "200": {
+        description: "Process is serving requests; no dependency checks",
+        ...json(z.toJSONSchema(z.object({ status: z.literal("ok") }))),
+      },
+    },
+  },
+};
+const readiness = {
+  description: "Dependency readiness; no identifiers or credentials",
+  ...json(
+    z.toJSONSchema(
+      z.object({
+        status: z.enum(["ok", "unavailable"]),
+        checks: z.object({ database: z.enum(["ok", "error"]), redis: z.enum(["ok", "error"]) }),
+      }),
+    ),
+  ),
+};
+paths["/api/health/ready"] = {
+  get: {
+    summary: "PostgreSQL and Redis readiness",
+    security: [],
+    responses: { "200": readiness, "503": readiness },
+  },
+};
+const actionOutput = await format(JSON.stringify(generateActionContract()), {
+  parser: "json",
+  printWidth: 100,
+});
+const actionFile = "docs/api/server-actions.json";
+if (process.argv.includes("--check")) {
+  if (readFileSync(actionFile, "utf8") !== actionOutput)
+    throw new Error("Server Action contract drift: run pnpm api:generate");
+} else writeFileSync(actionFile, actionOutput);
 const output = await format(JSON.stringify(document), { parser: "json", printWidth: 100 });
 const file = "docs/api/openapi.json";
 if (process.argv.includes("--check")) {

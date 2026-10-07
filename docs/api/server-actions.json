@@ -1,0 +1,397 @@
+{
+  "transport": "Next.js Server Actions; internal build-bound transport, not a public REST contract",
+  "description": "Parameters and return annotations are derived from the actual source. Form fields list only literal getters; mapped/dynamic fields and validation are specified by the linked module policies and docs/api/SERVER_ACTIONS.md. Authentication, permission, tenancy and audit checks remain in the existing modules.",
+  "actions": [
+    {
+      "name": "registerAction",
+      "source": "src/app/auth/actions.ts",
+      "line": 45,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "FormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<FormState>",
+      "literalFormFields": ["email", "name", "next", "password"]
+    },
+    {
+      "name": "resendVerificationAction",
+      "source": "src/app/auth/actions.ts",
+      "line": 59,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "FormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<FormState>",
+      "literalFormFields": ["email"]
+    },
+    {
+      "name": "loginAction",
+      "source": "src/app/auth/actions.ts",
+      "line": 70,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "FormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<FormState>",
+      "literalFormFields": ["email", "next", "password"]
+    },
+    {
+      "name": "verifyMfaAction",
+      "source": "src/app/auth/actions.ts",
+      "line": 83,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "FormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<FormState>",
+      "literalFormFields": ["code", "method", "next"]
+    },
+    {
+      "name": "forgotPasswordAction",
+      "source": "src/app/auth/actions.ts",
+      "line": 93,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "FormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<FormState>",
+      "literalFormFields": ["email"]
+    },
+    {
+      "name": "resetPasswordAction",
+      "source": "src/app/auth/actions.ts",
+      "line": 104,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "FormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<FormState>",
+      "literalFormFields": ["confirmPassword", "newPassword", "token"]
+    },
+    {
+      "name": "verifyEmailAction",
+      "source": "src/app/auth/actions.ts",
+      "line": 121,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "FormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<FormState>",
+      "literalFormFields": ["token"]
+    },
+    {
+      "name": "logoutAction",
+      "source": "src/app/auth/actions.ts",
+      "line": 126,
+      "modules": ["@/modules/identity"],
+      "parameters": [],
+      "returnType": "Promise<void>",
+      "literalFormFields": []
+    },
+    {
+      "name": "acceptInvitationAction",
+      "source": "src/app/invite/[token]/actions.ts",
+      "line": 21,
+      "modules": ["@/modules/identity", "@/modules/memberships"],
+      "parameters": [{ "name": "token", "type": "string" }],
+      "returnType": "Promise<AcceptState>",
+      "literalFormFields": []
+    },
+    {
+      "name": "switchAccountAction",
+      "source": "src/app/invite/[token]/actions.ts",
+      "line": 31,
+      "modules": ["@/modules/identity", "@/modules/memberships"],
+      "parameters": [{ "name": "token", "type": "string" }],
+      "returnType": "Promise<void>",
+      "literalFormFields": []
+    },
+    {
+      "name": "createVentureAction",
+      "source": "src/app/onboarding/actions.ts",
+      "line": 39,
+      "modules": ["@/modules/ventures"],
+      "parameters": [
+        { "name": "_prev", "type": "OnboardingFormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<OnboardingFormState>",
+      "literalFormFields": ["name", "requestId"]
+    },
+    {
+      "name": "saveBusinessAction",
+      "source": "src/app/onboarding/actions.ts",
+      "line": 69,
+      "modules": ["@/modules/ventures"],
+      "parameters": [
+        { "name": "ventureId", "type": "string" },
+        { "name": "_prev", "type": "OnboardingFormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<OnboardingFormState>",
+      "literalFormFields": []
+    },
+    {
+      "name": "lookupCompanyAction",
+      "source": "src/app/onboarding/actions.ts",
+      "line": 88,
+      "modules": ["@/modules/ventures"],
+      "parameters": [
+        { "name": "ventureId", "type": "string" },
+        { "name": "companyNumber", "type": "string" }
+      ],
+      "returnType": "Promise<CompanyLookupResult | { status: \"error\"; message: string }>",
+      "literalFormFields": []
+    },
+    {
+      "name": "completeDataConnectionsAction",
+      "source": "src/app/onboarding/actions.ts",
+      "line": 104,
+      "modules": ["@/modules/ventures"],
+      "parameters": [{ "name": "ventureId", "type": "string" }],
+      "returnType": "Promise<OnboardingFormState>",
+      "literalFormFields": []
+    },
+    {
+      "name": "completeOnboardingAction",
+      "source": "src/app/onboarding/actions.ts",
+      "line": 118,
+      "modules": ["@/modules/ventures"],
+      "parameters": [{ "name": "ventureId", "type": "string" }],
+      "returnType": "Promise<OnboardingFormState>",
+      "literalFormFields": []
+    },
+    {
+      "name": "openBillingAction",
+      "source": "src/app/settings/billing/actions.ts",
+      "line": 11,
+      "modules": ["@/modules/billing"],
+      "parameters": [
+        { "name": "_", "type": "BillingActionState" },
+        { "name": "form", "type": "FormData" }
+      ],
+      "returnType": "Promise<BillingActionState>",
+      "literalFormFields": ["accountId", "action", "requestId"]
+    },
+    {
+      "name": "markReadAction",
+      "source": "src/app/settings/notifications-activity/actions.ts",
+      "line": 6,
+      "modules": ["@/modules/notifications"],
+      "parameters": [
+        { "name": "_", "type": "{ message: string }" },
+        { "name": "form", "type": "FormData" }
+      ],
+      "returnType": "inferred",
+      "literalFormFields": ["id", "through"]
+    },
+    {
+      "name": "updateNameAction",
+      "source": "src/app/settings/profile-security/actions.ts",
+      "line": 56,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "SettingsState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<SettingsState>",
+      "literalFormFields": ["name"]
+    },
+    {
+      "name": "changePasswordAction",
+      "source": "src/app/settings/profile-security/actions.ts",
+      "line": 65,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "SettingsState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<SettingsState>",
+      "literalFormFields": ["confirmPassword", "currentPassword", "newPassword"]
+    },
+    {
+      "name": "startMfaAction",
+      "source": "src/app/settings/profile-security/actions.ts",
+      "line": 84,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "SettingsState<MfaEnrolment>" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<SettingsState<MfaEnrolment>>",
+      "literalFormFields": ["password"]
+    },
+    {
+      "name": "confirmMfaAction",
+      "source": "src/app/settings/profile-security/actions.ts",
+      "line": 99,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "SettingsState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<SettingsState>",
+      "literalFormFields": ["code"]
+    },
+    {
+      "name": "disableMfaAction",
+      "source": "src/app/settings/profile-security/actions.ts",
+      "line": 108,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "SettingsState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<SettingsState>",
+      "literalFormFields": ["password"]
+    },
+    {
+      "name": "regenerateCodesAction",
+      "source": "src/app/settings/profile-security/actions.ts",
+      "line": 117,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "SettingsState<{ recoveryCodes: string[] }>" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<SettingsState<{ recoveryCodes: string[] }>>",
+      "literalFormFields": ["password"]
+    },
+    {
+      "name": "revokeSessionAction",
+      "source": "src/app/settings/profile-security/actions.ts",
+      "line": 133,
+      "modules": ["@/modules/identity"],
+      "parameters": [
+        { "name": "_prev", "type": "SettingsState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<SettingsState>",
+      "literalFormFields": ["sessionId"]
+    },
+    {
+      "name": "revokeOtherSessionsAction",
+      "source": "src/app/settings/profile-security/actions.ts",
+      "line": 142,
+      "modules": ["@/modules/identity"],
+      "parameters": [],
+      "returnType": "Promise<SettingsState>",
+      "literalFormFields": []
+    },
+    {
+      "name": "reauthenticateAction",
+      "source": "src/app/settings/profile-security/actions.ts",
+      "line": 149,
+      "modules": ["@/modules/identity"],
+      "parameters": [],
+      "returnType": "Promise<void>",
+      "literalFormFields": []
+    },
+    {
+      "name": "submitSupportAction",
+      "source": "src/app/support/actions.ts",
+      "line": 8,
+      "modules": ["@/modules/support"],
+      "parameters": [
+        { "name": "_", "type": "SupportFormState" },
+        { "name": "form", "type": "FormData" }
+      ],
+      "returnType": "Promise<SupportFormState>",
+      "literalFormFields": ["description", "requestId", "subject"]
+    },
+    {
+      "name": "inviteMemberAction",
+      "source": "src/app/v/[ventureId]/(shell)/settings/team/actions.ts",
+      "line": 66,
+      "modules": ["@/modules/memberships", "@/modules/ventures"],
+      "parameters": [
+        { "name": "ventureId", "type": "string" },
+        { "name": "_prev", "type": "TeamFormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<TeamFormState>",
+      "literalFormFields": ["email", "role"]
+    },
+    {
+      "name": "revokeInvitationAction",
+      "source": "src/app/v/[ventureId]/(shell)/settings/team/actions.ts",
+      "line": 90,
+      "modules": ["@/modules/memberships", "@/modules/ventures"],
+      "parameters": [
+        { "name": "ventureId", "type": "string" },
+        { "name": "_prev", "type": "TeamFormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<TeamFormState>",
+      "literalFormFields": ["invitationId"]
+    },
+    {
+      "name": "changeRoleAction",
+      "source": "src/app/v/[ventureId]/(shell)/settings/team/actions.ts",
+      "line": 100,
+      "modules": ["@/modules/memberships", "@/modules/ventures"],
+      "parameters": [
+        { "name": "ventureId", "type": "string" },
+        { "name": "_prev", "type": "TeamFormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<TeamFormState>",
+      "literalFormFields": ["membershipId", "role", "version"]
+    },
+    {
+      "name": "changeStatusAction",
+      "source": "src/app/v/[ventureId]/(shell)/settings/team/actions.ts",
+      "line": 120,
+      "modules": ["@/modules/memberships", "@/modules/ventures"],
+      "parameters": [
+        { "name": "ventureId", "type": "string" },
+        { "name": "_prev", "type": "TeamFormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<TeamFormState>",
+      "literalFormFields": ["change", "membershipId", "version"]
+    },
+    {
+      "name": "approveRequestAction",
+      "source": "src/app/v/[ventureId]/(shell)/settings/team/actions.ts",
+      "line": 138,
+      "modules": ["@/modules/memberships", "@/modules/ventures"],
+      "parameters": [
+        { "name": "ventureId", "type": "string" },
+        { "name": "_prev", "type": "TeamFormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<TeamFormState>",
+      "literalFormFields": ["requestId", "role"]
+    },
+    {
+      "name": "rejectRequestAction",
+      "source": "src/app/v/[ventureId]/(shell)/settings/team/actions.ts",
+      "line": 151,
+      "modules": ["@/modules/memberships", "@/modules/ventures"],
+      "parameters": [
+        { "name": "ventureId", "type": "string" },
+        { "name": "_prev", "type": "TeamFormState" },
+        { "name": "data", "type": "FormData" }
+      ],
+      "returnType": "Promise<TeamFormState>",
+      "literalFormFields": ["requestId"]
+    },
+    {
+      "name": "requestAccessAction",
+      "source": "src/app/v/[ventureId]/request-access/actions.ts",
+      "line": 12,
+      "modules": ["@/modules/memberships"],
+      "parameters": [{ "name": "ventureId", "type": "string" }],
+      "returnType": "Promise<RequestAccessState>",
+      "literalFormFields": []
+    }
+  ]
+}

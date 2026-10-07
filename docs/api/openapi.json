@@ -3,7 +3,7 @@
   "info": {
     "title": "DirectorXO account APIs",
     "version": "1.0.0",
-    "description": "Support, Notifications and Billing API contracts. Existing identity and venture server-action coverage remains tracked in docs/P0_AUDIT.md."
+    "description": "Configured identity HTTP endpoints, Support, Notifications, Billing and operational health contracts. Existing Next.js Server Action signatures are inventoried separately in server-actions.json with behavioral/permission notes in SERVER_ACTIONS.md."
   },
   "servers": [{ "url": "/" }],
   "security": [{ "sessionCookie": [] }],
@@ -854,6 +854,3394 @@
           }
         }
       }
+    },
+    "/api/v1/auth/get-session": {
+      "get": {
+        "tags": ["Identity"],
+        "description": "Get the current session DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "getSession",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "session": { "$ref": "#/components/schemas/Session" },
+                    "user": { "$ref": "#/components/schemas/User" }
+                  },
+                  "required": ["session", "user"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Identity"],
+        "description": "Get the current session DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "getSessionPost",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "type": "object", "properties": {} } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "session": { "$ref": "#/components/schemas/Session" },
+                    "user": { "$ref": "#/components/schemas/User" }
+                  },
+                  "required": ["session", "user"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/sign-out": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Sign out the current user DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "signOut",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "callbackURL": {
+                    "type": "string",
+                    "description": "The URL to redirect to after provider logout"
+                  },
+                  "disableRedirect": {
+                    "type": "boolean",
+                    "description": "Return the provider logout URL without redirecting"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "State to pass to the provider logout endpoint"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "url": {
+                      "type": "string",
+                      "description": "Provider logout URL when RP-initiated logout is available"
+                    },
+                    "redirect": {
+                      "type": "boolean",
+                      "description": "Whether the client should redirect to the provider logout URL"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/sign-up/email": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Sign up a user using email and password DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "signUpWithEmailAndPassword",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "description": "The name of the user" },
+                  "email": { "type": "string", "description": "The email of the user" },
+                  "password": { "type": "string", "description": "The password of the user" },
+                  "image": { "type": "string", "description": "The profile image URL of the user" },
+                  "callbackURL": {
+                    "type": "string",
+                    "description": "The URL to use for email verification callback"
+                  },
+                  "rememberMe": {
+                    "type": "boolean",
+                    "description": "If this is false, the session will not be remembered. Default is `true`."
+                  }
+                },
+                "required": ["name", "email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully created user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "null",
+                      "description": "Session tokens are carried only by the HttpOnly cookie and stripped from browser JSON."
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The unique identifier of the user"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "The email address of the user"
+                        },
+                        "name": { "type": "string", "description": "The name of the user" },
+                        "image": {
+                          "type": "string",
+                          "format": "uri",
+                          "nullable": true,
+                          "description": "The profile image URL of the user"
+                        },
+                        "emailVerified": {
+                          "type": "boolean",
+                          "description": "Whether the email has been verified"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the user was created"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the user was last updated"
+                        }
+                      },
+                      "required": ["id", "email", "name", "emailVerified", "createdAt", "updatedAt"]
+                    }
+                  },
+                  "required": ["user"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity. User already exists or failed to create user.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/sign-in/email": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Sign in with email and password DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "signInEmail",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "description": "Email of the user" },
+                  "password": { "type": "string", "description": "Password of the user" },
+                  "callbackURL": {
+                    "type": "string",
+                    "description": "Callback URL to use as a redirect for email verification"
+                  },
+                  "rememberMe": {
+                    "type": "boolean",
+                    "description": "If this is false, the session will not be remembered. Default is `true`."
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success - Returns either session details or redirect URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Session response when idToken is provided",
+                  "properties": {
+                    "redirect": { "type": "boolean", "enum": [false] },
+                    "token": {
+                      "type": "null",
+                      "description": "Session tokens are carried only by the HttpOnly cookie and stripped from browser JSON."
+                    },
+                    "url": { "type": "string", "nullable": true },
+                    "user": { "type": "object", "$ref": "#/components/schemas/User" }
+                  },
+                  "required": ["redirect", "token", "user"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/reset-password": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Reset the password for a user DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "resetPassword",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newPassword": { "type": "string", "description": "The new password to set" },
+                  "token": { "type": "string", "description": "The token to reset the password" }
+                },
+                "required": ["newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "status": { "type": "boolean" } } }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify-email": {
+      "get": {
+        "tags": ["Identity"],
+        "description": "Verify the email of the user DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The token to verify the email",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "callbackURL",
+            "in": "query",
+            "description": "The URL to redirect to after email verification",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": { "type": "object", "$ref": "#/components/schemas/User" },
+                    "status": {
+                      "type": "boolean",
+                      "description": "Indicates if the email was verified successfully"
+                    }
+                  },
+                  "required": ["user", "status"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/send-verification-email": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Send a verification email to the user DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "sendVerificationEmail",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "The email to send the verification email to",
+                    "example": "user@example.com"
+                  },
+                  "callbackURL": {
+                    "type": "string",
+                    "description": "The URL to use for email verification callback",
+                    "example": "https://example.com/callback",
+                    "nullable": true
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Indicates if the email was sent successfully",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Verification email isn't enabled"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/change-password": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Change the password of the user DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "changePassword",
+        "security": [{ "sessionCookie": [] }],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newPassword": { "type": "string", "description": "The new password to set" },
+                  "currentPassword": {
+                    "type": "string",
+                    "description": "The current password is required"
+                  },
+                  "revokeOtherSessions": {
+                    "type": "boolean",
+                    "description": "Must be a boolean value"
+                  }
+                },
+                "required": ["newPassword", "currentPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password successfully changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "null",
+                      "description": "Session tokens are carried only by the HttpOnly cookie and stripped from browser JSON."
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The unique identifier of the user"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "The email address of the user"
+                        },
+                        "name": { "type": "string", "description": "The name of the user" },
+                        "image": {
+                          "type": "string",
+                          "format": "uri",
+                          "nullable": true,
+                          "description": "The profile image URL of the user"
+                        },
+                        "emailVerified": {
+                          "type": "boolean",
+                          "description": "Whether the email has been verified"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the user was created"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the user was last updated"
+                        }
+                      },
+                      "required": ["id", "email", "name", "emailVerified", "createdAt", "updatedAt"]
+                    }
+                  },
+                  "required": ["user"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/update-user": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Update the current user DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "updateUser",
+        "security": [{ "sessionCookie": [] }],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "description": "The name of the user" },
+                  "image": {
+                    "type": "string",
+                    "description": "The image of the user",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": { "type": "object", "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/request-password-reset": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Send a password reset email to the user DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "requestPasswordReset",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "The email address of the user to send a password reset email to"
+                  },
+                  "redirectTo": {
+                    "type": "string",
+                    "description": "The URL to redirect the user to reset their password. If the token isn't valid or expired, it'll be redirected with a query parameter `?error=INVALID_TOKEN`. If the token is valid, it'll be redirected with a query parameter `?token=VALID_TOKEN"
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "status": { "type": "boolean" }, "message": { "type": "string" } }
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/list-sessions": {
+      "get": {
+        "tags": ["Identity"],
+        "description": "List all active sessions for the user DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "operationId": "listUserSessions",
+        "security": [{ "sessionCookie": [] }],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Session" } }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/revoke-session": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Revoke a single session DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [{ "sessionCookie": [] }],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string", "description": "The token to revoke" }
+                },
+                "required": ["token"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Indicates if the session was revoked successfully"
+                    }
+                  },
+                  "required": ["status"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/revoke-sessions": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Revoke all sessions for the user DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [{ "sessionCookie": [] }],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "type": "object", "properties": {} } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Indicates if all sessions were revoked successfully"
+                    }
+                  },
+                  "required": ["status"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/revoke-other-sessions": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Revoke all other sessions for the user except the current one DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [{ "sessionCookie": [] }],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "type": "object", "properties": {} } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Indicates if all other sessions were revoked successfully"
+                    }
+                  },
+                  "required": ["status"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/ok": {
+      "get": {
+        "tags": ["Identity"],
+        "description": "Check if the API is working DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "API is working",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean", "description": "Indicates if the API is working" }
+                  },
+                  "required": ["ok"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/error": {
+      "get": {
+        "tags": ["Identity"],
+        "description": "Displays an error page DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/html": {
+                "schema": { "type": "string", "description": "The HTML content of the error page" }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/two-factor/verify-totp": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Verify two factor TOTP DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [{ "sessionCookie": [] }, { "mfaPendingCookie": [] }],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "The otp code to verify. Eg: \"012345\""
+                  },
+                  "trustDevice": {
+                    "type": "boolean",
+                    "description": "If true, the device will be trusted for 30 days. It'll be refreshed on every sign in request within this time. Eg: true"
+                  }
+                },
+                "required": ["code"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "status": { "type": "boolean" } } }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/two-factor/verify-backup-code": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Verify a backup code for two-factor authentication DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [{ "sessionCookie": [] }, { "mfaPendingCookie": [] }],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "A backup code to verify. Eg: \"123456\""
+                  },
+                  "disableSession": {
+                    "type": "boolean",
+                    "description": "If true, the session cookie will not be set."
+                  },
+                  "trustDevice": {
+                    "type": "boolean",
+                    "description": "If true, the device will be trusted for 30 days. It'll be refreshed on every sign in request within this time. Eg: true"
+                  }
+                },
+                "required": ["code"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Backup code verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string", "description": "Unique identifier of the user" },
+                        "email": {
+                          "type": "string",
+                          "format": "email",
+                          "nullable": true,
+                          "description": "User's email address"
+                        },
+                        "emailVerified": {
+                          "type": "boolean",
+                          "nullable": true,
+                          "description": "Whether the email is verified"
+                        },
+                        "name": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "User's name"
+                        },
+                        "image": {
+                          "type": "string",
+                          "format": "uri",
+                          "nullable": true,
+                          "description": "User's profile image URL"
+                        },
+                        "twoFactorEnabled": {
+                          "type": "boolean",
+                          "description": "Whether two-factor authentication is enabled for the user"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Timestamp when the user was created"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Timestamp when the user was last updated"
+                        }
+                      },
+                      "required": ["id", "twoFactorEnabled", "createdAt", "updatedAt"],
+                      "description": "The authenticated user object with two-factor details"
+                    },
+                    "session": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "null",
+                          "description": "Session tokens are carried only by the HttpOnly cookie and stripped from browser JSON."
+                        },
+                        "userId": {
+                          "type": "string",
+                          "description": "ID of the user associated with the session"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Timestamp when the session was created"
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Timestamp when the session expires"
+                        }
+                      },
+                      "required": ["token", "userId", "createdAt", "expiresAt"],
+                      "description": "The current session object, included unless disableSession is true"
+                    }
+                  },
+                  "required": ["user", "session"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/two-factor/generate-backup-codes": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Generate new backup codes for two-factor authentication DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [{ "sessionCookie": [] }],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": { "type": "string", "description": "The users password." }
+                },
+                "required": ["password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Backup codes generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Indicates if the backup codes were generated successfully",
+                      "enum": [true]
+                    },
+                    "backupCodes": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Array of generated backup codes in plain text"
+                    }
+                  },
+                  "required": ["status", "backupCodes"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/two-factor/enable": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Enable two factor authentication. Pass method 'totp' (default) to set up an authenticator app (returns TOTP URI and backup codes), or 'otp' to enable email/SMS-based codes immediately. DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [{ "sessionCookie": [] }],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": { "type": "string", "description": "User password" },
+                  "method": { "type": "string", "enum": ["otp", "totp"] },
+                  "issuer": { "type": "string", "description": "Custom issuer for the TOTP URI" }
+                },
+                "required": ["password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "enum": ["otp", "totp"],
+                      "description": "The 2FA method that was enabled."
+                    },
+                    "totpURI": {
+                      "type": "string",
+                      "description": "TOTP URI for authenticator app setup. Only present when method is 'totp'."
+                    },
+                    "backupCodes": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Recovery backup codes. Only present when method is 'totp'."
+                    }
+                  },
+                  "required": ["method"]
+                }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/two-factor/disable": {
+      "post": {
+        "tags": ["Identity"],
+        "description": "Use this endpoint to disable two factor authentication. DirectorXO: exact trusted Origin/CSRF enforced on mutations; configured per-IP/account limits; disabled social/refresh-token/email-OTP/account-deletion paths are omitted. Error bodies use Better Auth code/message; x-correlation-id is returned in headers. Session tokens are null in browser JSON. MFA trust-device/remember-me controls are not offered by the P0 UI.",
+        "security": [{ "sessionCookie": [] }],
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Must match APP_URL's trusted origin."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "password": { "type": "string", "description": "User password" } },
+                "required": ["password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "status": { "type": "boolean" } } }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Bad Request. Usually due to missing parameters, or invalid parameters.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"]
+                }
+              }
+            },
+            "description": "Unauthorized. Due to missing or invalid authentication.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Forbidden. You do not have permission to access this resource or to perform this action.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Not Found. The requested resource was not found.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Too Many Requests. You have exceeded the rate limit. Try again later.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "message": { "type": "string" } } }
+              }
+            },
+            "description": "Internal Server Error. This is a problem with the server that you cannot fix.",
+            "headers": {
+              "x-correlation-id": {
+                "description": "Incident/request identifier; no session token",
+                "schema": { "type": "string", "minLength": 8, "maxLength": 128 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health/live": {
+      "get": {
+        "summary": "Process liveness",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Process is serving requests; no dependency checks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": { "status": { "type": "string", "const": "ok" } },
+                  "required": ["status"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health/ready": {
+      "get": {
+        "summary": "PostgreSQL and Redis readiness",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Dependency readiness; no identifiers or credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "enum": ["ok", "unavailable"] },
+                    "checks": {
+                      "type": "object",
+                      "properties": {
+                        "database": { "type": "string", "enum": ["ok", "error"] },
+                        "redis": { "type": "string", "enum": ["ok", "error"] }
+                      },
+                      "required": ["database", "redis"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["status", "checks"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency readiness; no identifiers or credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "enum": ["ok", "unavailable"] },
+                    "checks": {
+                      "type": "object",
+                      "properties": {
+                        "database": { "type": "string", "enum": ["ok", "error"] },
+                        "redis": { "type": "string", "enum": ["ok", "error"] }
+                      },
+                      "required": ["database", "redis"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["status", "checks"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -863,6 +4251,12 @@
         "in": "cookie",
         "name": "better-auth.session_token",
         "description": "Opaque database-backed Better Auth session; secure deployments use the __Secure- cookie prefix."
+      },
+      "mfaPendingCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "dxo.two_factor",
+        "description": "Signed pending MFA challenge; production uses the __Secure- prefix."
       }
     },
     "schemas": {
@@ -887,6 +4281,81 @@
         },
         "required": ["error"],
         "additionalProperties": false
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "readOnly": true },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "emailVerified": { "type": "boolean", "default": false, "readOnly": true },
+          "image": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "twoFactorEnabled": { "type": "boolean", "default": false, "readOnly": true }
+        },
+        "required": ["id", "name", "email", "emailVerified", "createdAt", "updatedAt"]
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "readOnly": true },
+          "expiresAt": { "type": "string", "format": "date-time" },
+          "token": {
+            "type": "null",
+            "description": "Session tokens are carried only by the HttpOnly cookie and stripped from browser JSON."
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "ipAddress": { "type": "string" },
+          "userAgent": { "type": "string" },
+          "userId": { "type": "string" }
+        },
+        "required": ["id", "expiresAt", "token", "createdAt", "updatedAt", "userId"]
+      },
+      "Account": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "readOnly": true },
+          "accountId": { "type": "string" },
+          "providerId": { "type": "string" },
+          "userId": { "type": "string" },
+          "accessToken": { "type": "string" },
+          "refreshToken": { "type": "string" },
+          "idToken": { "type": "string" },
+          "accessTokenExpiresAt": { "type": "string", "format": "date-time" },
+          "refreshTokenExpiresAt": { "type": "string", "format": "date-time" },
+          "scope": { "type": "string" },
+          "password": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "accountId", "providerId", "userId", "createdAt", "updatedAt"]
+      },
+      "Verification": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "readOnly": true },
+          "identifier": { "type": "string" },
+          "value": { "type": "string" },
+          "expiresAt": { "type": "string", "format": "date-time" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "identifier", "value", "expiresAt", "createdAt", "updatedAt"]
+      },
+      "TwoFactor": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "readOnly": true },
+          "secret": { "type": "string" },
+          "backupCodes": { "type": "string" },
+          "userId": { "type": "string" },
+          "verified": { "type": "boolean", "default": true, "readOnly": true },
+          "failedVerificationCount": { "type": "number", "default": 0, "readOnly": true },
+          "lockedUntil": { "type": "string", "format": "date-time", "readOnly": true }
+        },
+        "required": ["id"]
       }
     }
   }

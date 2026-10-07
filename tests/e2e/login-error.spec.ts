@@ -8,7 +8,7 @@ test("canonical login error allows a real retry and retains a safe return path",
 }) => {
   const user = await createVerifiedUser(page, "error-retry");
   await page.goto("/auth/login/error?next=%2Fsettings%2Fprofile-security");
-  await expect(page.getByRole("alert")).toContainText("We couldn’t sign you in");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("We couldn’t sign you in");
   await expectNoA11yViolations(page);
   await page.getByLabel("Work email").fill(user.email);
   await page.getByLabel("Password", { exact: true }).fill(user.password);
