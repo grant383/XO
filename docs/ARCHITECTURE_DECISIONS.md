@@ -57,3 +57,6 @@ Status: Accepted
 | [0017](adr/0017-account-support.md) | Account support requests | Accepted |
 | [0018](adr/0018-account-notifications.md) | Account notifications and venture activity | Accepted |
 | [0019](adr/0019-subscription-foundation.md) | Local subscription billing foundation | Accepted; provider verification open |
+| [0020](adr/0020-billing-hosted-portal.md) | Hosted billing portal for P0 payment methods and invoices | Accepted |
+| [0021](adr/0021-p0-server-action-contracts.md) | Server-action contracts for P0 venture, onboarding and membership APIs | Accepted |
+| [0022](adr/0022-technical-specifications-in-docs.md) | Technical specifications live in version-controlled docs | Accepted |

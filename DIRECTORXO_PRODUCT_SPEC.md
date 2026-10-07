@@ -69,7 +69,7 @@ DirectorXO
 - Account-level settings use `/settings/*`.
 - Venture integrations use `/v/[ventureId]/settings/integrations`.
 - Error routes use `/errors/*`.
-- Technical documentation routes use `/internal/specs/*` and must not be exposed as customer navigation.
+- Technical specifications live in version-controlled repository documents, not application routes; no `/internal/specs/*` routes are built (ADR-0022).
 - IDs in URLs are opaque UUIDs.
 - The active venture is explicit in the route and authorization context.
 - Legacy routes redirect to canonical replacements where safe.
@@ -198,14 +198,16 @@ Matrix notation:
 
 ## 9. Technical Specification Frame Matrix
 
-| Figma node | Technical specification | Internal route | Scope | Phase |
+Technical specifications are maintained as version-controlled repository documents, not application routes (ADR-0022). The Figma frames remain design references.
+
+| Figma node | Technical specification | Repository source | Scope | Phase |
 |---|---|---|---|---|
-| 19:4 | System architecture | `/internal/specs/system-architecture` | Runtime topology, modules, boundaries, request flow | P0 |
-| 19:205 | Intelligence architecture | `/internal/specs/intelligence-architecture` | Deterministic forecasts, rules, recommendations, decisions, later ML boundary | P2 |
-| 19:614 | Data model | `/internal/specs/data-model` | Entities, tenancy, RLS, indexes, retention | P0 |
-| 19:1684 | API integrations | `/internal/specs/api-integrations` | Provider adapters, OAuth, webhooks, synchronization | P1 |
-| 19:2078 | Infrastructure security | `/internal/specs/infrastructure-security` | Identity, secrets, encryption, RLS, logging, backup, recovery | P0 |
-| 19:2323 | Development roadmap | `/internal/specs/development-roadmap` | P0–P4 sequencing, dependencies, release gates | P0 |
+| 19:4 | System architecture | §18, ADR-0006, ADR-0010, ADR-0023 | Runtime topology, modules, boundaries, request flow | P0 |
+| 19:205 | Intelligence architecture | §13 (until P2) | Deterministic forecasts, rules, recommendations, decisions, later ML boundary | P2 |
+| 19:614 | Data model | §16, `db/migrations/`, ADR-0007 | Entities, tenancy, RLS, indexes, retention | P0 |
+| 19:1684 | API integrations | §17, `docs/api/` | Provider adapters, OAuth, webhooks, synchronization | P1 |
+| 19:2078 | Infrastructure security | ADR-0007, ADR-0009, ADR-0016, ADR-0023, `docs/runbooks/` | Identity, secrets, encryption, RLS, logging, backup, recovery | P0 |
+| 19:2323 | Development roadmap | §19, `DIRECTORXO_IMPLEMENTATION_MATRIX.md` | P0–P4 sequencing, dependencies, release gates | P0 |
 
 ## 10. Legacy and Deprecated Decisions
 
@@ -244,6 +246,8 @@ The AI Copilot screen name does not authorize ML forecasting in Release 1. In P2
 - Sessions are database-backed, opaque and revocable (ADR-0009). There are no refresh tokens and no refresh-token API. An expired or revoked session leads to `/auth/session-expired` and re-authentication.
 - Access requests are not readable by the requester in P0: there is no `GET /api/v1/access-requests/[id]`, because a requester-visible status would disclose whether a venture exists (ADR-0013).
 - Notifications and Activity, and Help and Support, are P0 (§8). £1M Growth Command and AI Copilot are Viewer+ (§8).
+- In P0, the checked-in Server Action contracts (`docs/api/server-actions.json`, CI-checked) are the API contract for the Ventures, Onboarding and Memberships groups; versioned REST endpoints are added when a non-browser consumer needs them (ADR-0021).
+- In P0, payment methods, invoices, plan changes and cancellation are handled in the Stripe-hosted billing portal; `/settings/billing` shows the provider-confirmed subscription mirror and entitlements (ADR-0020).
 - Where a label in the Figma Master Implementation Matrix (node 54:29298) differs from this specification, this specification governs. The difference is tracked as a design-sync item in `DIRECTORXO_IMPLEMENTATION_MATRIX.md`, not as an implementation blocker.
 
 ## 12. Missing-Screen Backlog
