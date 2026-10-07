@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { z } from "zod";
+import { billingMinorDigits } from "./money";
 
 export const STRIPE_API_VERSION = "2025-02-24.acacia";
 const stripeId = (prefix: string) => z.string().regex(new RegExp(`^${prefix}_[A-Za-z0-9_]+$`));
@@ -63,6 +64,44 @@ export class BillingUnavailableError extends Error {
     super("Subscription billing is not configured or is temporarily unavailable");
   }
 }
+// Stripe charge-unit exceptions: https://docs.stripe.com/currencies.
+// Keep the domain mirror in ISO currency minor units, which the UI also uses.
+const stripeZeroDecimals = new Set([
+  "BIF",
+  "CLP",
+  "DJF",
+  "GNF",
+  "JPY",
+  "KMF",
+  "KRW",
+  "MGA",
+  "PYG",
+  "RWF",
+  "UGX",
+  "VND",
+  "VUV",
+  "XAF",
+  "XOF",
+  "XPF",
+]);
+export function normalizeStripeMinorAmount(amount: number, currency: string) {
+  const iso = currency.toUpperCase();
+  if (!Number.isSafeInteger(amount) || amount < 0) throw new BillingUnavailableError();
+  const apiDigits = ["ISK", "UGX"].includes(iso) ? 2 : stripeZeroDecimals.has(iso) ? 0 : 2;
+  let isoDigits: number;
+  try {
+    isoDigits = billingMinorDigits(iso);
+  } catch {
+    throw new BillingUnavailableError();
+  }
+  const difference = isoDigits - apiDigits;
+  const divisor = 10 ** -difference;
+  if (difference < 0 && amount % divisor !== 0) throw new BillingUnavailableError();
+  const normalized = difference < 0 ? amount / divisor : amount * 10 ** difference;
+  if (!Number.isSafeInteger(normalized)) throw new BillingUnavailableError();
+  return normalized;
+}
+
 export function stripeRedirect(url: string) {
   const parsed = new URL(url);
   if (
@@ -150,7 +189,7 @@ export class StripeBillingProvider implements BillingProvider {
       customerId: parsed.customer,
       status: parsed.status,
       priceId: p.id,
-      amountMinor: p.unit_amount,
+      amountMinor: normalizeStripeMinorAmount(p.unit_amount, p.currency),
       currency: p.currency.toUpperCase(),
       interval: p.recurring.interval,
       intervalCount: p.recurring.interval_count,

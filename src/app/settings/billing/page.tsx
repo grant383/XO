@@ -1,7 +1,12 @@
 import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
 import { z } from "zod";
-import { BillingPermissionError, getBillingOverview, listBillingAccounts } from "@/modules/billing";
+import {
+  formatBillingAmount,
+  BillingPermissionError,
+  getBillingOverview,
+  listBillingAccounts,
+} from "@/modules/billing";
 import { Button, EmptyState, SelectField, StatusBadge } from "@/ui";
 import { requireActor } from "../../actor";
 import { ForbiddenState } from "../../_chrome/error-states";
@@ -105,17 +110,7 @@ export default async function BillingPage({
               {subscription ? (
                 <>
                   <p className={styles.price}>
-                    {new Intl.NumberFormat("en-GB", {
-                      style: "currency",
-                      currency: subscription.currency,
-                    }).format(
-                      subscription.amountMinor /
-                        10 **
-                          (new Intl.NumberFormat("en-GB", {
-                            style: "currency",
-                            currency: subscription.currency,
-                          }).resolvedOptions().maximumFractionDigits ?? 2),
-                    )}
+                    {formatBillingAmount(subscription.amountMinor, subscription.currency)}
                     <span>
                       {" "}
                       / {subscription.intervalCount} {subscription.interval}
@@ -136,7 +131,7 @@ export default async function BillingPage({
                   </dl>
                 </>
               ) : (
-                <p>A confirmed recurring price is required before checkout can be enabled.</p>
+                <p>No subscription is attached to this billing account.</p>
               )}
             </section>
             <section className={styles.card}>

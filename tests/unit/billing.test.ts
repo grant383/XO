@@ -98,3 +98,71 @@ describe("Stripe adapter contract", () => {
     );
   });
 });
+
+import { normalizeStripeMinorAmount } from "@/modules/billing/provider";
+describe("Stripe amounts at the ISO minor-unit boundary", () => {
+  it.each([
+    [2500, "GBP", 2500],
+    [500, "JPY", 500],
+    [500, "ISK", 5],
+    [500, "UGX", 5],
+    [500, "MGA", 50000],
+    [1045, "HUF", 1045],
+  ])("normalizes %i %s provider units to %i ISO minor units", (amount, currency, expected) => {
+    expect(normalizeStripeMinorAmount(amount, currency)).toBe(expected);
+  });
+  it("rejects fractional zero-decimal charges, unknown currencies and unsafe amounts", () => {
+    for (const [amount, currency] of [
+      [501, "ISK"],
+      [501, "UGX"],
+      [2500, "ZZZ"],
+      [-1, "GBP"],
+      [Number.MAX_SAFE_INTEGER, "MGA"],
+    ] as const)
+      expect(() => normalizeStripeMinorAmount(amount, currency)).toThrow();
+  });
+});
+
+import { formatBillingAmount } from "@/modules/billing/money";
+it("renders ISO minor amounts without rounding away HUF or MGA fractional precision", () => {
+  expect(formatBillingAmount(1045, "HUF")).toContain("10.45");
+  expect(formatBillingAmount(50000, "MGA")).toContain("500.00");
+  expect(formatBillingAmount(500, "JPY")).not.toContain(".00");
+});
+
+it("normalizes a provider subscription snapshot before returning its data contract", async () => {
+  const client = new Stripe("sk_test_synthetic_fixture", {
+    apiVersion: STRIPE_API_VERSION as Stripe.LatestApiVersion,
+    maxNetworkRetries: 0,
+    httpClient: Stripe.createFetchHttpClient(async () =>
+      Response.json({
+        id: "sub_fixture",
+        customer: "cus_fixture",
+        status: "active",
+        current_period_end: 1800000000,
+        cancel_at_period_end: false,
+        items: {
+          data: [
+            {
+              price: {
+                id: "price_fixture",
+                unit_amount: 500,
+                currency: "isk",
+                recurring: { interval: "month", interval_count: 1 },
+              },
+            },
+          ],
+        },
+      }),
+    ),
+  });
+  const provider = new StripeBillingProvider({
+    secretKey: "sk_test_synthetic_fixture",
+    priceId: "price_fixture",
+    appUrl: "https://directorxo.test",
+    client,
+  });
+  const result = await provider.retrieveSubscription("sub_fixture");
+  expect(result.amountMinor).toBe(5);
+  expect(result.currency).toBe("ISK");
+});
