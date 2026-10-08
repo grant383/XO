@@ -41,7 +41,7 @@ const sections = [
 ];
 
 /** Operate items gated by role rather than by shipping status. */
-const roleGated = new Set(["Operations", "Growth"]);
+const roleGated = new Set(["Operations", "Growth", "Technology"]);
 
 /**
  * Node 8:651 has its own dense navigation. An item links only when the server-built nav
@@ -68,6 +68,7 @@ export function CommandShell({
   const operateGrowth = pathname.endsWith("/operate/growth");
   const finance = pathname.endsWith("/operate/finance");
   const operations = pathname.endsWith("/operate/operations");
+  const technology = pathname.endsWith("/operate/technology");
 
   // Close the mobile menu after navigation (including a venture switch).
   useEffect(() => {
@@ -180,15 +181,17 @@ export function CommandShell({
             <span>Operate</span>
             <span>/</span>
             <span>
-              {operateGrowth
-                ? "Growth"
-                : operations
-                  ? "Operations"
-                  : finance
-                    ? "Finance"
-                    : growth
-                      ? "£1M Growth Command"
-                      : "Command"}
+              {technology
+                ? "Technology"
+                : operateGrowth
+                  ? "Growth"
+                  : operations
+                    ? "Operations"
+                    : finance
+                      ? "Finance"
+                      : growth
+                        ? "£1M Growth Command"
+                        : "Command"}
             </span>
           </p>
           <div className={styles.meta}>
@@ -197,6 +200,11 @@ export function CommandShell({
                 <span className={styles.period}>
                   Period: August 2026{" "}
                   <img src="/ui/finance/chevron.svg" width="10" height="10" alt="" />
+                </span>
+              ) : technology ? (
+                <span className={styles.systemStatus}>
+                  <img src="/ui/command/success.svg" width="6" height="6" alt="" />
+                  Sample status: All systems operational
                 </span>
               ) : operateGrowth ? (
                 <span className={styles.growthRate}>Sample growth rate: +12% MoM</span>

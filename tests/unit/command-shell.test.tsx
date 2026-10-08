@@ -68,18 +68,18 @@ describe("CommandShell", () => {
     const viewer = links(render([operate(), system(false)])).map((l) => l.label);
     expect(viewer).not.toContain("Operations");
     expect(viewer).not.toContain("Growth");
+    expect(viewer).not.toContain("Technology");
     expect(viewer).not.toContain("Team &amp; permissions");
     expect(viewer).toContain("Profile &amp; Security");
 
-    const owner = links(render([operate(["Operations", "Growth"]), system(true)])).map(
-      (l) => l.label,
-    );
+    const owner = links(
+      render([operate(["Operations", "Growth", "Technology"]), system(true)]),
+    ).map((l) => l.label);
     expect(owner).toEqual(
-      expect.arrayContaining(["Operations", "Growth", "Team &amp; permissions"]),
+      expect.arrayContaining(["Operations", "Growth", "Technology", "Team &amp; permissions"]),
     );
     // Unshipped Figma modules stay inert.
     expect(owner).not.toContain("Idea Lab");
-    expect(owner).not.toContain("Technology");
   });
 
   it("does not link Command destinations the role was not granted", () => {
@@ -96,20 +96,22 @@ describe("CommandShell", () => {
     ["/v/v1/operate/finance", "Finance"],
     ["/v/v1/operate/operations", "Operations"],
     ["/v/v1/operate/growth", "Growth"],
+    ["/v/v1/operate/technology", "Technology"],
   ])("marks only the current route on %s", (path, label) => {
     pathname = path;
-    const current = links(render([operate(["Operations", "Growth"]), system(true)])).filter(
-      (l) => l.current,
-    );
+    const current = links(
+      render([operate(["Operations", "Growth", "Technology"]), system(true)]),
+    ).filter((l) => l.current);
     expect(current.map((l) => l.label)).toEqual([label]);
   });
 
   it("offers the same authorised destinations in the mobile menu", () => {
-    const html = render([operate(["Operations", "Growth"]), system(true)]);
+    const html = render([operate(["Operations", "Growth", "Technology"]), system(true)]);
     const menu = html.slice(html.indexOf("<dialog"), html.indexOf("</dialog>"));
     for (const href of [
       "/v/v1/command",
       "/v/v1/operate/growth",
+      "/v/v1/operate/technology",
       "/v/v1/settings/team",
       "/settings/profile-security",
       "/v/v2/command",

@@ -277,6 +277,19 @@
   font-weight: 600;
 }
 
+.systemStatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border: 1px solid #10b981;
+  border-radius: 4px;
+  background: #10b98114;
+  color: #10b981;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 /* Venture switcher (shared component) sized to the 220px sidebar. */
 .venture {
   padding: 0 16px 12px;

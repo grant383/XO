@@ -47,6 +47,13 @@ function navigationFor(access: VentureAccess): ShellNavSection[] {
   if (can(access.role, "growth:view")) {
     sections[0]?.items.push({ href: `${base}/operate/growth`, label: "Growth", exact: true });
   }
+  if (can(access.role, "technology:view")) {
+    sections[0]?.items.push({
+      href: `${base}/operate/technology`,
+      label: "Technology",
+      exact: true,
+    });
+  }
   // Profile & Security is account-level (/settings/*), open to every signed-in user.
   const system = [{ href: "/settings/profile-security", label: "Profile & Security" }];
   if (can(access.role, "team:view")) {

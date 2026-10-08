@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="120" height="21.3416" viewBox="0 0 120 21.3416" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="sparkline-container">
+<line id="Line" x1="0.335468" y1="0.670791" x2="20.334" y2="10.6722" stroke="#10B981" stroke-width="1.5"/>
+<line id="Line_2" x1="20.1471" y1="10.6061" x2="40.1509" y2="14.6069" stroke="#10B981" stroke-width="1.5"/>
+<line id="Line_3" x1="40.1819" y1="14.614" x2="60.186" y2="19.6164" stroke="#10B981" stroke-width="1.5"/>
+<line id="Line_4" x1="59.9254" y1="19.5953" x2="79.9257" y2="17.5955" stroke="#10B981" stroke-width="1.5"/>
+<line id="Line_5" x1="80.1112" y1="17.5999" x2="100.108" y2="20.5991" stroke="#10B981" stroke-width="1.5"/>
+<line id="Line_6" x1="99.9626" y1="20.5925" x2="119.958" y2="19.5936" stroke="#10B981" stroke-width="1.5"/>
+</g>
+</svg>

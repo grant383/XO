@@ -46,6 +46,8 @@ export const CAPABILITIES = [
   "operations:view",
   /** Operate Growth reference screen (spec §8: Operator+). */
   "growth:view",
+  /** Operate Technology reference screen (spec §8: Operator+). */
+  "technology:view",
 ] as const;
 export type Capability = (typeof CAPABILITIES)[number];
 
@@ -73,6 +75,7 @@ const GRANTS: Record<Capability, readonly VentureRole[]> = {
   "command:manage_tasks": OPERATOR_PLUS,
   "operations:view": OPERATOR_PLUS,
   "growth:view": OPERATOR_PLUS,
+  "technology:view": OPERATOR_PLUS,
 };
 
 export function can(role: VentureRole | null | undefined, capability: Capability): boolean {
