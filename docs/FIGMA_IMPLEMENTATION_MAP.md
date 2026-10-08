@@ -79,7 +79,7 @@ Do **not** treat exported/generated Figma code as the application architecture. 
 | `14:740` | Quoting and Invoicing | `/v/[ventureId]/operate/billing` | Operate | Operator+ | P1 | NOT STARTED |
 | `14:1060` | Forecast vs Actual | `/v/[ventureId]/operate/forecast-vs-actual` | Operate | Viewer+ | P1 | NOT STARTED |
 | `14:1766` | AI Copilot | `/v/[ventureId]/intelligence/copilot` | Intelligence | Viewer+ | P2 | NOT STARTED |
-| `8:1303` | Portfolio Command | `/portfolio/command` | Portfolio | Portfolio Viewer+ | P3 | NOT STARTED |
+| `8:1303` | Portfolio Command | `/portfolio/command` | Portfolio | Portfolio Viewer+ | P3 | NOT STARTED — deferred to P3 on the full portfolio membership model; no interim venture-access workaround (decision 8 Oct 2026) |
 | `10:3942` | Venture Pipeline | `/portfolio/ventures` | Portfolio | Portfolio Manager+ | P3 | NOT STARTED |
 | `10:4165` | Capital Allocation | `/portfolio/capital-allocation` | Portfolio | Portfolio Manager+ | P3 | NOT STARTED |
 | `33:3534` | Profile and Security | `/settings/profile-security` | System | Authenticated | P0 | COMPLETE |
