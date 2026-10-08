@@ -1,12 +1,15 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Brand, Icon } from "@/ui";
 import { AccountMenu } from "./account-menu";
-import type { ShellUser, ShellVenture } from "./types";
 import styles from "./command-shell.module.css";
+import { isActive } from "./nav-link";
+import type { ShellNavItem, ShellNavSection, ShellUser, ShellVenture } from "./types";
+import { VentureSwitcher } from "./venture-switcher";
 
 const sections = [
   { label: "Portfolio", items: ["Portfolio Command", "Venture Pipeline", "Capital"] },
@@ -37,14 +40,26 @@ const sections = [
   },
 ];
 
-/** Node 8:651 has its own dense navigation; unshipped destinations remain truthful. */
+/** Operate items gated by role rather than by shipping status. */
+const roleGated = new Set(["Operations", "Growth"]);
+
+/**
+ * Node 8:651 has its own dense navigation. An item links only when the server-built nav
+ * model (role-checked in the venture layout) contains it; unshipped or unauthorised
+ * destinations stay visible but inert. Sections the Figma frame does not draw (System:
+ * Profile & Security, Team & permissions) follow it in the same style.
+ */
 export function CommandShell({
   venture,
+  ventures,
   user,
+  nav,
   children,
 }: {
   venture: ShellVenture;
+  ventures: ShellVenture[];
   user: ShellUser;
+  nav: ShellNavSection[];
   children: ReactNode;
 }) {
   const menu = useRef<HTMLDialogElement>(null);
@@ -53,68 +68,68 @@ export function CommandShell({
   const operateGrowth = pathname.endsWith("/operate/growth");
   const finance = pathname.endsWith("/operate/finance");
   const operations = pathname.endsWith("/operate/operations");
-  const canOpenOperations = venture.operationsAllowed === true;
+
+  // Close the mobile menu after navigation (including a venture switch).
+  useEffect(() => {
+    if (menu.current?.open) menu.current.close();
+  }, [pathname]);
+
+  const authorised = (section: string, label: string) =>
+    nav.find((s) => s.label === section)?.items.find((i) => i.label === label);
+  const link = (item: ShellNavItem) => (
+    <Link
+      href={item.href as Route}
+      aria-current={isActive(pathname, item) ? "page" : undefined}
+      onClick={() => menu.current?.close()}
+    >
+      {item.label}
+    </Link>
+  );
+  const figmaLabels = new Set(sections.map((s) => s.label));
+  const extra = nav.filter((s) => !figmaLabels.has(s.label));
   const navigation = (
     <>
       <div className={styles.brand}>
         <Brand compact />
+      </div>
+      <div className={styles.venture}>
+        <VentureSwitcher current={venture} ventures={ventures} />
       </div>
       <div className={styles.navigation}>
         {sections.map((section) => (
           <nav key={section.label} aria-label={section.label}>
             <p className={styles.sectionLabel}>{section.label}</p>
             <ul>
+              {section.items.map((label) => {
+                const item = authorised(section.label, label);
+                return (
+                  <li key={label}>
+                    {item ? (
+                      link(item)
+                    ) : (
+                      <span
+                        aria-disabled="true"
+                        title={
+                          section.label === "Operate" && roleGated.has(label)
+                            ? "Operator access required"
+                            : "Module not yet available"
+                        }
+                      >
+                        {label}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        ))}
+        {extra.map((section) => (
+          <nav key={section.label} aria-label={section.label}>
+            <p className={styles.sectionLabel}>{section.label}</p>
+            <ul>
               {section.items.map((item) => (
-                <li key={item}>
-                  {item === "Command" ||
-                  item === "£1M Growth Command" ||
-                  (item === "Growth" && venture.growthAllowed === true) ||
-                  item === "Finance" ||
-                  (section.label === "Operate" && item === "Operations" && canOpenOperations) ? (
-                    <Link
-                      href={
-                        item === "£1M Growth Command"
-                          ? `/v/${venture.id}/command/growth-1m`
-                          : item === "Command"
-                            ? `/v/${venture.id}/command`
-                            : item === "Operations"
-                              ? `/v/${venture.id}/operate/operations`
-                              : item === "Finance"
-                                ? `/v/${venture.id}/operate/finance`
-                                : `/v/${venture.id}/operate/growth`
-                      }
-                      aria-current={
-                        (
-                          item === "£1M Growth Command"
-                            ? growth
-                            : item === "Operations"
-                              ? operations
-                              : item === "Finance"
-                                ? finance
-                                : item === "Growth"
-                                  ? operateGrowth
-                                  : !growth && !finance && !operations && !operateGrowth
-                        )
-                          ? "page"
-                          : undefined
-                      }
-                      onClick={() => menu.current?.close()}
-                    >
-                      {item}
-                    </Link>
-                  ) : (
-                    <span
-                      aria-disabled="true"
-                      title={
-                        section.label === "Operate" && (item === "Operations" || item === "Growth")
-                          ? "Operator access required"
-                          : "Module not yet available"
-                      }
-                    >
-                      {item}
-                    </span>
-                  )}
-                </li>
+                <li key={item.href}>{link(item)}</li>
               ))}
             </ul>
           </nav>

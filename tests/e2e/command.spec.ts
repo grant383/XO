@@ -38,7 +38,7 @@ test("owner sees the Command Centre quadrants in the Operate navigation", async 
 
   if (test.info().project.name === "desktop") {
     const nav = page.getByRole("navigation", { name: "Operate" });
-    await expect(nav.getByRole("link", { name: "Command" })).toHaveAttribute(
+    await expect(nav.getByRole("link", { name: "Command", exact: true })).toHaveAttribute(
       "aria-current",
       "page",
     );

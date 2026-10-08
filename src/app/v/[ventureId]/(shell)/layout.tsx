@@ -84,8 +84,6 @@ export default async function VentureShellLayout({ children, params }: Props) {
         id: access.id,
         name: access.name,
         roleLabel: ROLE_LABELS[access.role],
-        operationsAllowed: can(access.role, "operations:view"),
-        growthAllowed: can(access.role, "growth:view"),
       }}
       ventures={ventures.map((v) => ({ id: v.id, name: v.name, roleLabel: ROLE_LABELS[v.role] }))}
       user={{ name: actor.name, email: actor.email }}

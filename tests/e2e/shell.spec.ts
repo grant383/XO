@@ -22,12 +22,16 @@ test("shell adapts across breakpoints and keeps account controls separate", asyn
       sidebar.getByRole("button", { name: /Current venture: Ridgeway Studio/ }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Open menu" })).toBeHidden();
+    // Command Centre (Figma 8:651) keeps team access inside its 220px premium shell.
+    await expect(sidebar.getByRole("link", { name: "Team & permissions" })).toBeVisible();
 
-    // Tablet: the sidebar collapses to an icon rail; names stay available to assistive tech.
+    // Tablet: the global shell's sidebar collapses to an icon rail; names stay available
+    // to assistive tech. Command Centre's own shell keeps its 220px sidebar to 768px.
+    await page.goto(`/v/${ventureId}/settings/team`);
     await page.setViewportSize({ width: 900, height: 900 });
     const box = await sidebar.boundingBox();
     expect(box?.width).toBe(76);
-    await expect(sidebar.getByRole("link", { name: "Command", exact: true })).toHaveAttribute(
+    await expect(sidebar.getByRole("link", { name: "Team & permissions" })).toHaveAttribute(
       "aria-current",
       "page",
     );
@@ -40,6 +44,9 @@ test("shell adapts across breakpoints and keeps account controls separate", asyn
     const sheet = page.getByRole("dialog", { name: "Menu" });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByRole("link", { name: "Team & permissions" })).toBeVisible();
+    await expect(
+      sheet.getByRole("button", { name: /Current venture: Ridgeway Studio/ }),
+    ).toBeVisible();
     await expectNoA11yViolations(page);
     await page.keyboard.press("Escape");
     await expect(sheet).toBeHidden();
@@ -53,17 +60,39 @@ test("shell adapts across breakpoints and keeps account controls separate", asyn
   await skip.press("Enter");
   await expect(page.locator("main#main")).toBeFocused();
 
-  // Account menu: account-level only, signs out.
-  // Desktop shows the named account control; mobile a 40px avatar button.
-  const account = page
-    .getByRole("banner")
-    .getByRole("button", { name: new RegExp(user.name) })
-    .filter({ visible: true });
+  // Account menu: account-level only, signs out. Command Centre (Figma 8:651) draws it at
+  // the foot of the sidebar on desktop and of the menu sheet on mobile, never in the top
+  // bar, and outside the venture navigation landmarks.
+  const accountName = new RegExp(user.name);
+  await expect(page.getByRole("banner").getByRole("button", { name: accountName })).toHaveCount(0);
+  const mobile = info.project.name === "mobile";
+  if (mobile) await page.getByRole("button", { name: "Open menu" }).click();
+  const container = mobile ? page.getByRole("dialog", { name: "Menu" }) : sidebar;
+  await expect(
+    container.getByRole("navigation").getByRole("button", { name: accountName }),
+  ).toHaveCount(0);
+  const account = container.getByRole("button", { name: accountName });
+  await expect(account).toHaveAccessibleName(`${user.name} Owner`);
   await expect(account).toHaveAttribute("aria-expanded", "false");
-  await account.click();
+
+  // Keyboard: Enter opens the panel it controls; Escape closes only the panel (the mobile
+  // sheet stays open) and returns focus to the trigger.
+  await account.focus();
+  await page.keyboard.press("Enter");
   await expect(account).toHaveAttribute("aria-expanded", "true");
-  await expect(page.getByText(user.email).filter({ visible: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sign out" }).filter({ visible: true }).click();
+  const panel = page.locator(`[id="${await account.getAttribute("aria-controls")}"]`);
+  await expect(panel).toBeVisible();
+  await expect(panel.getByText(user.email)).toBeVisible();
+  await expect(panel.getByRole("link", { name: "Profile & Security" })).toBeVisible();
+  await expectNoA11yViolations(page);
+  await page.keyboard.press("Escape");
+  await expect(account).toHaveAttribute("aria-expanded", "false");
+  await expect(panel).toBeHidden();
+  await expect(account).toBeFocused();
+  await expect(container).toBeVisible();
+
+  await account.click();
+  await panel.getByRole("button", { name: "Sign out" }).click();
   await page.waitForURL("**/auth/login");
 
   // Signed out, venture routes require sign-in and return afterwards.

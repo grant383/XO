@@ -24,6 +24,9 @@ export function usePopover<T extends HTMLElement = HTMLDivElement>() {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        // Escape closes only the innermost popup: without this, a popover inside the
+        // modal menu sheet would also close the sheet (the dialog's close request).
+        e.preventDefault();
         setOpen(false);
         triggerRef.current?.focus();
       }

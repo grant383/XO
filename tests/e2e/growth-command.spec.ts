@@ -31,14 +31,15 @@ test("Growth Command renders the approved shell and labelled Figma fixture", asy
   if (test.info().project.name === "desktop") {
     expect((await page.getByRole("complementary").boundingBox())?.width).toBe(220);
     expect((await page.getByRole("banner").boundingBox())?.height).toBe(48);
-    await expect(page.getByRole("link", { name: "Growth", exact: true })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-    await expect(page.getByRole("link", { name: "Command", exact: true })).not.toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    const operate = page.getByRole("complementary").getByRole("navigation", { name: "Operate" });
+    await expect(
+      operate.getByRole("link", { name: "£1M Growth Command", exact: true }),
+    ).toHaveAttribute("aria-current", "page");
+    for (const name of ["Command", "Growth"])
+      await expect(operate.getByRole("link", { name, exact: true })).not.toHaveAttribute(
+        "aria-current",
+        "page",
+      );
   }
   await page.addStyleTag({ content: "nextjs-portal { display:none; }" });
   await page.screenshot({
