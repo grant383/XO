@@ -31,6 +31,7 @@ describe("role defaults (spec §7)", () => {
         "command:view",
         "command:manage_tasks",
         "operations:view",
+        "growth:view",
       ]);
     }
     expect(capabilitiesOf("viewer")).toEqual(["venture:view", "command:view"]);

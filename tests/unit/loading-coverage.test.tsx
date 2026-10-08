@@ -46,6 +46,10 @@ const EXPECTED: Record<string, string | null> = {
   "dashboard/page.tsx": null,
   "v/[ventureId]/page.tsx": null,
   "v/[ventureId]/(shell)/command/page.tsx": "v/[ventureId]/(shell)/loading.tsx",
+  "v/[ventureId]/(shell)/command/growth-1m/page.tsx": "v/[ventureId]/(shell)/loading.tsx",
+  "v/[ventureId]/(shell)/operate/finance/page.tsx": "v/[ventureId]/(shell)/loading.tsx",
+  "v/[ventureId]/(shell)/operate/growth/page.tsx": "v/[ventureId]/(shell)/loading.tsx",
+  "v/[ventureId]/(shell)/operate/operations/page.tsx": "v/[ventureId]/(shell)/loading.tsx",
   "v/[ventureId]/(shell)/settings/team/page.tsx": "v/[ventureId]/(shell)/loading.tsx",
 };
 
