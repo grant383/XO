@@ -64,7 +64,8 @@ export function AppShell({ venture, ventures, user, nav, children }: Props) {
       pathname === `/v/${venture.id}/operate/finance` ||
       pathname === `/v/${venture.id}/operate/operations` ||
       pathname === `/v/${venture.id}/operate/growth` ||
-      pathname === `/v/${venture.id}/operate/technology`)
+      pathname === `/v/${venture.id}/operate/technology` ||
+      pathname === `/v/${venture.id}/operate/crm`)
   ) {
     return (
       <CommandShell venture={venture} ventures={ventures} user={user} nav={nav}>

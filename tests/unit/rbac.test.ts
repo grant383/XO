@@ -33,6 +33,7 @@ describe("role defaults (spec §7)", () => {
         "operations:view",
         "growth:view",
         "technology:view",
+        "crm:view",
       ]);
     }
     expect(capabilitiesOf("viewer")).toEqual(["venture:view", "command:view"]);

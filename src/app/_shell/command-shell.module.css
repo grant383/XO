@@ -290,6 +290,24 @@
   font-weight: 500;
 }
 
+.totals {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #8e93a4;
+}
+.totals strong {
+  color: white;
+  font-weight: 600;
+}
+.totals > span {
+  margin: 0 12px;
+  color: var(--text-muted);
+}
+.totals .active {
+  color: #10b981;
+}
+
 /* Venture switcher (shared component) sized to the 220px sidebar. */
 .venture {
   padding: 0 16px 12px;

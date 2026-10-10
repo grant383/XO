@@ -36,12 +36,30 @@ const sections = [
   },
   {
     label: "Operate",
-    items: ["Command", "£1M Growth Command", "Finance", "Operations", "Growth", "Technology"],
+    items: [
+      "Command",
+      "£1M Growth Command",
+      "Clients",
+      "Finance",
+      "Operations",
+      "Growth",
+      "Technology",
+    ],
   },
 ];
 
+/** Breadcrumb label per Command-shell route; anything else under /command is Command. */
+const PAGE_LABELS = [
+  ["/command/growth-1m", "£1M Growth Command"],
+  ["/operate/crm", "Clients"],
+  ["/operate/finance", "Finance"],
+  ["/operate/operations", "Operations"],
+  ["/operate/growth", "Growth"],
+  ["/operate/technology", "Technology"],
+] as const;
+
 /** Operate items gated by role rather than by shipping status. */
-const roleGated = new Set(["Operations", "Growth", "Technology"]);
+const roleGated = new Set(["Clients", "Operations", "Growth", "Technology"]);
 
 /**
  * Node 8:651 has its own dense navigation. An item links only when the server-built nav
@@ -69,6 +87,7 @@ export function CommandShell({
   const finance = pathname.endsWith("/operate/finance");
   const operations = pathname.endsWith("/operate/operations");
   const technology = pathname.endsWith("/operate/technology");
+  const crm = pathname.endsWith("/operate/crm");
 
   // Close the mobile menu after navigation (including a venture switch).
   useEffect(() => {
@@ -181,17 +200,7 @@ export function CommandShell({
             <span>Operate</span>
             <span>/</span>
             <span>
-              {technology
-                ? "Technology"
-                : operateGrowth
-                  ? "Growth"
-                  : operations
-                    ? "Operations"
-                    : finance
-                      ? "Finance"
-                      : growth
-                        ? "£1M Growth Command"
-                        : "Command"}
+              {PAGE_LABELS.find(([suffix]) => pathname.endsWith(suffix))?.[1] ?? "Command"}
             </span>
           </p>
           <div className={styles.meta}>
@@ -200,6 +209,12 @@ export function CommandShell({
                 <span className={styles.period}>
                   Period: August 2026{" "}
                   <img src="/ui/finance/chevron.svg" width="10" height="10" alt="" />
+                </span>
+              ) : crm ? (
+                <span className={styles.totals}>
+                  Total Clients: <strong>87</strong>
+                  <span aria-hidden="true">|</span>
+                  Active: <strong className={styles.active}>64</strong>
                 </span>
               ) : technology ? (
                 <span className={styles.systemStatus}>

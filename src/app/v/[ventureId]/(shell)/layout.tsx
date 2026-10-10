@@ -47,6 +47,9 @@ function navigationFor(access: VentureAccess): ShellNavSection[] {
   if (can(access.role, "growth:view")) {
     sections[0]?.items.push({ href: `${base}/operate/growth`, label: "Growth", exact: true });
   }
+  if (can(access.role, "crm:view")) {
+    sections[0]?.items.push({ href: `${base}/operate/crm`, label: "Clients", exact: true });
+  }
   if (can(access.role, "technology:view")) {
     sections[0]?.items.push({
       href: `${base}/operate/technology`,
