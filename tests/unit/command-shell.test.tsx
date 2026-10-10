@@ -11,6 +11,7 @@ const venture = { id: "v1", name: "Atlas Home Services", roleLabel: "Owner" };
 const ventures = [venture, { id: "v2", name: "Beta Supplies", roleLabel: "Viewer" }];
 const user = { name: "Ada Owner", email: "ada@example.test" };
 
+const ROUTES: Record<string, string> = { Clients: "crm", Scheduling: "schedule" };
 const operate = (extra: string[] = []): ShellNavSection => ({
   label: "Operate",
   items: [
@@ -18,7 +19,7 @@ const operate = (extra: string[] = []): ShellNavSection => ({
     { href: "/v/v1/command/growth-1m", label: "£1M Growth Command", exact: true },
     { href: "/v/v1/operate/finance", label: "Finance", exact: true },
     ...extra.map((label) => ({
-      href: `/v/v1/operate/${label === "Clients" ? "crm" : label.toLowerCase()}`,
+      href: `/v/v1/operate/${ROUTES[label] ?? label.toLowerCase()}`,
       label,
       exact: true,
     })),
@@ -70,15 +71,20 @@ describe("CommandShell", () => {
     expect(viewer).not.toContain("Growth");
     expect(viewer).not.toContain("Technology");
     expect(viewer).not.toContain("Clients");
+    expect(viewer).not.toContain("Scheduling");
     expect(viewer).not.toContain("Team &amp; permissions");
     expect(viewer).toContain("Profile &amp; Security");
 
     const owner = links(
-      render([operate(["Operations", "Growth", "Technology", "Clients"]), system(true)]),
+      render([
+        operate(["Operations", "Growth", "Technology", "Clients", "Scheduling"]),
+        system(true),
+      ]),
     ).map((l) => l.label);
     expect(owner).toEqual(
       expect.arrayContaining([
         "Clients",
+        "Scheduling",
         "Operations",
         "Growth",
         "Technology",
@@ -105,22 +111,30 @@ describe("CommandShell", () => {
     ["/v/v1/operate/growth", "Growth"],
     ["/v/v1/operate/technology", "Technology"],
     ["/v/v1/operate/crm", "Clients"],
+    ["/v/v1/operate/schedule", "Scheduling"],
   ])("marks only the current route on %s", (path, label) => {
     pathname = path;
-    const html = render([operate(["Operations", "Growth", "Technology", "Clients"]), system(true)]);
+    const html = render([
+      operate(["Operations", "Growth", "Technology", "Clients", "Scheduling"]),
+      system(true),
+    ]);
     const current = links(html).filter((l) => l.current);
     expect(current.map((l) => l.label)).toEqual([label]);
     expect(html).toContain(`<span>/</span><span>${label}</span></p>`);
   });
 
   it("offers the same authorised destinations in the mobile menu", () => {
-    const html = render([operate(["Operations", "Growth", "Technology", "Clients"]), system(true)]);
+    const html = render([
+      operate(["Operations", "Growth", "Technology", "Clients", "Scheduling"]),
+      system(true),
+    ]);
     const menu = html.slice(html.indexOf("<dialog"), html.indexOf("</dialog>"));
     for (const href of [
       "/v/v1/command",
       "/v/v1/operate/growth",
       "/v/v1/operate/technology",
       "/v/v1/operate/crm",
+      "/v/v1/operate/schedule",
       "/v/v1/settings/team",
       "/settings/profile-security",
       "/v/v2/command",

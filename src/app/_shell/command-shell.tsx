@@ -42,6 +42,7 @@ const sections = [
       "Clients",
       "Finance",
       "Operations",
+      "Scheduling",
       "Growth",
       "Technology",
     ],
@@ -54,12 +55,13 @@ const PAGE_LABELS = [
   ["/operate/crm", "Clients"],
   ["/operate/finance", "Finance"],
   ["/operate/operations", "Operations"],
+  ["/operate/schedule", "Scheduling"],
   ["/operate/growth", "Growth"],
   ["/operate/technology", "Technology"],
 ] as const;
 
 /** Operate items gated by role rather than by shipping status. */
-const roleGated = new Set(["Clients", "Operations", "Growth", "Technology"]);
+const roleGated = new Set(["Clients", "Operations", "Scheduling", "Growth", "Technology"]);
 
 /**
  * Node 8:651 has its own dense navigation. An item links only when the server-built nav
@@ -88,6 +90,7 @@ export function CommandShell({
   const operations = pathname.endsWith("/operate/operations");
   const technology = pathname.endsWith("/operate/technology");
   const crm = pathname.endsWith("/operate/crm");
+  const schedule = pathname.endsWith("/operate/schedule");
 
   // Close the mobile menu after navigation (including a venture switch).
   useEffect(() => {
@@ -223,7 +226,7 @@ export function CommandShell({
                 </span>
               ) : operateGrowth ? (
                 <span className={styles.growthRate}>Sample growth rate: +12% MoM</span>
-              ) : growth || operations ? (
+              ) : growth || operations || schedule ? (
                 "Fixed Figma fixture"
               ) : (
                 "Thursday 4 Sep 2026"

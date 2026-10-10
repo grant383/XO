@@ -75,7 +75,7 @@ Do **not** treat exported/generated Figma code as the application architecture. 
 | `10:3734` | Operate Growth | `/v/[ventureId]/operate/growth` | Operate | Operator+ | P1 | **LOCAL COMPLETE — ready for review** — [verification](verification/operate-growth.md) |
 | `10:4344` | Operate Technology | `/v/[ventureId]/operate/technology` | Operate | Operator+ | P1 | **LOCAL COMPLETE — ready for review** — [verification](verification/operate-technology.md) |
 | `14:4` | Client CRM | `/v/[ventureId]/operate/crm` | Operate | Operator+ | P1 | **LOCAL COMPLETE — ready for review** — [verification](verification/operate-crm.md) |
-| `14:438` | Scheduling Calendar | `/v/[ventureId]/operate/schedule` | Operate | Operator+ | P1 | NOT STARTED |
+| `14:438` | Scheduling Calendar | `/v/[ventureId]/operate/schedule` | Operate | Operator+ | P1 | **LOCAL COMPLETE — ready for review** — [verification](verification/operate-schedule.md) |
 | `14:740` | Quoting and Invoicing | `/v/[ventureId]/operate/billing` | Operate | Operator+ | P1 | NOT STARTED |
 | `14:1060` | Forecast vs Actual | `/v/[ventureId]/operate/forecast-vs-actual` | Operate | Viewer+ | P1 | NOT STARTED |
 | `14:1766` | AI Copilot | `/v/[ventureId]/intelligence/copilot` | Intelligence | Viewer+ | P2 | NOT STARTED |

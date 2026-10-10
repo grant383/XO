@@ -44,6 +44,13 @@ function navigationFor(access: VentureAccess): ShellNavSection[] {
       exact: true,
     });
   }
+  if (can(access.role, "scheduling:view")) {
+    sections[0]?.items.push({
+      href: `${base}/operate/schedule`,
+      label: "Scheduling",
+      exact: true,
+    });
+  }
   if (can(access.role, "growth:view")) {
     sections[0]?.items.push({ href: `${base}/operate/growth`, label: "Growth", exact: true });
   }
